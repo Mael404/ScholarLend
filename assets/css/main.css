@@ -22,7 +22,7 @@
   --background-color: #ffffff; /* Background color for the entire website, including individual sections */
   --default-color: #444444; /* Default color used for the majority of the text content across the entire website */
   --heading-color: #0f394c; /* Color for headings, subheadings and title throughout the website */
-  --accent-color: #49b5e7; /* Accent color that represents your brand on the website. It's used for buttons, links, and other elements that need to stand out */
+  --accent-color: #caaa82; /* Accent color that represents your brand on the website. It's used for buttons, links, and other elements that need to stand out */
   --surface-color: #ffffff; /* The surface color is used as a background of boxed elements within sections, such as cards, icon boxes, or other elements that require a visual separation from the global background. */
   --contrast-color: #ffffff; /* Contrast color for text, ensuring readability against backgrounds of accent, heading, or default colors. */
 }
@@ -1721,3 +1721,24 @@ section,
     animation: fadeInUp 1.5s ease-in-out;
 }
 
+.custom-dropdown-menu {
+  width: 400px; /* Adjust the width as needed */
+}
+
+.custom-dropdown-item {
+  font-size: 1.2rem; /* Adjust the font size as needed */
+  padding: 1rem; /* Adjust the padding as needed */
+}
+
+.custom-dropdown-item .form-control {
+  width: 100%;
+}
+
+.card-img-top {
+  padding: 10px; /* Add padding around the image */
+  border-radius: 15px; /* Rounded corners */
+  object-fit: cover; /* Makes sure the image covers the entire area */
+  width: 100%; /* Ensures the image is responsive */
+  height: 200px; /* Fixed height, adjust as needed */
+  box-sizing: border-box; /* Ensures padding is included in width/height */
+}
