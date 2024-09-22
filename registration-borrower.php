@@ -80,97 +80,96 @@
             </p>
           </div>
 
-          <form>
-            <div class="row mb-3">
-              <div class="col-12 col-md-4 mb-3">
-                <div class="form-floating">
-                  <input type="text" class="form-control form-control-sm" id="firstName" placeholder="First Name" style="font-size: 0.9rem;">
-                  <label for="firstName">First Name</label>
-                </div>
-              </div>
-              <div class="col-12 col-md-4 mb-3">
-                <div class="form-floating">
-                  <input type="text" class="form-control form-control-sm" id="middleName" placeholder="Middle Name" style="font-size: 0.9rem;">
-                  <label for="middleName">Middle Name</label>
-                </div>
-              </div>
-              <div class="col-12 col-md-4 mb-3">
-                <div class="form-floating">
-                  <input type="text" class="form-control form-control-sm" id="lastName" placeholder="Last Name" style="font-size: 0.9rem;">
-                  <label for="lastName">Last Name</label>
-                </div>
-              </div>
-            </div>
+          <form id="registrationForm" action="register.php" method="POST">
+  <div class="row mb-3">
+    <div class="col-12 col-md-4 mb-3">
+      <div class="form-floating">
+        <input type="text" class="form-control form-control-sm" id="firstName" name="firstName" placeholder="First Name" style="font-size: 0.9rem;" required>
+        <label for="firstName">First Name</label>
+      </div>
+    </div>
+    <div class="col-12 col-md-4 mb-3">
+      <div class="form-floating">
+        <input type="text" class="form-control form-control-sm" id="middleName" name="middleName" placeholder="Middle Name" style="font-size: 0.9rem;" required>
+        <label for="middleName">Middle Name</label>
+      </div>
+    </div>
+    <div class="col-12 col-md-4 mb-3">
+      <div class="form-floating">
+        <input type="text" class="form-control form-control-sm" id="lastName" name="lastName" placeholder="Last Name" style="font-size: 0.9rem;" required>
+        <label for="lastName">Last Name</label>
+      </div>
+    </div>
+  </div>
 
-            <div class="mb-3">
-              <div class="form-floating">
-                <input type="date" class="form-control form-control-sm" id="birthdate" placeholder="Birthdate" style="font-size: 0.9rem;">
-                <label for="birthdate">Birthdate</label>
-              </div>
-            </div>
+  <div class="mb-3">
+    <div class="form-floating">
+      <input type="date" class="form-control form-control-sm" id="birthdate" name="birthdate" placeholder="Birthdate" style="font-size: 0.9rem;" required>
+      <label for="birthdate">Birthdate</label>
+    </div>
+  </div>
 
-            <div class="mb-3">
-              <div class="form-floating">
-                <input type="tel" class="form-control form-control-sm" id="phoneNumber" placeholder="Phone Number" style="font-size: 0.9rem;">
-                <label for="phoneNumber">Phone Number</label>
-              </div>
-            </div>
+  <div class="mb-3">
+    <div class="form-floating">
+      <input type="tel" class="form-control form-control-sm" id="phoneNumber" name="phoneNumber" placeholder="Phone Number" style="font-size: 0.9rem;" required>
+      <label for="phoneNumber">Phone Number</label>
+    </div>
+  </div>
 
-            <div class="mb-3">
-              <div class="form-floating">
-                <input type="email" class="form-control form-control-sm" id="email" placeholder="Email address" style="font-size: 0.9rem;">
-                <label for="email">Email address</label>
-              </div>
-            </div>
+  <div class="mb-3">
+    <div class="form-floating">
+      <input type="email" class="form-control form-control-sm" id="email" name="email" placeholder="Email address" style="font-size: 0.9rem;" required>
+      <label for="email">Email address</label>
+    </div>
+  </div>
 
-            <div class="mb-3">
-              <div class="form-floating">
-                <input type="password" class="form-control form-control-sm" id="password" placeholder="Password" style="font-size: 0.9rem;">
-                <label for="password">Password</label>
-              </div>
-            </div>
+  <div class="mb-3">
+    <div class="form-floating">
+      <input type="password" class="form-control form-control-sm" id="password" name="password" placeholder="Password" style="font-size: 0.9rem;" required>
+      <label for="password">Password</label>
+    </div>
+  </div>
 
-            <div class="mb-3">
-              <div class="form-floating">
-                <input type="password" class="form-control form-control-sm" id="confirmPassword" placeholder="Confirm Password" style="font-size: 0.9rem;">
-                <label for="confirmPassword">Confirm Password</label>
-              </div>
-            </div>
+  <div class="mb-3">
+    <div class="form-floating">
+      <input type="password" class="form-control form-control-sm" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" style="font-size: 0.9rem;" required>
+      <label for="confirmPassword">Confirm Password</label>
+    </div>
+  </div>
 
-            <div class="d-grid gap-2 mt-3">
-              <button type="button" class="btn btn-primary" id="submitBtn" style="background: #caac82; border-color: #caac82; font-size: 0.9rem;">Create Account</button>
-              <a href="login.html" class="btn btn-outline-primary" style="color: #caac82; border-color: #caac82; font-size: 0.9rem;">Log In</a>
-            </div>
-          </form>
+  <div class="d-grid gap-2 mt-3">
+    <button type="submit" class="btn btn-primary" id="submitBtn" style="background: #caac82; border-color: #caac82; font-size: 0.9rem;">Create Account</button>
+    <a href="login.html" class="btn btn-outline-primary" style="color: #caac82; border-color: #caac82; font-size: 0.9rem;">Log In</a>
+  </div>
+</form>
 
-          <!-- MODALS -->
-          <!-- Account Terms Modal -->
-          <div class="modal fade" id="accountModal" tabindex="-1" aria-labelledby="accountModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="accountModalLabel" style="font-family: 'Times New Roman', Times, serif; color:#caac82;">Oops, one more thing</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  <p>To finish creating your account, please agree to the user terms and conditions:</p>
-                  <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" id="agreeTerms">
-                    <label class="form-check-label" for="agreeTerms">I agree to the terms and conditions (required)</label>
-                  </div>
-                  <div class="form-check mb-3">
-                    <input class="form-check-input" type="checkbox" id="emailUpdates">
-                    <label class="form-check-label" for="emailUpdates">I want to receive updates about my loans and promotions via email (optional)</label>
-                  </div>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-primary" id="sendOtpBtn" style="background-color:#caac82; border: none;">Send OTP</button>
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel Registration</button>
-                </div>
-              </div>
-            </div>
-          </div>
 
+         <!-- MODALS -->
+<div class="modal fade" id="accountModal" tabindex="-1" aria-labelledby="accountModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="accountModalLabel" style="font-family: 'Times New Roman', Times, serif; color:#caac82;">Oops, one more thing</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p>To finish creating your account, please agree to the user terms and conditions:</p>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="agreeTerms">
+          <label class="form-check-label" for="agreeTerms">I agree to the terms and conditions (required)</label>
+        </div>
+        <div class="form-check mb-3">
+          <input class="form-check-input" type="checkbox" id="emailUpdates">
+          <label class="form-check-label" for="emailUpdates">I want to receive updates about my loans and promotions via email (optional)</label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="sendOtpBtn" style="background-color:#caac82; border: none;">Send OTP</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel Registration</button>
+      </div>
+    </div>
+  </div>
+</div>
           <!-- Terms Notice Modal -->
           <div class="modal fade" id="agreeTermsModal" tabindex="-1" aria-labelledby="agreeTermsModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -201,7 +200,8 @@
                   OTP has been sent to your email!
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="window.location.href='user_otp.html';">OK</button>
+
                 </div>
               </div>
             </div>
@@ -248,7 +248,10 @@
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
   <script>
-  document.getElementById('submitBtn').addEventListener('click', function() {
+  document.getElementById('submitBtn').addEventListener('click', function(event) {
+    // Prevent form submission to show the modal instead
+    event.preventDefault();
+    
     // Trigger modal when the "Create Account" button is clicked
     var accountModal = new bootstrap.Modal(document.getElementById('accountModal'));
     accountModal.show();
@@ -262,15 +265,14 @@
       var agreeTermsModal = new bootstrap.Modal(document.getElementById('agreeTermsModal'));
       agreeTermsModal.show();
     } else {
-      // Show "OTP Sent" modal
-      var otpSentModal = new bootstrap.Modal(document.getElementById('otpSentModal'));
-      otpSentModal.show();
-
-      // Close the original modal after OTP is sent (assuming you have the accountModal)
+      // Close the account modal
       var accountModal = bootstrap.Modal.getInstance(document.getElementById('accountModal'));
       if (accountModal) {
         accountModal.hide();
       }
+
+      // Submit the form to register.php to send the OTP
+      document.getElementById('registrationForm').submit();
     }
   });
 </script>
