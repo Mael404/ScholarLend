@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Starter Page - Butterfly Bootstrap Template</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Jost:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+  <!-- Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet">
+
+</head>
+
+<body class="starter-page-page">
+
+  <main class="main">
+
+    <section id="hero" class="hero section light-background" style="position: relative; background-image: url('assets/img/hero-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 100vh;">
+      <!-- Overlay with z-index to be behind content -->
+      <div class="overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(19, 30, 61, 0.7); z-index: 1;">
+          <a href="javascript:history.back()" class="go-back-btn" style="position: relative; z-index: 3; padding: 10px 20px; display: inline-block;">
+              <i class="fa fa-angle-left" aria-hidden="true" style="margin-right: 10px;"></i> Go Back
+          </a>
+      </div>
+  
+      <!-- Content section with z-index higher than overlay -->
+      <div class="container" style="position: relative; z-index: 2;">
+          <div class="row g-1">
+              <!-- First box, custom height and responsive width -->
+              <div class="col-lg-7 col-md-6 col-sm-12 mb-4 first-box">
+                  <div class="customs-box" style="background-color: #f5f5f5; padding: 20px; border-radius: 10px; height: 100%; min-height: 400px;">
+                      <div class="d-flex align-items-center flex-column flex-sm-row">
+                          <img src="assets/img/about.jpg" alt="Profile Picture" class="img-fluid" style="border-radius: 50%; width: 100px; height: 100px; margin-right: 20px;">
+                          <div class="text-center text-sm-start mt-3 mt-sm-0">
+                              <h3 style="margin: 0;">Borrower A</h3>
+                              <p style="margin: 0;">Junior</p>
+                          </div>
+                      </div>
+                      <br>
+                      <h4>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Hic ut nostrum repellendus minima ipsum reprehenderit asperiores distinctio perferendis earum quasi.</h4>
+                  </div>
+              </div>
+  
+              <div class="col-lg-5 col-md-6 col-sm-12 mb-4 second-box">
+                <div class="customs-box d-flex flex-column align-items-center justify-content-center" style="background-color: #f5f5f5; padding: 0 20px 60px 20px; border-radius: 10px; min-height: 300px; margin-top: 45px;">
+                    <!-- Keep the title aligned to the left on larger screens and centered on small screens -->
+                    <h4 class="w-100 text-center text-md-start">Help fund this loan</h4>
+                    <!-- Center the input and button -->
+                    <div class="input-group mt-3" style="width: 100%; max-width: 300px;">
+                        <input type="text" class="form-control textbox" value="Amount" readonly>
+                        <button class="btn btn-danger button">Lend now</button>
+                    </div>
+                </div>
+            </div>
+            
+            
+
+          </div>
+      </div>
+  </section>
+  
+   
+   <!-- CSS for responsiveness -->
+   <style>
+     /* Ensure "Go Back" button is always visible */
+     .go-back-btn {
+       position: absolute;
+       top: 10px;  /* Adjust as needed */
+       left: 20px; /* Adjust as needed */
+       z-index: 3; /* Higher z-index so it stays on top */
+       color: white;
+       font-size: 18px;
+       text-decoration: none;
+     }
+   
+     /* Make sure the height and width adjust dynamically */
+     .customs-box {
+       width: 100%;
+       max-width: 100%;
+     }
+   
+     /* Adjustments for medium screens (768px - 991px) */
+     @media (max-width: 991px) {
+       .customs-box {
+         height: auto; /* Let height adjust to content */
+       }
+     }
+   
+     /* Adjustments for small screens (max-width: 767px) */
+     @media (max-width: 767px) {
+  
+       .customs-box {
+         height: auto; /* Auto height for small screens */
+         margin-top: -50px; /* Remove any top margin */
+       }
+   
+       /* Full width for the columns on small screens */
+       .col-lg-7, .col-lg-5 {
+         width: 100%;
+       }
+   
+       /* Add margin-top for the first box on mobile view */
+       .first-box {
+         margin-top: 20px;
+       }
+   
+       /* Reduce the height of the first box in mobile view */
+       .first-box .customs-box {
+         height: 300px; /* Reduce height for mobile view */
+       }
+   
+       /* Reduce the height of the second box in mobile view */
+       .col-lg-5 .customs-box {
+         height: 250px; /* Reduce height for mobile view */
+       }
+
+       .second-box{
+        margin-top: -40px;
+       }
+     }
+
+     .input-group {
+    display: flex;
+    align-items: center;
+}
+
+.form-control.textbox {
+    flex: 1;
+    margin-right: 10px; /* Spacing between the textbox and button */
+    max-width: 150px; /* Adjust width as needed */
+    background-color: #e9ecef;
+    border: 1px solid #ced4da;
+}
+
+.btn-danger.button {
+    flex: 0 0 200px; /* Fixed width for the button, adjust as needed */
+    background-color: red;
+    border-color: red;
+}
+
+   </style>
+   
+   
+   
+   
+    
+    
+    
+
+  </main>
+  
+  
+  
+  
+
+
+
+
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Main JS File -->
+  <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>

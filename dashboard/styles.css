@@ -1,0 +1,98 @@
+:root {
+  --main-bg-color: #009d63;
+  --main-text-color: #009d63;
+  --second-text-color: #bbbec5;
+  --second-bg-color: #c1efde;
+}
+
+.primary-text {
+  color: black;
+}
+
+.second-text {
+  color: var(--second-text-color);
+}
+
+.primary-bg {
+  background-color: var(--main-bg-color);
+}
+
+.secondary-bg {
+  background-color: var(--second-bg-color);
+}
+
+.rounded-full {
+  border-radius: 100%;
+}
+
+
+
+#sidebar-wrapper {
+  min-height: 100vh; /* Ensures the sidebar takes full viewport height */
+  margin-left: -25rem; /* Initially hidden */
+  transition: margin 0.25s ease-out;
+  border-right: 4px solid #f0f0f0; /* Adds a 4px border on the left with a gray color */
+}
+
+
+#sidebar-wrapper .sidebar-heading {
+  padding: 0.875rem 1.25rem;
+  font-size: 1.2rem;
+}
+
+#sidebar-wrapper .list-group {
+  width: 25rem;
+}
+
+#page-content-wrapper {
+  min-width: 100vw; /* Full width by default */
+}
+
+#wrapper.toggled #sidebar-wrapper {
+  margin-left: 0; /* Show the sidebar */
+}
+
+#wrapper.toggled #page-content-wrapper {
+  min-width: calc(100vw - 25rem); /* Adjust to account for sidebar width */
+}
+
+#menu-toggle {
+  cursor: pointer;
+}
+
+.list-group-item {
+  border: none;
+  padding: 20px 30px;
+}
+
+.list-group-item.active {
+  background-color: transparent;
+  color: var(--main-text-color);
+  font-weight:100;
+  border: none;
+}
+
+.list-group-item {
+  border-radius: 8px; /* Add border radius to list items */
+  transition: background-color 0.3s ease; /* Smooth transition effect */
+}
+
+.list-group-item:hover {
+  background-color: brown; /* Set background color on hover */
+  color: black; /* Set text color on hover */
+}
+
+@media (min-width: 768px) {
+  #sidebar-wrapper {
+    margin-left: 0; /* Always visible on larger screens */
+  }
+
+  #page-content-wrapper {
+    min-width: 0;
+    width: 100%; /* Full width on larger screens */
+  }
+
+  #wrapper.toggled #sidebar-wrapper {
+    margin-left: -25rem; /* Hide on toggle */
+  }
+}
