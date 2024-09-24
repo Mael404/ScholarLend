@@ -27,13 +27,7 @@
   <!-- Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
 
-  <!-- =======================================================
-  * Template Name: Butterfly
-  * Template URL: https://bootstrapmade.com/butterfly-free-bootstrap-theme/
-  * Updated: Aug 07 2024 with Bootstrap v5.3.3
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
+
 </head>
 
 <body class="starter-page-page">
@@ -80,68 +74,68 @@
             </p>
           </div>
 
-          <form id="registrationForm" action="register.php" method="POST">
-  <div class="row mb-3">
-    <div class="col-12 col-md-4 mb-3">
-      <div class="form-floating">
-        <input type="text" class="form-control form-control-sm" id="firstName" name="firstName" placeholder="First Name" style="font-size: 0.9rem;" required>
-        <label for="firstName">First Name</label>
+              <form id="registrationForm" action="register.php" method="POST">
+      <div class="row mb-3">
+        <div class="col-12 col-md-4 mb-3">
+          <div class="form-floating">
+            <input type="text" class="form-control form-control-sm" id="firstName" name="firstName" placeholder="First Name" style="font-size: 0.9rem;" required>
+            <label for="firstName">First Name</label>
+          </div>
+        </div>
+        <div class="col-12 col-md-4 mb-3">
+          <div class="form-floating">
+            <input type="text" class="form-control form-control-sm" id="middleName" name="middleName" placeholder="Middle Name" style="font-size: 0.9rem;" required>
+            <label for="middleName">Middle Name</label>
+          </div>
+        </div>
+        <div class="col-12 col-md-4 mb-3">
+          <div class="form-floating">
+            <input type="text" class="form-control form-control-sm" id="lastName" name="lastName" placeholder="Last Name" style="font-size: 0.9rem;" required>
+            <label for="lastName">Last Name</label>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="col-12 col-md-4 mb-3">
-      <div class="form-floating">
-        <input type="text" class="form-control form-control-sm" id="middleName" name="middleName" placeholder="Middle Name" style="font-size: 0.9rem;" required>
-        <label for="middleName">Middle Name</label>
+
+      <div class="mb-3">
+        <div class="form-floating">
+          <input type="date" class="form-control form-control-sm" id="birthdate" name="birthdate" placeholder="Birthdate" style="font-size: 0.9rem;" required>
+          <label for="birthdate">Birthdate</label>
+        </div>
       </div>
-    </div>
-    <div class="col-12 col-md-4 mb-3">
-      <div class="form-floating">
-        <input type="text" class="form-control form-control-sm" id="lastName" name="lastName" placeholder="Last Name" style="font-size: 0.9rem;" required>
-        <label for="lastName">Last Name</label>
+
+      <div class="mb-3">
+        <div class="form-floating">
+          <input type="tel" class="form-control form-control-sm" id="phoneNumber" name="phoneNumber" placeholder="Phone Number" style="font-size: 0.9rem;" required>
+          <label for="phoneNumber">Phone Number</label>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <div class="mb-3">
-    <div class="form-floating">
-      <input type="date" class="form-control form-control-sm" id="birthdate" name="birthdate" placeholder="Birthdate" style="font-size: 0.9rem;" required>
-      <label for="birthdate">Birthdate</label>
-    </div>
-  </div>
+      <div class="mb-3">
+        <div class="form-floating">
+          <input type="email" class="form-control form-control-sm" id="email" name="email" placeholder="Email address" style="font-size: 0.9rem;" required>
+          <label for="email">Email address</label>
+        </div>
+      </div>
 
-  <div class="mb-3">
-    <div class="form-floating">
-      <input type="tel" class="form-control form-control-sm" id="phoneNumber" name="phoneNumber" placeholder="Phone Number" style="font-size: 0.9rem;" required>
-      <label for="phoneNumber">Phone Number</label>
-    </div>
-  </div>
+      <div class="mb-3">
+        <div class="form-floating">
+          <input type="password" class="form-control form-control-sm" id="password" name="password" placeholder="Password" style="font-size: 0.9rem;" required>
+          <label for="password">Password</label>
+        </div>
+      </div>
 
-  <div class="mb-3">
-    <div class="form-floating">
-      <input type="email" class="form-control form-control-sm" id="email" name="email" placeholder="Email address" style="font-size: 0.9rem;" required>
-      <label for="email">Email address</label>
-    </div>
-  </div>
+      <div class="mb-3">
+        <div class="form-floating">
+          <input type="password" class="form-control form-control-sm" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" style="font-size: 0.9rem;" required>
+          <label for="confirmPassword">Confirm Password</label>
+        </div>
+      </div>
 
-  <div class="mb-3">
-    <div class="form-floating">
-      <input type="password" class="form-control form-control-sm" id="password" name="password" placeholder="Password" style="font-size: 0.9rem;" required>
-      <label for="password">Password</label>
-    </div>
-  </div>
-
-  <div class="mb-3">
-    <div class="form-floating">
-      <input type="password" class="form-control form-control-sm" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password" style="font-size: 0.9rem;" required>
-      <label for="confirmPassword">Confirm Password</label>
-    </div>
-  </div>
-
-  <div class="d-grid gap-2 mt-3">
-    <button type="submit" class="btn btn-primary" id="submitBtn" style="background: #caac82; border-color: #caac82; font-size: 0.9rem;">Create Account</button>
-    <a href="login.html" class="btn btn-outline-primary" style="color: #caac82; border-color: #caac82; font-size: 0.9rem;">Log In</a>
-  </div>
-</form>
+      <div class="d-grid gap-2 mt-3">
+        <button type="submit" class="btn btn-primary" id="submitBtn" style="background: #caac82; border-color: #caac82; font-size: 0.9rem;">Create Account</button>
+        <a href="login.html" class="btn btn-outline-primary" style="color: #caac82; border-color: #caac82; font-size: 0.9rem;">Log In</a>
+      </div>
+    </form>
 
 
          <!-- MODALS -->
@@ -188,24 +182,61 @@
             </div>
           </div>
 
-          <!-- OTP Sent Modal -->
-          <div class="modal fade" id="otpSentModal" tabindex="-1" aria-labelledby="otpSentModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="otpSentModalLabel">Success</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  OTP has been sent to your email!
-                </div>
-                <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="window.location.href='user_otp.html';">OK</button>
+          <!-- Age Restriction Modal -->
+<div class="modal fade" id="ageModal" tabindex="-1" aria-labelledby="ageModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="ageModalLabel">Age Restriction</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        You must be at least 18 years old to create an account.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-                </div>
-              </div>
-            </div>
-          </div>
+<!-- Password Mismatch Modal -->
+<div class="modal fade" id="passwordModal" tabindex="-1" aria-labelledby="passwordModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="passwordModalLabel">Password Mismatch</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Passwords do not match. Please try again.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Required Fields Alert -->
+<div class="modal fade" id="requiredFieldsModal" tabindex="-1" aria-labelledby="requiredFieldsModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="requiredFieldsModalLabel">Missing Information</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Please fill out all required fields.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+         
 
         </div>
       </div>
@@ -213,8 +244,6 @@
   </div>
 </section>
   
-
-
 
 
 
@@ -248,34 +277,97 @@
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
   <script>
+  // Calculate the age based on the provided birthdate
+  function calculateAge(birthdate) {
+    const today = new Date();
+    const birthDate = new Date(birthdate);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
+  }
+
+  // Form validation function
+  function validateForm() {
+    const birthdate = document.getElementById('birthdate').value;
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+
+    const inputs = document.querySelectorAll('#registrationForm input[required]');
+    let formIsValid = true;
+
+    // Check if any required field is empty
+    inputs.forEach(function(input) {
+      if (input.value.trim() === '') {
+        input.classList.add('is-invalid'); // Optionally add visual feedback
+        formIsValid = false;
+      } else {
+        input.classList.remove('is-invalid'); // Remove invalid class if field is filled
+      }
+    });
+
+    if (!formIsValid) {
+      // Show modal for missing information
+      const requiredFieldsModal = new bootstrap.Modal(document.getElementById('requiredFieldsModal'));
+      requiredFieldsModal.show();
+      return false; // Prevent the form from proceeding if fields are empty
+    }
+
+    // Age validation
+    if (birthdate) {
+      const age = calculateAge(birthdate);
+      if (age < 18) {
+        const ageModal = new bootstrap.Modal(document.getElementById('ageModal'));
+        ageModal.show();
+        return false; // Prevent form from submitting if under 18
+      }
+    }
+
+    // Password match validation
+    if (password !== confirmPassword) {
+      const passwordModal = new bootstrap.Modal(document.getElementById('passwordModal'));
+      passwordModal.show();
+      return false; // Prevent form from submitting if passwords do not match
+    }
+
+    return true; // All checks passed
+  }
+
+  // Event listener for the submit button click
   document.getElementById('submitBtn').addEventListener('click', function(event) {
-    // Prevent form submission to show the modal instead
-    event.preventDefault();
-    
-    // Trigger modal when the "Create Account" button is clicked
-    var accountModal = new bootstrap.Modal(document.getElementById('accountModal'));
-    accountModal.show();
+    event.preventDefault(); // Prevent default form submission
+
+    if (validateForm()) {
+      // Show account modal only if form is valid
+      const accountModal = new bootstrap.Modal(document.getElementById('accountModal'));
+      accountModal.show();
+    }
   });
 
+  // Event listener for sending OTP
   document.getElementById('sendOtpBtn').addEventListener('click', function() {
-    var agreeTerms = document.getElementById('agreeTerms').checked;
+    const agreeTerms = document.getElementById('agreeTerms').checked;
 
     if (!agreeTerms) {
-      // Show "Agree to Terms" modal
-      var agreeTermsModal = new bootstrap.Modal(document.getElementById('agreeTermsModal'));
+      // Show terms agreement modal if terms are not agreed
+      const agreeTermsModal = new bootstrap.Modal(document.getElementById('agreeTermsModal'));
       agreeTermsModal.show();
     } else {
-      // Close the account modal
-      var accountModal = bootstrap.Modal.getInstance(document.getElementById('accountModal'));
+      // Hide the account modal if terms are agreed
+      const accountModal = bootstrap.Modal.getInstance(document.getElementById('accountModal'));
       if (accountModal) {
         accountModal.hide();
       }
 
-      // Submit the form to register.php to send the OTP
+      // Submit the form if all checks passed
       document.getElementById('registrationForm').submit();
     }
   });
 </script>
+
+
 
 </body>
 

@@ -1,4 +1,7 @@
 <?php
+// Start the session to access session variables
+session_start(); // Start the session
+
 // Database connection
 $conn = new mysqli("localhost", "root", "", "scholarlend_db");
 
@@ -33,22 +36,25 @@ if (isset($_POST['email']) && isset($_POST['otp_digit_1']) && isset($_POST['otp_
                 $otp_expiry = $row['otp_expiry'];
                 $current_time = date('Y-m-d H:i:s');
 
-                // Debugging output (comment out in production)
-                // echo "Stored OTP: $stored_otp<br>";
-                // echo "OTP Expiry: $otp_expiry<br>";
-                // echo "Current Time: $current_time<br>";
-                // echo "Email: $email<br>";
-                // echo "Entered OTP: $otp_entered<br>";
-
-                // Check if OTP matches and is not expired
-                if (trim($otp_entered) === trim($stored_otp) && $current_time <= $otp_expiry) {
-                    echo "OTP verified successfully. You are now registered.";
+                // Check if the OTP matches
+                if (trim($otp_entered) === trim($stored_otp)) {
+                    // OTP is correct, proceed with registration
+                    echo "OTP verified successfully!";
+                    
+                    // Optionally, clear the session variables after successful verification
+                    unset($_SESSION['otp']);
+                    unset($_SESSION['email']);
+                    
                     // Update user status to 'verified'
                     $update_status = $conn->prepare("UPDATE users_tb SET is_verified = 1 WHERE email = ?");
                     if ($update_status) {
                         $update_status->bind_param("s", $email);
                         $update_status->execute();
                         $update_status->close();
+                        
+                        // Redirect to success.php
+                        header("Location: success.php");
+                        exit(); // Ensure script stops after redirection
                     } else {
                         echo "Failed to prepare update statement.";
                     }
