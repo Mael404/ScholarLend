@@ -38,15 +38,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['first_name'] = $user['first_name'];
             $_SESSION['account_role'] = $user['account_role'];
-
+           
             // Redirect based on role
-            if ($user['account_role'] == 'lender') {
-                header("Location: lenderdashboard.html");
-            } elseif ($user['account_role'] == 'borrower') {
-                header("Location: borrowerdashboard.html");
-            } else {
-                header("Location: dashboard.html");
-            }
+            // Redirect based on role
+if (strtolower($user['account_role']) == 'lender') {
+  header("Location: lenderdashboard.html");
+} elseif (strtolower($user['account_role']) == 'borrower') {
+  header("Location: borrower_dashboard.php");
+} else {
+  header("Location: dashboard.html");
+}
+
             exit();
         } else {
             // Set error message
