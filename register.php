@@ -32,24 +32,24 @@ $email_check_sql = "SELECT * FROM users_tb WHERE email = '$email' AND is_verifie
 $email_check_result = $conn->query($email_check_sql);
 
 if ($email_check_result->num_rows > 0) {
-    // If an entry is found with the specified email and it's verified
-    header("Location: email_failed.php"); // Redirect if the email is already verified
-    exit(); // Ensure no further code is executed after the redirect
+   
+    header("Location: email_failed.php"); 
+    exit(); 
 } else {
     // Generate OTP
     $otp = rand(100000, 999999);
-    $otp_expiry = date('Y-m-d H:i:s', strtotime('+10 minutes')); // OTP valid for 10 minutes
+    $otp_expiry = date('Y-m-d H:i:s', strtotime('+10 minutes')); 
 
-    // Insert user data along with OTP into the database, including accountRole
+ 
     $sql = "INSERT INTO users_tb (first_name, middle_name, last_name, birthdate, phone_number, email, password, otp, otp_expiry, account_role) 
             VALUES ('$firstName', '$middleName', '$lastName', '$birthdate', '$phoneNumber', '$email', '$password', '$otp', '$otp_expiry', '$accountRole')";
 
     if ($conn->query($sql) === TRUE) {
-        // After inserting, store OTP and email in the session
-        $_SESSION['otp'] = $otp; // Store OTP in session
-        $_SESSION['email'] = $email; // Store email in session
+       
+        $_SESSION['otp'] = $otp; 
+        $_SESSION['email'] = $email;
 
-        // Send OTP via email using PHPMailer
+       
         $subject = "Your OTP for Account Registration";
 
         $message = "
@@ -125,14 +125,14 @@ function send_mail($recipient, $subject, $message)
     $mail->SMTPSecure = "tls";
     $mail->Port       = 587;
     $mail->Host       = "smtp.gmail.com";
-    $mail->Username   = "maelaquino141@gmail.com";  // Your Gmail username
-    $mail->Password   = "aytbbzlqaordegbl";          // Your Gmail app-specific password
+    $mail->Username   = "maelaquino141@gmail.com";  
+    $mail->Password   = "aytbbzlqaordegbl";          
 
     $mail->IsHTML(true);
     $mail->AddAddress($recipient, "Esteemed Customer");
     $mail->SetFrom("ScholarLend@gmail.com", "ScholarLend");
     $mail->Subject = $subject;
-    $mail->MsgHTML($message);  // The message content
+    $mail->MsgHTML($message);  
 
     if (!$mail->Send()) {
         return false;

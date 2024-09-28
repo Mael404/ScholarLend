@@ -1,3 +1,66 @@
+<?php
+session_start();
+
+// Database connection
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "scholarlend_db";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Initialize error message
+$error_message = "";
+
+// Check if form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    // Sanitize input to avoid SQL injection
+    $email = $conn->real_escape_string($email);
+
+    // Query to check if user exists
+    $sql = "SELECT * FROM users_tb WHERE email = '$email' AND is_verified = 1 LIMIT 1";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows == 1) {
+        $user = $result->fetch_assoc();
+
+        // Verify the password
+        if (password_verify($password, $user['password'])) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['first_name'] = $user['first_name'];
+            $_SESSION['account_role'] = $user['account_role'];
+
+            // Redirect based on role
+            if ($user['account_role'] == 'lender') {
+                header("Location: lenderdashboard.html");
+            } elseif ($user['account_role'] == 'borrower') {
+                header("Location: borrowerdashboard.html");
+            } else {
+                header("Location: dashboard.html");
+            }
+            exit();
+        } else {
+            // Set error message
+            $error_message = "Invalid email or password.";
+        }
+    } else {
+        // Set error message
+        $error_message = "Invalid email or password.";
+    }
+}
+
+$conn->close();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -27,13 +90,7 @@
   <!-- Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
 
-  <!-- =======================================================
-  * Template Name: Butterfly
-  * Template URL: https://bootstrapmade.com/butterfly-free-bootstrap-theme/
-  * Updated: Aug 07 2024 with Bootstrap v5.3.3
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
+
 </head>
 
 <body class="starter-page-page">
@@ -85,32 +142,35 @@
         <p class="text-center" style="margin: -10px">
           <span style="color: black; font-weight: 300; font-size: medium;">Sign in the same way you did last time to avoid creating a second ScholarLend account</span>
         </p>
-        <form>
-          <div class="mb-3" style="margin-top: 10%;">
-            <label for="email" class="form-label" style="font-weight: bold;" >Email address:</label>
-            <input type="email" class="form-control" id="email" placeholder="Enter your email" style="border: 1px solid #d4b891; border-radius: 0%;">
-          </div>
-          <div class="mb-3">
-            <label for="password" class="form-label" style="font-weight: bold;">Password</label>
-            <input type="password" class="form-control" id="password" placeholder="Enter your password" style="border: 1px solid #d4b891; border-radius: 0%;">
-          </div>
-          <div class="d-grid gap-2" style="margin-top: 10%;">
-            <button type="button" class="btn btn-primary" style="background: #caac82; border-color: #caac82;" onclick="window.location.href='lenderdashboard.html'">Sign In</button>
+        <form method="POST" action="login.php">
+    <div class="mb-3" style="margin-top: 10%;">
+        <label for="email" class="form-label" style="font-weight: bold;">Email address:</label>
+        <input type="email" class="form-control" name="email" id="email" placeholder="Enter your email" required style="border: 1px solid #d4b891; border-radius: 0%;">
+    </div>
+    <div class="mb-3">
+        <label for="password" class="form-label" style="font-weight: bold;">Password</label>
+        <input type="password" class="form-control" name="password" id="password" placeholder="Enter your password" required style="border: 1px solid #d4b891; border-radius: 0%;">
+    </div>
 
-          </div>
-          <div class="form-check mt-3 d-flex justify-content-center">
-            <input class="form-check-input" type="checkbox" id="rememberMe">
-            <label class="form-check-label ms-2" for="rememberMe" style="font-weight: 400;">
-              Remember me
-            </label>
-          </div>
-          
-          <div class="text-center mt-2">
-            <a href="#" style="color: #caac82; font-weight: 400; text-decoration: none; padding-bottom: 10px; border-bottom: 2px solid #caac82;">
-              Forgot password?
-            </a>
-          </div>
-        </form>
+    <!-- Display error message here -->
+    <?php if (!empty($error_message)) : ?>
+        <div class="alert alert-danger" role="alert">
+            <?= $error_message; ?>
+        </div>
+    <?php endif; ?>
+
+    <div class="d-grid gap-2" style="margin-top: 10%;">
+        <button type="submit" class="btn btn-primary" style="background: #caac82; border-color: #caac82;">Sign In</button>
+    </div>
+    <div class="form-check mt-3 d-flex justify-content-center">
+        <input class="form-check-input" type="checkbox" id="rememberMe">
+        <label class="form-check-label ms-2" for="rememberMe" style="font-weight: 400;">Remember me</label>
+    </div>
+    <div class="text-center mt-2">
+        <a href="#" style="color: #caac82; font-weight: 400; text-decoration: none; padding-bottom: 10px; border-bottom: 2px solid #caac82;">Forgot password?</a>
+    </div>
+</form>
+
       </div>
     </div>
   </div>
