@@ -270,7 +270,7 @@
 
 <!-- Apply Now Button -->
 <div class="text-center mt-4">
-  <a href="#" class="btn btn-primary" style="background-color: #131E3D; padding: 15px 40px; font-size: 1.15rem; border: none;">
+  <a href="dashboard/borrower_applicationform.php" class="btn btn-primary" style="background-color: #131E3D; padding: 15px 40px; font-size: 1.15rem; border: none;">
     Apply Now <i class="bi bi-chevron-right" style="margin-left: 10px; font-size: 1.25rem;"></i>
   </a>
 </div>

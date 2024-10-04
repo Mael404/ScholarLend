@@ -97,28 +97,36 @@
   }
 }
 
+
+
+/* INPUT FORM ***************************************************************************************/
 #heading {
   text-transform: uppercase;
-  color: #673AB7;
+  color: #dbbf94;
   font-weight: normal;
 }
 
 #msform {
   text-align: center;
   position: relative;
-  margin-top: 20px;
+  margin-top: 0px;
+  width: 100%; /* This will make it take up all the available width */
+  max-width: 1400px; /* Increase this to make the form wider */
+  margin: 0 auto; /* This will center it on the page */
 }
 
+
+
 #msform fieldset {
-  background: white;
-  border: none;
-  border-radius: 0.5rem;
-  box-sizing: border-box;
   width: 100%;
-  margin: 0;
-  padding-bottom: 20px;
-  position: relative;
+  max-width: 100%; /* Ensure it doesn’t limit its own width */
+  background-color: #f4f1ec; /* Add your desired background color */
+  padding: 20px;
+  box-sizing: border-box; /* Ensures padding doesn’t add to width */
+  border-radius: 9px;
 }
+
+
 
 .form-card {
   text-align: center;
@@ -137,9 +145,9 @@
   margin-top: 2px;
   width: 100%;
   box-sizing: border-box;
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+ 
   color: #2C3E50;
-  background-color: #ECEFF1;
+  
   font-size: 16px;
   letter-spacing: 1px;
 }
@@ -147,7 +155,7 @@
 #msform input:focus,
 #msform textarea:focus {
   box-shadow: none !important;
-  border: 1px solid #673AB7;
+  border: 1px solid #dbbf94;
   outline-width: 0;
 }
 
@@ -165,12 +173,12 @@
 }
 
 #msform .action-button {
-  background: #673AB7;
+  background: #dbbf94;
 }
 
 #msform .action-button:hover,
 #msform .action-button:focus {
-  background-color: #311B92;
+  background-color: #dbbf94;
 }
 
 #msform .action-button-previous {
@@ -190,14 +198,18 @@
 
 .fs-title {
   font-size: 25px;
-  color: #673AB7;
-  margin-bottom: 15px;
-  font-weight: normal;
+  color: #000000;
   text-align: left;
+  font-family: 'Times New Roman', Times, serif;
+  font-weight: 900;
+  white-space: nowrap; /* Prevent text from wrapping to the next line */
+margin-bottom: 30px;
+  text-overflow: ellipsis; /* Add an ellipsis ("...") if the text overflows */
 }
 
+
 .purple-text {
-  color: #673AB7;
+  color: #dbbf94;
   font-weight: normal;
 }
 
@@ -269,10 +281,39 @@
 }
 
 .progress-bar {
-  background-color: #673AB7;
+  background-color: #dbbf94;
 }
 
 .fit-image {
   width: 100%;
   object-fit: cover;
+}
+
+/* INPUT FORM ***************************************************************************************/
+
+
+
+
+/* PADDING IN THE FLOATING INPUT */
+.form-floating select {
+  padding-top: 1.0rem; /* Adjust padding to match with floating label */
+}
+
+.form-floating label {
+  padding-top: 10px; /* Adjust top padding for label */
+  padding-bottom: 0px; /* Adjust bottom padding for label */
+}
+
+.form-floating .form-control, 
+.form-floating .form-select {
+  margin-top: 0px; /* Remove unnecessary top margin */
+}
+/* PADDING IN THE FLOATING INPUT */
+
+.form-floating input[type="file"] {
+  padding-top: 2.5rem; /* Adjust padding to prevent overlap */
+}
+
+.form-floating label {
+  padding-top: 10px; /* Keep label padding for spacing */
 }
