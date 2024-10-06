@@ -739,144 +739,165 @@
     </script>
 
 <script>
-   document.addEventListener('DOMContentLoaded', function () {
-    const paymentMode = document.getElementById('paymentMode');
-    const frequencyContainer = document.getElementById('frequencyContainer');
-    const paymentFrequency = document.getElementById('paymentFrequency');
-    const dueDateInput = document.getElementById('dueDate');
-    const dueDateOptions = document.getElementById('dueDateOptions'); // Dropdown for weeks/months
-    const durationContainer = document.getElementById('durationContainer'); // Container for duration dropdown
-    const principalInput = document.getElementById('loanAmount'); // Assuming this is where the loan amount is entered
 
-    // Add event listener to the payment mode select element
-    paymentMode.addEventListener('change', function () {
-        const mode = this.value;
 
-        if (mode === 'Lump Sum') {
-            setAllowedDates(); // Enable and set the due date for Lump Sum
-            frequencyContainer.style.display = 'none'; // Hide frequency selection
-            dueDateInput.disabled = false; // Enable due date input
-        } else if (mode === 'Installment') {
-            frequencyContainer.style.display = 'block'; // Show frequency selection
-            disableDueDate(); // Disable the due date for Installment
-        }
-    });
+    document.addEventListener('DOMContentLoaded', function () {
+        const paymentMode = document.getElementById('paymentMode');
+        const frequencyContainer = document.getElementById('frequencyContainer');
+        const paymentFrequency = document.getElementById('paymentFrequency');
+        const dueDateInput = document.getElementById('dueDate');
+        const dueDateOptions = document.getElementById('dueDateOptions'); // Dropdown for weeks/months
+        const durationContainer = document.getElementById('durationContainer'); // Container for duration dropdown
+        const principalInput = document.getElementById('loanAmount'); // Assuming this is where the loan amount is entered
 
-    // Call to set the allowed dates when the document loads
-    setAllowedDates(); // By default, set the allowed dates
+        let totalAmountToBePaid = 0; // Keep track of the total amount
 
-    // Event listener for payment frequency selection
-    paymentFrequency.addEventListener('change', function () {
-        const frequency = this.value;
+        // Add event listener to the payment mode select element
+        paymentMode.addEventListener('change', function () {
+            const mode = this.value;
 
-        if (frequency === 'Weekly') {
-            durationContainer.style.display = 'block'; // Show duration dropdown
-            dueDateInput.disabled = true; // Disable due date input
-            dueDateOptions.innerHTML = ''; // Clear previous options
-            for (let i = 2; i <= 12; i++) {
-                dueDateOptions.innerHTML += `<option value="${i}">${i} Week${i > 1 ? 's' : ''}</option>`;
+            if (mode === 'Lump Sum') {
+                setAllowedDates(); // Enable and set the due date for Lump Sum
+                frequencyContainer.style.display = 'none'; // Hide frequency selection
+                durationContainer.style.display = 'none'; // Hide duration selection
+                dueDateInput.disabled = false; // Enable due date input
+            } else if (mode === 'Installment') {
+                frequencyContainer.style.display = 'block'; // Show frequency selection
+                disableDueDate(); // Disable the due date for Installment
+                durationContainer.style.display = 'none'; // Hide duration initially until frequency is selected
             }
-        } else if (frequency === 'Monthly') {
-            durationContainer.style.display = 'block'; // Show duration dropdown
-            dueDateInput.disabled = true; // Disable due date input
-            dueDateOptions.innerHTML = ''; // Clear previous options
-            // Limit choices to 2 and 3 months
-            for (let i = 2; i <= 3; i++) {
-                dueDateOptions.innerHTML += `<option value="${i}">${i} Month${i > 1 ? 's' : ''}</option>`;
-            }
-        } else {
-            durationContainer.style.display = 'none'; // Hide duration selection
-            dueDateInput.disabled = false; // Enable due date input for Daily frequency
-        }
-    });
+        });
 
-    // Event listener for duration selection
-    dueDateOptions.addEventListener('change', function () {
-        if (this.value) {
-            const selectedDuration = parseInt(this.value);
-            const frequency = paymentFrequency.value;
+        // Call to set the allowed dates when the document loads
+        setAllowedDates(); // By default, set the allowed dates
+
+        // Event listener for payment frequency selection
+        paymentFrequency.addEventListener('change', function () {
+            const frequency = this.value;
+
+            if (frequency === 'Weekly') {
+                durationContainer.style.display = 'block'; // Show duration dropdown
+                dueDateInput.disabled = true; // Disable due date input
+                dueDateOptions.innerHTML = ''; // Clear previous options
+                for (let i = 2; i <= 12; i++) {
+                    dueDateOptions.innerHTML += `<option value="${i}">${i} Week${i > 1 ? 's' : ''}</option>`;
+                }
+            } else if (frequency === 'Monthly') {
+                durationContainer.style.display = 'block'; // Show duration dropdown
+                dueDateInput.disabled = true; // Disable due date input
+                dueDateOptions.innerHTML = ''; // Clear previous options
+                // Limit choices to 2 and 3 months
+                for (let i = 2; i <= 3; i++) {
+                    dueDateOptions.innerHTML += `<option value="${i}">${i} Month${i > 1 ? 's' : ''}</option>`;
+                }
+            } else if (frequency === 'Daily') {
+                durationContainer.style.display = 'none'; // Hide duration selection
+                dueDateInput.disabled = false; // Enable due date input
+                dueDateOptions.innerHTML = ''; // Clear any options for daily payments
+            } else {
+                durationContainer.style.display = 'none'; // Hide duration selection
+                dueDateInput.disabled = false; // Enable due date input for Lump Sum or Daily frequency
+            }
+        });
+
+        // Function to handle submission and showing the modal
+        function showSummaryModal() {
+            const paymentModeValue = paymentMode.value;
+            const frequencyValue = paymentFrequency.value;
+            const dueDate = dueDateInput.value;
+            const accountDetails = document.getElementById('accountDetails').value;
             const principal = parseFloat(principalInput.value);
 
-            if (isNaN(principal)) {
-                alert("Please enter a valid principal amount.");
+            if (isNaN(principal) || principal <= 0) {
+                alert("Please enter a valid loan amount.");
                 return;
             }
 
-            let totalAmountToBePaid;
+            if (paymentModeValue === 'Lump Sum') {
+                if (!dueDate || !accountDetails) {
+                    alert("Please fill out all fields before submitting.");
+                    return;
+                }
 
-            // Calculate the total amount based on the frequency
-            if (frequency === 'Daily') {
-                const days = selectedDuration;
-                totalAmountToBePaid = ((0.04 / 7) * principal * days) + principal;
-            } else if (frequency === 'Weekly') {
-                const weeks = selectedDuration;
-                totalAmountToBePaid = ((0.04 * principal * weeks) + principal) / weeks;
-            } else if (frequency === 'Monthly') {
-                const months = selectedDuration;
-                totalAmountToBePaid = ((0.04 * principal * 4 * months) + principal) / months;
+                // Ask user for the number of days for lump sum
+                const noOfDays = parseInt(prompt("Enter the number of days for Lump Sum payment:"));
+                if (isNaN(noOfDays) || noOfDays <= 0) {
+                    alert("Please enter a valid number of days.");
+                    return;
+                }
+
+                // Calculate total amount for Lump Sum
+                const interestRatePerDay = 0.04 / 7; // Weekly interest rate of 4%, converted to daily rate
+                const interest = interestRatePerDay * principal * noOfDays; // Interest calculation
+                totalAmountToBePaid = principal + interest; // Add interest to the principal
+
+            } else if (paymentModeValue === 'Installment') {
+                if (!frequencyValue || !accountDetails || (frequencyValue !== 'Daily' && !dueDateOptions.value)) {
+                    alert("Please fill out all fields before submitting.");
+                    return;
+                }
+
+                if (frequencyValue === 'Daily') {
+                    const noOfDays = parseInt(prompt("Enter the number of days for daily payments:"));
+                    if (isNaN(noOfDays) || noOfDays <= 0) {
+                        alert("Please select a valid number of days.");
+                        return;
+                    }
+                    const dailyInterestRate = (0.04 / 7); // 4% per week divided by 7 days
+                    totalAmountToBePaid = ((dailyInterestRate * principal * noOfDays) + principal) / noOfDays;
+
+                } else if (frequencyValue === 'Weekly') {
+                    const weeks = parseInt(dueDateOptions.value);
+                    totalAmountToBePaid = ((0.04 * principal * weeks) + principal) / weeks;
+                } else if (frequencyValue === 'Monthly') {
+                    const months = parseInt(dueDateOptions.value);
+                    totalAmountToBePaid = ((0.04 * principal * 4 * months) + principal) / months;
+                }
             }
 
-            // Set the due date based on the selected duration
-            const newDate = new Date();
-            if (frequency === 'Weekly') {
-                newDate.setDate(newDate.getDate() + selectedDuration * 7);
-            } else if (frequency === 'Monthly') {
-                newDate.setMonth(newDate.getMonth() + selectedDuration);
-            }
+            // Set the values in the modal
+            document.getElementById('modalDueDate').textContent = dueDate || 'N/A';
+            document.getElementById('modalAccountDetails').textContent = accountDetails;
+            document.getElementById('modalTotalAmount').textContent = totalAmountToBePaid.toFixed(2); // Show 2 decimal places
 
-            dueDateInput.value = newDate.toISOString().split('T')[0]; // Set due date
-            dueDateInput.disabled = false; // Enable due date input
-
-            // Show the summary modal
-            showSummaryModal(totalAmountToBePaid);
+            // Show the modal using Bootstrap
+            const summaryModal = new bootstrap.Modal(document.getElementById('summaryModal'));
+            summaryModal.show();
         }
+
+        // Function to set allowed dates
+        function setAllowedDates() {
+            const currentDate = new Date();
+            const minDate = new Date(currentDate);
+            const maxDate = new Date(currentDate);
+
+            // Set minimum date to tomorrow
+            minDate.setDate(minDate.getDate() + 1);
+
+            // Set maximum date to 3 months from today
+            maxDate.setMonth(maxDate.getMonth() + 3);
+
+            // Format dates as YYYY-MM-DD for input
+            dueDateInput.min = minDate.toISOString().split('T')[0];
+            dueDateInput.max = maxDate.toISOString().split('T')[0];
+
+            // Ensure the date input is enabled
+            dueDateInput.disabled = false;
+        }
+
+        // Function to disable due date
+        function disableDueDate() {
+            dueDateInput.value = ''; // Clear the input value
+            dueDateInput.disabled = true; // Disable the field
+        }
+
+        // Add event listener to the submit button
+        document.querySelector('input[name="summary"]').addEventListener('click', showSummaryModal);
     });
-
-    // Function to set allowed dates
-    function setAllowedDates() {
-        const currentDate = new Date();
-        const minDate = new Date(currentDate);
-        const maxDate = new Date(currentDate);
-
-        // Set minimum date to tomorrow
-        minDate.setDate(minDate.getDate() + 1);
-
-        // Set maximum date to 3 months from today
-        maxDate.setMonth(maxDate.getMonth() + 3);
-
-        // Format dates as YYYY-MM-DD for input
-        dueDateInput.min = minDate.toISOString().split('T')[0];
-        dueDateInput.max = maxDate.toISOString().split('T')[0];
-
-        // Ensure the date input is enabled
-        dueDateInput.disabled = false;
-    }
-
-    // Function to disable due date
-    function disableDueDate() {
-        dueDateInput.value = ''; // Clear the input value
-        dueDateInput.disabled = true; // Disable the field
-    }
-
-    // Function to show summary modal
-    function showSummaryModal(totalAmount) {
-        const dueDate = dueDateInput.value;
-        const accountDetails = document.getElementById('accountDetails').value;
-
-        // Set the values in the modal (assuming you have a modal setup)
-        document.getElementById('modalDueDate').textContent = dueDate;
-        document.getElementById('modalAccountDetails').textContent = accountDetails;
-        document.getElementById('modalTotalAmount').textContent = totalAmount.toFixed(2); // Show 2 decimal places
-
-        // Show the modal using Bootstrap
-        const summaryModal = new bootstrap.Modal(document.getElementById('summaryModal'));
-        summaryModal.show();
-    }
-});
-
+</script>
 
     
-</script>
+
 
 
 
