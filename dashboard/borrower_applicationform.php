@@ -558,10 +558,30 @@
             <label for="paymentMode">Mode of Payment</label>
         </div>
 
+        <!-- Frequency of Payment (only shown when Installment is selected) -->
+        <div class="form-floating mb-3" id="frequencyContainer" style="display: none;">
+            <select class="form-select" name="payment_frequency" id="paymentFrequency" aria-label="Floating label select example">
+                <option selected>Select Payment Frequency</option>
+                <option value="Daily">Daily</option>
+                <option value="Weekly">Weekly</option>
+                <option value="Monthly">Monthly</option>
+            </select>
+            <label for="paymentFrequency">Payment Frequency</label>
+        </div>
+
         <!-- Due Date -->
         <div class="form-floating mb-3">
             <input type="date" class="form-control" name="due_date" id="dueDate" placeholder="Select Date of Payment" required>
             <label for="dueDate">Due Date</label>
+        </div>
+
+        <!-- Duration Selection (shown based on frequency) -->
+        <div class="form-floating mb-3" id="durationContainer" style="display: none;">
+            <label for="dueDateOptions">Choose Duration:</label>
+            <select class="form-select" id="dueDateOptions">
+                <option value="">Select</option>
+                <!-- Options will be populated dynamically -->
+            </select>
         </div>
 
         <!-- Account Details -->
@@ -577,6 +597,8 @@
         <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
     </div>
 </fieldset>
+
+
                                 
                             </form>
 
@@ -586,6 +608,8 @@
                     </div>
                 </div>
             </div>
+
+            
             <div class="modal fade" id="summaryModal" tabindex="-1" aria-labelledby="summaryModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -715,68 +739,149 @@
     </script>
 
 <script>
-function setAllowedDates() {
+   document.addEventListener('DOMContentLoaded', function () {
+    const paymentMode = document.getElementById('paymentMode');
+    const frequencyContainer = document.getElementById('frequencyContainer');
+    const paymentFrequency = document.getElementById('paymentFrequency');
     const dueDateInput = document.getElementById('dueDate');
-    const currentDate = new Date();
-    const minDate = new Date(currentDate);
-    const maxDate = new Date(currentDate);
-    
-    minDate.setDate(minDate.getDate() + 1); // Min date is tomorrow
-    maxDate.setMonth(maxDate.getMonth() + 3); // Max date is 3 months from now
-    
-    // Format the dates as YYYY-MM-DD for input
-    dueDateInput.min = minDate.toISOString().split('T')[0];
-    dueDateInput.max = maxDate.toISOString().split('T')[0];
-}
+    const dueDateOptions = document.getElementById('dueDateOptions'); // Dropdown for weeks/months
+    const durationContainer = document.getElementById('durationContainer'); // Container for duration dropdown
+    const principalInput = document.getElementById('loanAmount'); // Assuming this is where the loan amount is entered
 
-function showSummaryModal() {
-    const dueDate = document.getElementById('dueDate').value;
-    const accountDetails = document.getElementById('accountDetails').value;
-    
-    // Retrieve loan amount from the Loan Information fieldset
-    const loanAmountSelect = document.getElementById('loanAmount');
-    const loanAmount = parseFloat(loanAmountSelect.value);
+    // Add event listener to the payment mode select element
+    paymentMode.addEventListener('change', function () {
+        const mode = this.value;
 
-    // Validate loanAmount
-    if (isNaN(loanAmount)) {
-        alert("Loan amount is invalid. Please check the loan information.");
-        return;
+        if (mode === 'Lump Sum') {
+            setAllowedDates(); // Enable and set the due date for Lump Sum
+            frequencyContainer.style.display = 'none'; // Hide frequency selection
+            dueDateInput.disabled = false; // Enable due date input
+        } else if (mode === 'Installment') {
+            frequencyContainer.style.display = 'block'; // Show frequency selection
+            disableDueDate(); // Disable the due date for Installment
+        }
+    });
+
+    // Call to set the allowed dates when the document loads
+    setAllowedDates(); // By default, set the allowed dates
+
+    // Event listener for payment frequency selection
+    paymentFrequency.addEventListener('change', function () {
+        const frequency = this.value;
+
+        if (frequency === 'Weekly') {
+            durationContainer.style.display = 'block'; // Show duration dropdown
+            dueDateInput.disabled = true; // Disable due date input
+            dueDateOptions.innerHTML = ''; // Clear previous options
+            for (let i = 2; i <= 12; i++) {
+                dueDateOptions.innerHTML += `<option value="${i}">${i} Week${i > 1 ? 's' : ''}</option>`;
+            }
+        } else if (frequency === 'Monthly') {
+            durationContainer.style.display = 'block'; // Show duration dropdown
+            dueDateInput.disabled = true; // Disable due date input
+            dueDateOptions.innerHTML = ''; // Clear previous options
+            // Limit choices to 2 and 3 months
+            for (let i = 2; i <= 3; i++) {
+                dueDateOptions.innerHTML += `<option value="${i}">${i} Month${i > 1 ? 's' : ''}</option>`;
+            }
+        } else {
+            durationContainer.style.display = 'none'; // Hide duration selection
+            dueDateInput.disabled = false; // Enable due date input for Daily frequency
+        }
+    });
+
+    // Event listener for duration selection
+    dueDateOptions.addEventListener('change', function () {
+        if (this.value) {
+            const selectedDuration = parseInt(this.value);
+            const frequency = paymentFrequency.value;
+            const principal = parseFloat(principalInput.value);
+
+            if (isNaN(principal)) {
+                alert("Please enter a valid principal amount.");
+                return;
+            }
+
+            let totalAmountToBePaid;
+
+            // Calculate the total amount based on the frequency
+            if (frequency === 'Daily') {
+                const days = selectedDuration;
+                totalAmountToBePaid = ((0.04 / 7) * principal * days) + principal;
+            } else if (frequency === 'Weekly') {
+                const weeks = selectedDuration;
+                totalAmountToBePaid = ((0.04 * principal * weeks) + principal) / weeks;
+            } else if (frequency === 'Monthly') {
+                const months = selectedDuration;
+                totalAmountToBePaid = ((0.04 * principal * 4 * months) + principal) / months;
+            }
+
+            // Set the due date based on the selected duration
+            const newDate = new Date();
+            if (frequency === 'Weekly') {
+                newDate.setDate(newDate.getDate() + selectedDuration * 7);
+            } else if (frequency === 'Monthly') {
+                newDate.setMonth(newDate.getMonth() + selectedDuration);
+            }
+
+            dueDateInput.value = newDate.toISOString().split('T')[0]; // Set due date
+            dueDateInput.disabled = false; // Enable due date input
+
+            // Show the summary modal
+            showSummaryModal(totalAmountToBePaid);
+        }
+    });
+
+    // Function to set allowed dates
+    function setAllowedDates() {
+        const currentDate = new Date();
+        const minDate = new Date(currentDate);
+        const maxDate = new Date(currentDate);
+
+        // Set minimum date to tomorrow
+        minDate.setDate(minDate.getDate() + 1);
+
+        // Set maximum date to 3 months from today
+        maxDate.setMonth(maxDate.getMonth() + 3);
+
+        // Format dates as YYYY-MM-DD for input
+        dueDateInput.min = minDate.toISOString().split('T')[0];
+        dueDateInput.max = maxDate.toISOString().split('T')[0];
+
+        // Ensure the date input is enabled
+        dueDateInput.disabled = false;
     }
 
-    // Check if due date is valid
-    const selectedDueDate = new Date(dueDate);
-    if (isNaN(selectedDueDate.getTime())) {
-        alert("Please select a valid due date.");
-        return;
+    // Function to disable due date
+    function disableDueDate() {
+        dueDateInput.value = ''; // Clear the input value
+        dueDateInput.disabled = true; // Disable the field
     }
 
-    // Calculate the number of days from current date to due date
-    const currentDate = new Date();
-    const timeDiff = selectedDueDate - currentDate;
-    const days = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+    // Function to show summary modal
+    function showSummaryModal(totalAmount) {
+        const dueDate = dueDateInput.value;
+        const accountDetails = document.getElementById('accountDetails').value;
 
-    // Calculate the total amount to be paid
-    const totalAmountToBePaid = calculateAmountToBePaid(loanAmount, days);
+        // Set the values in the modal (assuming you have a modal setup)
+        document.getElementById('modalDueDate').textContent = dueDate;
+        document.getElementById('modalAccountDetails').textContent = accountDetails;
+        document.getElementById('modalTotalAmount').textContent = totalAmount.toFixed(2); // Show 2 decimal places
 
-    // Set the values in the modal (assuming you have a modal setup)
-    document.getElementById('modalDueDate').textContent = dueDate;
-    document.getElementById('modalAccountDetails').textContent = accountDetails;
-    document.getElementById('modalTotalAmount').textContent = totalAmountToBePaid.toFixed(2); // Show 2 decimal places
+        // Show the modal using Bootstrap
+        const summaryModal = new bootstrap.Modal(document.getElementById('summaryModal'));
+        summaryModal.show();
+    }
+});
 
-    // Show the modal using Bootstrap
-    const summaryModal = new bootstrap.Modal(document.getElementById('summaryModal'));
-    summaryModal.show();
-}
 
-function calculateAmountToBePaid(principal, days) {
-    const interestRate = 0.04; // 4% interest rate
-    const amountToBePaid = ((interestRate / 7) * principal * days) + principal;
-    return amountToBePaid;
-}
+    
+</script>
 
-// Call to set the allowed dates when the document loads
-document.addEventListener('DOMContentLoaded', setAllowedDates);
 
+
+<script>
+    
 function submitForm() {
     // Collect form data
     const loanAmountSelect = document.getElementById('loanAmount');
@@ -830,7 +935,6 @@ function submitForm() {
 // Call to set the allowed dates when the document loads
 document.addEventListener('DOMContentLoaded', setAllowedDates);
 </script>
-
 
 </body>
 
