@@ -1,6 +1,9 @@
 <?php
+// Enable error reporting
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
+
+header('Content-Type: application/json');
 
 $servername = "localhost";
 $username = "root";
@@ -12,7 +15,8 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Check connection
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    echo json_encode(['status' => 'error', 'message' => 'Connection failed: ' . $conn->connect_error]);
+    exit();
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -30,7 +34,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $yearofstudy = $_POST['yearofstudy'] ?? null;
     $graduationdate = $_POST['graduationdate'] ?? null;
     $monthly_allowance = $_POST['monthly-allowance'] ?? null;
-
     $source_of_allowance = $_POST['source-of-allowance'] ?? null;
     $monthly_expenses = $_POST['monthly_expenses'] ?? null;
     $payment_mode = $_POST['payment_mode'] ?? null;
@@ -61,11 +64,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (move_uploaded_file($fileTmpPath, $destPath)) {
                 $uploadedFiles[$fileInput] = $destPath;
             } else {
-                echo "Error uploading $fileInput.";
+                echo json_encode(['status' => 'error', 'message' => "Error uploading $fileInput."]);
                 exit();
             }
         } else {
-            echo "Error with $fileInput upload.";
+            echo json_encode(['status' => 'error', 'message' => "Error with $fileInput upload."]);
             exit();
         }
     }
@@ -83,7 +86,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     ");
 
     if (!$stmt) {
-        die("Prepare failed: " . $conn->error);
+        echo json_encode(['status' => 'error', 'message' => 'Prepare failed: ' . $conn->error]);
+        exit();
     }
 
     // Bind parameters
@@ -102,18 +106,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Adjust bind_param format based on the number of uploaded files
     $typeString = str_repeat('s', count($bindParams));
     if (!$stmt->bind_param($typeString, ...$bindParams)) {
-        die("Bind failed: " . $stmt->error);
+        echo json_encode(['status' => 'error', 'message' => 'Bind failed: ' . $stmt->error]);
+        exit();
     }
 
     // Execute the statement
     if ($stmt->execute()) {
-        echo "New record created successfully";
-    } else {
-        echo "Error: " . $stmt->error;
+        // If data insertion is successful, redirect to another page
+        header("Location: borrower_applicationform.php");
+        exit();
+    }
+     else {
+        echo json_encode(['status' => 'error', 'message' => 'Error: ' . $stmt->error]);
     }
 
     // Close statement and connection
     $stmt->close();
-    $conn->close();
 }
+$conn->close();
 ?>

@@ -459,13 +459,19 @@
                                         </div>
                                         
                                         <div class="row">
-                                            <div class="col-md-12 mb-3">
-                                                <div class="form-floating">
-                                                    <input type="number" class="form-control form-control-sm" id="loanAmount" name="loan_amount" placeholder="Loan Amount" required>
-                                                    <label for="loanAmount">Loan Amount</label>
-                                                </div>
-                                            </div>
-                                        </div>
+            <div class="col-md-12 mb-3">
+                <div class="form-floating">
+                    <select class="form-control form-control-sm" id="loanAmount" name="loan_amount" required>
+                        <option value="" disabled selected>Select Loan Amount</option>
+                        <option value="500"><?= '₱' ?>500</option>
+                        <option value="1000"><?= '₱' ?>1000</option>
+                        <option value="2000"><?= '₱' ?>2000</option>
+                    </select>
+                    <label for="loanAmount">Loan Amount</label>
+                </div>
+            </div>
+        </div>
+
                             
                                         <div class="row">
                                             <div class="col-md-12 mb-3">
@@ -532,53 +538,78 @@
                                     <input type="button" name="next" class="next action-button" value="Submit" /> 
                                     <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
                                 </fieldset>
-                            
+       
 
                                 <fieldset>
-        <div class="form-card">
-            <div class="row">
-                <div class="col-7">
-                    <h2 class="fs-title">Payment Details:</h2>
-                </div>
-                <div class="col-5">
-                    <!-- Any additional content can go here -->
-                </div>
+    <div class="form-card">
+        <div class="row">
+            <div class="col-7">
+                <h2 class="fs-title">Payment Details:</h2>
             </div>
-            
-            <!-- Mode of Payment -->
-            <div class="form-floating mb-3">
-                <select class="form-select" name="payment_mode" id="paymentMode" aria-label="Floating label select example">
-                    <option selected>Select Mode of Payment</option>
-                    <option value="Lump Sum">Lump Sum</option>
-                    <option value="Installment">Installment</option>
-                </select>
-                <label for="paymentMode">Mode of Payment</label>
-            </div>
-        
-            <!-- Due Date -->
-            <div class="form-floating mb-3">
-                <input type="date" class="form-control" name="due_date" id="dueDate" placeholder="Select Date of Payment">
-                <label for="dueDate">Due Date</label>
-            </div>
-        
-            <!-- Account Details -->
-            <div class="form-floating mb-3">
-                <input type="text" class="form-control" name="account_details" id="accountDetails" placeholder="Enter Bank Account Details">
-                <label for="accountDetails">Account Details</label>
-            </div>
-        
-            <input type="submit" name="submit" class="next action-button" value="Submit" />
-            <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
         </div>
-    </fieldset>
+
+        <!-- Mode of Payment -->
+        <div class="form-floating mb-3">
+            <select class="form-select" name="payment_mode" id="paymentMode" aria-label="Floating label select example">
+                <option selected>Select Mode of Payment</option>
+                <option value="Lump Sum">Lump Sum</option>
+                <option value="Installment">Installment</option>
+            </select>
+            <label for="paymentMode">Mode of Payment</label>
+        </div>
+
+        <!-- Due Date -->
+        <div class="form-floating mb-3">
+            <input type="date" class="form-control" name="due_date" id="dueDate" placeholder="Select Date of Payment" required>
+            <label for="dueDate">Due Date</label>
+        </div>
+
+        <!-- Account Details -->
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" name="account_details" id="accountDetails" placeholder="Enter Bank Account Details" required>
+            <label for="accountDetails">Account Details</label>
+        </div>
+
+        <!-- Submit Button -->
+        <input type="button" name="summary" class="next action-button" value="Submit" onclick="showSummaryModal()" />
+
+        <!-- Previous Button -->
+        <input type="button" name="previous" class="previous action-button-previous" value="Previous" />
+    </div>
+</fieldset>
                                 
                             </form>
+
 
                             
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="modal fade" id="summaryModal" tabindex="-1" aria-labelledby="summaryModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="summaryModalLabel">Payment Summary</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <p><strong>Due Date:</strong> <span id="modalDueDate"></span></p>
+        <p><strong>Account Details:</strong> <span id="modalAccountDetails"></span></p>
+        <p><strong>Total Amount to be Paid:</strong> <span id="modalTotalAmount"></span></p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        
+        <!-- Inside your modal -->
+        <button type="button" class="btn btn-primary" data-bs-dismiss="modal" onclick="submitForm()">Submit</button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+
         </div>
             
             
@@ -682,6 +713,124 @@
 });
 
     </script>
+
+<script>
+function setAllowedDates() {
+    const dueDateInput = document.getElementById('dueDate');
+    const currentDate = new Date();
+    const minDate = new Date(currentDate);
+    const maxDate = new Date(currentDate);
+    
+    minDate.setDate(minDate.getDate() + 1); // Min date is tomorrow
+    maxDate.setMonth(maxDate.getMonth() + 3); // Max date is 3 months from now
+    
+    // Format the dates as YYYY-MM-DD for input
+    dueDateInput.min = minDate.toISOString().split('T')[0];
+    dueDateInput.max = maxDate.toISOString().split('T')[0];
+}
+
+function showSummaryModal() {
+    const dueDate = document.getElementById('dueDate').value;
+    const accountDetails = document.getElementById('accountDetails').value;
+    
+    // Retrieve loan amount from the Loan Information fieldset
+    const loanAmountSelect = document.getElementById('loanAmount');
+    const loanAmount = parseFloat(loanAmountSelect.value);
+
+    // Validate loanAmount
+    if (isNaN(loanAmount)) {
+        alert("Loan amount is invalid. Please check the loan information.");
+        return;
+    }
+
+    // Check if due date is valid
+    const selectedDueDate = new Date(dueDate);
+    if (isNaN(selectedDueDate.getTime())) {
+        alert("Please select a valid due date.");
+        return;
+    }
+
+    // Calculate the number of days from current date to due date
+    const currentDate = new Date();
+    const timeDiff = selectedDueDate - currentDate;
+    const days = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+
+    // Calculate the total amount to be paid
+    const totalAmountToBePaid = calculateAmountToBePaid(loanAmount, days);
+
+    // Set the values in the modal (assuming you have a modal setup)
+    document.getElementById('modalDueDate').textContent = dueDate;
+    document.getElementById('modalAccountDetails').textContent = accountDetails;
+    document.getElementById('modalTotalAmount').textContent = totalAmountToBePaid.toFixed(2); // Show 2 decimal places
+
+    // Show the modal using Bootstrap
+    const summaryModal = new bootstrap.Modal(document.getElementById('summaryModal'));
+    summaryModal.show();
+}
+
+function calculateAmountToBePaid(principal, days) {
+    const interestRate = 0.04; // 4% interest rate
+    const amountToBePaid = ((interestRate / 7) * principal * days) + principal;
+    return amountToBePaid;
+}
+
+// Call to set the allowed dates when the document loads
+document.addEventListener('DOMContentLoaded', setAllowedDates);
+
+function submitForm() {
+    // Collect form data
+    const loanAmountSelect = document.getElementById('loanAmount');
+    const loanAmount = loanAmountSelect.value;
+
+    const dueDate = document.getElementById('dueDate').value;
+    const accountDetails = document.getElementById('accountDetails').value;
+
+    // Validate input data
+    if (!loanAmount || !dueDate || !accountDetails) {
+        alert("Please fill in all required fields.");
+        return; // Prevent form submission if validation fails
+    }
+
+    // Populate modal with summary data
+    document.getElementById('modalDueDate').innerText = dueDate;
+    document.getElementById('modalAccountDetails').innerText = accountDetails;
+    document.getElementById('modalTotalAmount').innerText = loanAmount; // Adjust this if needed
+
+    // If all validations pass, submit the form
+    document.getElementById('msform').submit();
+}
+
+
+    // Create an object with the form data to send to the server
+    const formData = {
+        loan_amount: loanAmount,
+        due_date: dueDate,
+        account_details: accountDetails,
+    };
+
+    // Send the form data to the server
+    fetch('borrower_apform_data.php', {  // Replace with your server endpoint
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Success:', data);
+        // Handle success (e.g., show a confirmation message)
+    })
+    .catch((error) => {
+        console.error('Error:', error);
+        // Handle error (e.g., show an error message)
+    });
+
+
+// Call to set the allowed dates when the document loads
+document.addEventListener('DOMContentLoaded', setAllowedDates);
+</script>
+
 
 </body>
 
