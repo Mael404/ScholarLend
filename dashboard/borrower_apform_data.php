@@ -1,4 +1,6 @@
 <?php
+session_start(); // Start session to access session variables
+print_r($_SESSION); // Check what’s in the session
 // Database connection
 $host = 'localhost'; // Your database host
 $db = 'scholarlend_db'; // Your database name
@@ -11,7 +13,7 @@ $conn = new mysqli($host, $user, $pass, $db);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-
+$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 // Retrieve and sanitize form data
 $fname = $conn->real_escape_string($_POST['fname']);
 $mname = $conn->real_escape_string($_POST['mname']);
@@ -78,14 +80,14 @@ if (!$errorOccurred) {
 
     // Insert into the database
     $sql = "INSERT INTO borrower_info (
-        fname, mname, lname, birthdate, gender, cellphonenumber, email, school, college, 
+        user_id,fname, mname, lname, birthdate, gender, cellphonenumber, email, school, college, 
         course, yearofstudy, graduationdate, monthly_allowance, source_of_allowance, 
         monthly_expenses, school_community, spending_pattern, monthly_savings, 
         career_goals, loan_amount, loan_purpose, loan_description, payment_mode, 
         payment_frequency, due_date, account_details, total_amount,
         cor1_path, cor2_path, cor3_path, cor4_path
     ) VALUES (
-        '$fname', '$mname', '$lname', '$birthdate', '$gender', '$cellphonenumber', '$email', 
+         '$user_id','$fname', '$mname', '$lname', '$birthdate', '$gender', '$cellphonenumber', '$email', 
         '$school', '$college', '$course', '$yearofstudy', '$graduationdate', 
         '$monthly_allowance', '$source_of_allowance', '$monthly_expenses', '$school_community', 
         '$spending_pattern', '$monthly_savings', '$career_goals', '$loan_amount', 

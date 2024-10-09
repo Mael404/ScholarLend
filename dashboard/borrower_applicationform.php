@@ -1,3 +1,7 @@
+<?php
+session_start(); // Start session to access session variables
+print_r($_SESSION);
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -88,9 +92,9 @@
             <div class="user-info d-flex align-items-center my-3 text-center">
                 <img src="red.jpg" alt="User Profile Picture" class="img-fluid rounded-circle" style="width: 50px; height: 50px; margin-right: 10px;">
                 <div class="user-details">
-                    <div class="username">Your Name Here</div>
-                    <div class="email">user@example.com</div>
-                </div>
+    <div class="username"><?php echo isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Guest'; ?></div>
+    <div class="email"><?php echo isset($_SESSION['email']) ? $_SESSION['email'] : 'user@example.com'; ?></div>
+</div>
           
            
                
