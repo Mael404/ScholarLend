@@ -1,127 +1,105 @@
 <?php
-// Enable error reporting
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
+// Database connection
+$host = 'localhost'; // Your database host
+$db = 'scholarlend_db'; // Your database name
+$user = 'root'; // Your database username
+$pass = ''; // Your database password
 
-header('Content-Type: application/json');
-
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "scholarlend_db";
-
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
+$conn = new mysqli($host, $user, $pass, $db);
 
 // Check connection
 if ($conn->connect_error) {
-    echo json_encode(['status' => 'error', 'message' => 'Connection failed: ' . $conn->connect_error]);
-    exit();
+    die("Connection failed: " . $conn->connect_error);
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Retrieve form data
-    $fname = $_POST['fname'] ?? null;
-    $mname = $_POST['mname'] ?? null;
-    $lname = $_POST['lname'] ?? null;
-    $birthdate = $_POST['birthdate'] ?? null;
-    $gender = $_POST['gender'] ?? null;
-    $cellphonenumber = $_POST['cellphonenumber'] ?? null;
-    $email = $_POST['email'] ?? null;
-    $school = $_POST['school'] ?? null;
-    $college = $_POST['college'] ?? null;
-    $course = $_POST['course'] ?? null;
-    $yearofstudy = $_POST['yearofstudy'] ?? null;
-    $graduationdate = $_POST['graduationdate'] ?? null;
-    $monthly_allowance = $_POST['monthly-allowance'] ?? null;
-    $source_of_allowance = $_POST['source-of-allowance'] ?? null;
-    $monthly_expenses = $_POST['monthly_expenses'] ?? null;
-    $payment_mode = $_POST['payment_mode'] ?? null;
-    $due_date = $_POST['due_date'] ?? null;
-    $account_details = $_POST['account_details'] ?? null;
-    $school_community = $_POST['school_community'] ?? null;
-    $spending_pattern = $_POST['spending-pattern'] ?? null;
-    $monthly_savings = $_POST['monthly-savings'] ?? null;
-    $career_goals = $_POST['career-goals'] ?? null;
+// Retrieve and sanitize form data
+$fname = $conn->real_escape_string($_POST['fname']);
+$mname = $conn->real_escape_string($_POST['mname']);
+$lname = $conn->real_escape_string($_POST['lname']);
+$birthdate = $conn->real_escape_string($_POST['birthdate']);
+$gender = $conn->real_escape_string($_POST['gender']);
+$cellphonenumber = $conn->real_escape_string($_POST['cellphonenumber']);
+$email = $conn->real_escape_string($_POST['email']);
+$school = $conn->real_escape_string($_POST['school']);
+$college = $conn->real_escape_string($_POST['college']);
+$course = $conn->real_escape_string($_POST['course']);
+$yearofstudy = $conn->real_escape_string($_POST['yearofstudy']);
+$graduationdate = $conn->real_escape_string($_POST['graduationdate']);
+$monthly_allowance = $conn->real_escape_string($_POST['monthly-allowance']);
+$source_of_allowance = $conn->real_escape_string($_POST['source-of-allowance']);
+$monthly_expenses = $conn->real_escape_string($_POST['monthly-expenses']);
+$school_community = $conn->real_escape_string($_POST['school_community']);
+$spending_pattern = $conn->real_escape_string($_POST['spending-pattern']);
+$monthly_savings = $conn->real_escape_string($_POST['monthly-savings']);
+$career_goals = $conn->real_escape_string($_POST['career-goals']);
+$loan_amount = $conn->real_escape_string($_POST['loan_amount']);
+$loan_purpose = $conn->real_escape_string($_POST['loan_purpose']);
+$loan_description = $conn->real_escape_string($_POST['loan_description']);
+$payment_mode = $conn->real_escape_string($_POST['payment_mode']);
+$payment_frequency = $conn->real_escape_string($_POST['frequency']);
+$due_date = $conn->real_escape_string($_POST['due_date']);
+$account_details = $conn->real_escape_string($_POST['account_details']);
+$total_amount = $conn->real_escape_string($_POST['total_amount']);
 
-    // Loan Information Fields
-    $loan_amount = $_POST['loan_amount'] ?? null;
-    $loan_purpose = $_POST['loan_purpose'] ?? null;
-    $loan_description = $_POST['loan_description'] ?? null;
+// Handle file uploads
+$uploadDir = "uploads/";
+$files = ['cor1', 'cor2', 'cor3', 'cor4'];
+$uploadedFiles = [];
+$errorOccurred = false;
 
-    // File Upload Handling
-    $uploadDir = "uploads/";
-    $files = ['cor1', 'cor2', 'cor3', 'cor4'];
-    $uploadedFiles = [];
+foreach ($files as $fileInput) {
+    if (isset($_FILES[$fileInput]) && $_FILES[$fileInput]['error'] == 0) {
+        $fileTmpPath = $_FILES[$fileInput]['tmp_name'];
+        $fileName = basename($_FILES[$fileInput]['name']);
+        $destPath = $uploadDir . $fileName;
 
-    foreach ($files as $fileInput) {
-        if (isset($_FILES[$fileInput]) && $_FILES[$fileInput]['error'] == 0) {
-            $fileTmpPath = $_FILES[$fileInput]['tmp_name'];
-            $fileName = basename($_FILES[$fileInput]['name']);
-            $destPath = $uploadDir . $fileName;
-
-            // Move the uploaded file to the destination directory
-            if (move_uploaded_file($fileTmpPath, $destPath)) {
-                $uploadedFiles[$fileInput] = $destPath;
-            } else {
-                echo json_encode(['status' => 'error', 'message' => "Error uploading $fileInput."]);
-                exit();
-            }
+        // Move the uploaded file to the destination directory
+        if (move_uploaded_file($fileTmpPath, $destPath)) {
+            $uploadedFiles[$fileInput] = $destPath;
         } else {
-            echo json_encode(['status' => 'error', 'message' => "Error with $fileInput upload."]);
-            exit();
+            echo json_encode(['status' => 'error', 'message' => "Error uploading $fileInput."]);
+            $errorOccurred = true;
+            break;
         }
+    } else {
+        echo json_encode(['status' => 'error', 'message' => "Error with $fileInput upload."]);
+        $errorOccurred = true;
+        break;
     }
-
-    // Prepare and bind SQL
-    $stmt = $conn->prepare("
-    INSERT INTO borrower_information (
-        fname, mname, lname, birthdate, gender, cellphonenumber, email, 
-        school, college, course, yearofstudy, graduationdate, 
-        monthly_allowance, source_of_allowance, monthly_expenses, payment_mode, 
-        due_date, account_details, school_community, spending_pattern, 
-        monthly_savings, career_goals, loan_amount, loan_purpose, loan_description, 
-        cor1, cor2, cor3, cor4
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ");
-
-    if (!$stmt) {
-        echo json_encode(['status' => 'error', 'message' => 'Prepare failed: ' . $conn->error]);
-        exit();
-    }
-
-    // Bind parameters
-    $bindParams = [
-        $fname, $mname, $lname, $birthdate, $gender, $cellphonenumber, $email, 
-        $school, $college, $course, $yearofstudy, $graduationdate, 
-        $monthly_allowance, $source_of_allowance, $monthly_expenses, $payment_mode, 
-        $due_date, $account_details, $school_community, $spending_pattern, 
-        $monthly_savings, $career_goals, $loan_amount, $loan_purpose, $loan_description, 
-        $uploadedFiles['cor1'] ?? null, 
-        $uploadedFiles['cor2'] ?? null, 
-        $uploadedFiles['cor3'] ?? null, 
-        $uploadedFiles['cor4'] ?? null
-    ];
-
-    // Adjust bind_param format based on the number of uploaded files
-    $typeString = str_repeat('s', count($bindParams));
-    if (!$stmt->bind_param($typeString, ...$bindParams)) {
-        echo json_encode(['status' => 'error', 'message' => 'Bind failed: ' . $stmt->error]);
-        exit();
-    }
-
-    // Execute the statement
-    if ($stmt->execute()) {
-        // If data insertion is successful, redirect to another page
-        header("Location: borrower_applicationform.php");
-        exit();
-    }
-     else {
-        echo json_encode(['status' => 'error', 'message' => 'Error: ' . $stmt->error]);
-    }
-
-    // Close statement and connection
-    $stmt->close();
 }
+
+// Only insert into the database if all files were uploaded successfully
+if (!$errorOccurred) {
+    // Prepare file paths for database insertion
+    $file1 = isset($uploadedFiles['cor1']) ? $conn->real_escape_string($uploadedFiles['cor1']) : null;
+    $file2 = isset($uploadedFiles['cor2']) ? $conn->real_escape_string($uploadedFiles['cor2']) : null;
+    $file3 = isset($uploadedFiles['cor3']) ? $conn->real_escape_string($uploadedFiles['cor3']) : null;
+    $file4 = isset($uploadedFiles['cor4']) ? $conn->real_escape_string($uploadedFiles['cor4']) : null;
+
+    // Insert into the database
+    $sql = "INSERT INTO borrower_info (
+        fname, mname, lname, birthdate, gender, cellphonenumber, email, school, college, 
+        course, yearofstudy, graduationdate, monthly_allowance, source_of_allowance, 
+        monthly_expenses, school_community, spending_pattern, monthly_savings, 
+        career_goals, loan_amount, loan_purpose, loan_description, payment_mode, 
+        payment_frequency, due_date, account_details, total_amount,
+        cor1_path, cor2_path, cor3_path, cor4_path
+    ) VALUES (
+        '$fname', '$mname', '$lname', '$birthdate', '$gender', '$cellphonenumber', '$email', 
+        '$school', '$college', '$course', '$yearofstudy', '$graduationdate', 
+        '$monthly_allowance', '$source_of_allowance', '$monthly_expenses', '$school_community', 
+        '$spending_pattern', '$monthly_savings', '$career_goals', '$loan_amount', 
+        '$loan_purpose', '$loan_description', '$payment_mode', '$payment_frequency', 
+        '$due_date', '$account_details', '$total_amount',
+        '$file1', '$file2', '$file3', '$file4'
+    )";
+
+    if ($conn->query($sql) === TRUE) {
+        echo "New record created successfully";
+    } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+}
+
 $conn->close();
 ?>
