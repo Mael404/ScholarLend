@@ -45,7 +45,11 @@ if (password_verify($password, $user['password'])) {
       header("Location: lenderdashboard.html");
   } elseif (strtolower($user['account_role']) == 'borrower') {
       header("Location: borrower_dashboard.php");
-  } else {
+  } 
+  elseif (strtolower($user['account_role']) == 'admin') {
+    header("Location: dashboard/admin_applications.php");
+} 
+    else {
       header("Location: dashboard.html");
   }
 
