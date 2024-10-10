@@ -1,4 +1,5 @@
 <?php
+session_start();
 // Database connection
 $servername = "localhost"; // Replace with your server name
 $username = "root"; // Replace with your database username
@@ -95,21 +96,65 @@ $result = $conn->query($sql);
 .border-bottom {
     border-bottom: 3.5px solid #f0f0f0 !important;
 }
-#image-container img {
-        max-width: 100%; /* Ensure images are responsive */
-        height: auto;    /* Maintain aspect ratio */
-        width: 100%;     /* Set width to 100% of the container */
-        max-height: 400px; /* Set a max-height for larger images */
-        object-fit: cover; /* Crop images to fit the container */
-    }
-    .modal-body {
-    font-size: 1.1rem; /* Increase font size */
+
+
+
+.modal-content {
+    border-radius: 15px;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+    margin-left: 20%;
 }
 
-.img-fluid {
-    max-width: 100%; /* Ensure images are responsive */
-    height: auto; /* Maintain aspect ratio */
+.modal-header {
+    border-bottom: none;
+    background-color: #f8f9fa;
+    padding: 20px;
 }
+
+.modal-title {
+    font-weight: bold;
+    color: #333;
+}
+
+.section-title {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    color: #555;
+}
+
+.info-item {
+    margin-bottom: 8px;
+    line-height: 1.5;
+    font-size: 0.9em;
+}
+
+.image-uploads img {
+    max-width: 100%;
+    height: auto;
+    border: 2px solid #007bff;
+    border-radius: 8px;
+}
+
+.btn-secondary {
+    background-color: #007bff;
+    border: none;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #0056b3;
+}
+
+.section-title {
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    color: #fff; /* White text for better contrast */
+    background-color: #ccac82; /* Background color */
+    border-radius: 9px; /* Rounded corners */
+    padding: 8px 12px; /* Padding for better spacing */
+    display: inline-block; /* To make the background wrap around the text */
+}
+
 
     </style>
 </head>
@@ -126,9 +171,9 @@ $result = $conn->query($sql);
             <div class="user-info d-flex align-items-center my-3 text-center">
                 <img src="red.jpg" alt="User Profile Picture" class="img-fluid rounded-circle" style="width: 50px; height: 50px; margin-right: 10px;">
                 <div class="user-details">
-                    <div class="username">Your Name Here</div>
-                    <div class="email">user@example.com</div>
-                </div>          
+    <div class="username"><?php echo isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Guest'; ?></div>
+    <div class="email"><?php echo isset($_SESSION['email']) ? $_SESSION['email'] : 'user@example.com'; ?></div>
+</div>       
             </div>
 
             <br>
@@ -251,7 +296,8 @@ $result = $conn->query($sql);
             <th scope="col">Last Name</th>
             <th scope="col">Email</th>
             <th scope="col">Birthdate</th>
-            <th scope="col">View More</th>
+            <th scope="col">Actions</th>
+            
         </tr>
     </thead>
     <tbody>
@@ -282,9 +328,11 @@ $result = $conn->query($sql);
 </div>
 
   </div>
+
+  
 <!-- Borrower Modal -->
 <div class="modal fade" id="borrowerModal" tabindex="-1" aria-labelledby="borrowerModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="borrowerModalLabel">Borrower Information</h5>
@@ -293,57 +341,143 @@ $result = $conn->query($sql);
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-6">
-                        <h6>Personal Information</h6>
-                        <p><strong>First Name:</strong> <span id="modal-fname"></span></p>
-                        <p><strong>Middle Name:</strong> <span id="modal-mname"></span></p>
-                        <p><strong>Last Name:</strong> <span id="modal-lname"></span></p>
-                        <p><strong>Birthdate:</strong> <span id="modal-birthdate"></span></p>
-                        <p><strong>Gender:</strong> <span id="modal-gender"></span></p>
-                        <p><strong>Cell Phone Number:</strong> <span id="modal-cellphonenumber"></span></p>
-                        <p><strong>Email:</strong> <span id="modal-email"></span></p>
+                        <h6 class="section-title">Personal Information</h6>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-fname" value="" readonly>
+                            <label for="modal-fname">&nbsp;&nbsp;First Name:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-mname" value="" readonly>
+                            <label for="modal-mname">&nbsp;&nbsp;Middle Name:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-lname" value="" readonly>
+                            <label for="modal-lname">&nbsp;&nbsp;Last Name:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-birthdate" value="" readonly>
+                            <label for="modal-birthdate">&nbsp;&nbsp;Birthdate:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-gender" value="" readonly>
+                            <label for="modal-gender">&nbsp;&nbsp;Gender:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-cellphonenumber" value="" readonly>
+                            <label for="modal-cellphonenumber">&nbsp;&nbsp;Cell Phone:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-email" value="" readonly>
+                            <label for="modal-email">&nbsp;&nbsp;Email:</label>
+                        </div>
                     </div>
+
                     <div class="col-md-6">
-                        <h6>Loan Details</h6>
-                        <p><strong>Loan Amount:</strong> <span id="modal-loan_amount"></span></p>
-                        <p><strong>Loan Purpose:</strong> <span id="modal-loan_purpose"></span></p>
-                        <p><strong>Loan Description:</strong> <span id="modal-loan_description"></span></p>
-                        <p><strong>Payment Mode:</strong> <span id="modal-payment_mode"></span></p>
-                        <p><strong>Payment Frequency:</strong> <span id="modal-payment_frequency"></span></p>
-                        <p><strong>Due Date:</strong> <span id="modal-due_date"></span></p>
-                        <p><strong>Total Amount:</strong> <span id="modal-total_amount"></span></p>
+                        <h6 class="section-title">Community & Spending</h6>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-school_community" value="" readonly>
+                            <label for="modal-school_community">&nbsp;&nbsp;School Community:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-spending_pattern" value="" readonly>
+                            <label for="modal-spending_pattern">&nbsp;&nbsp;Spending Pattern:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-account_details" value="" readonly>
+                            <label for="modal-account_details">&nbsp;&nbsp;Account Details:</label>
+                        </div>
                     </div>
                 </div>
                 <div class="row mt-3">
                     <div class="col-md-6">
-                        <h6>Education</h6>
-                        <p><strong>School:</strong> <span id="modal-school"></span></p>
-                        <p><strong>College:</strong> <span id="modal-college"></span></p>
-                        <p><strong>Course:</strong> <span id="modal-course"></span></p>
-                        <p><strong>Year of Study:</strong> <span id="modal-yearofstudy"></span></p>
-                        <p><strong>Graduation Date:</strong> <span id="modal-graduationdate"></span></p>
+                        <h6 class="section-title">Education</h6>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-school" value="" readonly>
+                            <label for="modal-school">&nbsp;&nbsp;School:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-college" value="" readonly>
+                            <label for="modal-college">&nbsp;&nbsp;College:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-course" value="" readonly>
+                            <label for="modal-course">&nbsp;&nbsp;Course:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-yearofstudy" value="" readonly>
+                            <label for="modal-yearofstudy">&nbsp;&nbsp;Year of Study:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-graduationdate" value="" readonly>
+                            <label for="modal-graduationdate">&nbsp;&nbsp;Graduation Date:</label>
+                        </div>
                     </div>
                     <div class="col-md-6">
-                        <h6>Financial Information</h6>
-                        <p><strong>Monthly Allowance:</strong> <span id="modal-monthly_allowance"></span></p>
-                        <p><strong>Source of Allowance:</strong> <span id="modal-source_of_allowance"></span></p>
-                        <p><strong>Monthly Expenses:</strong> <span id="modal-monthly_expenses"></span></p>
-                        <p><strong>Monthly Savings:</strong> <span id="modal-monthly_savings"></span></p>
-                        <p><strong>Career Goals:</strong> <span id="modal-career_goals"></span></p>
+                        <h6 class="section-title">Financial Information</h6>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-monthly_allowance" value="" readonly>
+                            <label for="modal-monthly_allowance">&nbsp;&nbsp;Monthly Allowance:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-source_of_allowance" value="" readonly>
+                            <label for="modal-source_of_allowance">&nbsp;&nbsp;Source of Allowance:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-monthly_expenses" value="" readonly>
+                            <label for="modal-monthly_expenses">&nbsp;&nbsp;Monthly Expenses:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-monthly_savings" value="" readonly>
+                            <label for="modal-monthly_savings">&nbsp;&nbsp;Monthly Savings:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-career_goals" value="" readonly>
+                            <label for="modal-career_goals">&nbsp;&nbsp;Career Goals:</label>
+                        </div>
                     </div>
                 </div>
                 <div class="row mt-3">
                     <div class="col-md-6">
-                        <h6>Images</h6>
-                        <img id="modal-cor1" class="img-fluid mb-2" alt="COR1 Image">
-                        <img id="modal-cor2" class="img-fluid mb-2" alt="COR2 Image">
-                        <img id="modal-cor3" class="img-fluid mb-2" alt="COR3 Image">
-                        <img id="modal-cor4" class="img-fluid mb-2" alt="COR4 Image">
+                        <h6 class="section-title">Loan Details</h6>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-loan_amount" value="" readonly>
+                            <label for="modal-loan_amount">&nbsp;&nbsp;Loan Amount:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-loan_purpose" value="" readonly>
+                            <label for="modal-loan_purpose">&nbsp;&nbsp;Loan Purpose:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-loan_description" value="" readonly>
+                            <label for="modal-loan_description">&nbsp;&nbsp;Loan Description:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-payment_mode" value="" readonly>
+                            <label for="modal-payment_mode">&nbsp;&nbsp;Payment Mode:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-payment_frequency" value="" readonly>
+                            <label for="modal-payment_frequency">&nbsp;&nbsp;Payment Frequency:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-due_date" value="" readonly>
+                            <label for="modal-due_date">&nbsp;&nbsp;Due Date:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-total_amount" value="" readonly>
+                            <label for="modal-total_amount">&nbsp;&nbsp;Total Amount:</label>
+                        </div>
                     </div>
-                    <div class="col-md-6">
-                        <h6>Community & Spending</h6>
-                        <p><strong>School Community:</strong> <span id="modal-school_community"></span></p>
-                        <p><strong>Spending Pattern:</strong> <span id="modal-spending_pattern"></span></p>
-                        <p><strong>Account Details:</strong> <span id="modal-account_details"></span></p>
+                </div>
+                <div class="row mt-4 text-center">
+                    <div class="col-md-12">
+                        <h6 class="section-title">COR Image Uploads</h6>
+                        <div class="image-uploads">
+                            <img id="modal-cor1" class="img-fluid mb-2" alt="COR1 Image">
+                            <img id="modal-cor2" class="img-fluid mb-2" alt="COR2 Image">
+                            <img id="modal-cor3" class="img-fluid mb-2" alt="COR3 Image">
+                            <img id="modal-cor4" class="img-fluid mb-2" alt="COR4 Image">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -353,6 +487,9 @@ $result = $conn->query($sql);
         </div>
     </div>
 </div>
+
+
+
 
 
 
@@ -371,7 +508,8 @@ $result = $conn->query($sql);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"></script>
     
    
-    <script>
+    
+<script>
 document.addEventListener('DOMContentLoaded', function () {
     var borrowerModal = document.getElementById('borrowerModal');
     
@@ -387,33 +525,33 @@ document.addEventListener('DOMContentLoaded', function () {
                 var data = JSON.parse(this.responseText);
 
                 // Populate the modal fields with fetched data
-                document.getElementById('modal-fname').innerText = data.fname;
-                document.getElementById('modal-mname').innerText = data.mname;
-                document.getElementById('modal-lname').innerText = data.lname;
-                document.getElementById('modal-birthdate').innerText = data.birthdate;
-                document.getElementById('modal-gender').innerText = data.gender;
-                document.getElementById('modal-cellphonenumber').innerText = data.cellphonenumber;
-                document.getElementById('modal-email').innerText = data.email;
-                document.getElementById('modal-loan_amount').innerText = data.loan_amount;
-                document.getElementById('modal-loan_purpose').innerText = data.loan_purpose;
-                document.getElementById('modal-loan_description').innerText = data.loan_description;
-                document.getElementById('modal-payment_mode').innerText = data.payment_mode;
-                document.getElementById('modal-payment_frequency').innerText = data.payment_frequency;
-                document.getElementById('modal-due_date').innerText = data.due_date;
-                document.getElementById('modal-total_amount').innerText = data.total_amount;
-                document.getElementById('modal-school').innerText = data.school;
-                document.getElementById('modal-college').innerText = data.college;
-                document.getElementById('modal-course').innerText = data.course;
-                document.getElementById('modal-yearofstudy').innerText = data.yearofstudy;
-                document.getElementById('modal-graduationdate').innerText = data.graduationdate;
-                document.getElementById('modal-monthly_allowance').innerText = data.monthly_allowance;
-                document.getElementById('modal-source_of_allowance').innerText = data.source_of_allowance;
-                document.getElementById('modal-monthly_expenses').innerText = data.monthly_expenses;
-                document.getElementById('modal-monthly_savings').innerText = data.monthly_savings;
-                document.getElementById('modal-career_goals').innerText = data.career_goals;
-                document.getElementById('modal-school_community').innerText = data.school_community;
-                document.getElementById('modal-spending_pattern').innerText = data.spending_pattern;
-                document.getElementById('modal-account_details').innerText = data.account_details;
+                document.getElementById('modal-fname').value = data.fname;
+                document.getElementById('modal-mname').value = data.mname;
+                document.getElementById('modal-lname').value = data.lname;
+                document.getElementById('modal-birthdate').value = data.birthdate;
+                document.getElementById('modal-gender').value = data.gender;
+                document.getElementById('modal-cellphonenumber').value = data.cellphonenumber;
+                document.getElementById('modal-email').value = data.email;
+                document.getElementById('modal-loan_amount').value = data.loan_amount;
+                document.getElementById('modal-loan_purpose').value = data.loan_purpose;
+                document.getElementById('modal-loan_description').value = data.loan_description;
+                document.getElementById('modal-payment_mode').value = data.payment_mode;
+                document.getElementById('modal-payment_frequency').value = data.payment_frequency;
+                document.getElementById('modal-due_date').value = data.due_date;
+                document.getElementById('modal-total_amount').value = data.total_amount;
+                document.getElementById('modal-school').value = data.school;
+                document.getElementById('modal-college').value = data.college;
+                document.getElementById('modal-course').value = data.course;
+                document.getElementById('modal-yearofstudy').value = data.yearofstudy;
+                document.getElementById('modal-graduationdate').value = data.graduationdate;
+                document.getElementById('modal-monthly_allowance').value = data.monthly_allowance;
+                document.getElementById('modal-source_of_allowance').value = data.source_of_allowance;
+                document.getElementById('modal-monthly_expenses').value = data.monthly_expenses;
+                document.getElementById('modal-monthly_savings').value = data.monthly_savings;
+                document.getElementById('modal-career_goals').value = data.career_goals;
+                document.getElementById('modal-school_community').value = data.school_community;
+                document.getElementById('modal-spending_pattern').value = data.spending_pattern;
+                document.getElementById('modal-account_details').value = data.account_details;
 
                 // Set the image sources
                 document.getElementById('modal-cor1').src = data.cor1_path || '#';
@@ -425,12 +563,16 @@ document.addEventListener('DOMContentLoaded', function () {
         xhr.send();
     });
 });
+</script>
 
 </script>
 
 
 
     <script>
+        console.log('Image 1 Path:', data.cor1_path);
+console.log('Image 2 Path:', data.cor2_path);
+
         var el = document.getElementById("wrapper");
         var toggleButton = document.getElementById("menu-toggle");
 

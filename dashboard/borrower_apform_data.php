@@ -1,6 +1,6 @@
 <?php
 session_start(); // Start session to access session variables
-print_r($_SESSION); // Check what’s in the session
+
 // Database connection
 $host = 'localhost'; // Your database host
 $db = 'scholarlend_db'; // Your database name

@@ -1,6 +1,6 @@
 <?php
 session_start(); // Start session to access session variables
-print_r($_SESSION);
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
