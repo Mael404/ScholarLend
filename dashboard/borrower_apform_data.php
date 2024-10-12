@@ -42,6 +42,8 @@ $payment_frequency = $conn->real_escape_string($_POST['frequency']);
 $due_date = $conn->real_escape_string($_POST['due_date']);
 $account_details = $conn->real_escape_string($_POST['account_details']);
 $total_amount = $conn->real_escape_string($_POST['total_amount']);
+$next_deadlines = $conn->real_escape_string($_POST['next_deadlines']);
+$statuss = "Pending";
 
 // Handle file uploads
 $uploadDir = "uploads/";
@@ -80,21 +82,22 @@ if (!$errorOccurred) {
 
     // Insert into the database
     $sql = "INSERT INTO borrower_info (
-        user_id,fname, mname, lname, birthdate, gender, cellphonenumber, email, school, college, 
+        user_id, fname, mname, lname, birthdate, gender, cellphonenumber, email, school, college, 
         course, yearofstudy, graduationdate, monthly_allowance, source_of_allowance, 
         monthly_expenses, school_community, spending_pattern, monthly_savings, 
         career_goals, loan_amount, loan_purpose, loan_description, payment_mode, 
-        payment_frequency, due_date, account_details, total_amount,
+        payment_frequency, due_date, next_deadlines, account_details, total_amount, status, 
         cor1_path, cor2_path, cor3_path, cor4_path
     ) VALUES (
-         '$user_id','$fname', '$mname', '$lname', '$birthdate', '$gender', '$cellphonenumber', '$email', 
+        '$user_id', '$fname', '$mname', '$lname', '$birthdate', '$gender', '$cellphonenumber', '$email', 
         '$school', '$college', '$course', '$yearofstudy', '$graduationdate', 
         '$monthly_allowance', '$source_of_allowance', '$monthly_expenses', '$school_community', 
         '$spending_pattern', '$monthly_savings', '$career_goals', '$loan_amount', 
         '$loan_purpose', '$loan_description', '$payment_mode', '$payment_frequency', 
-        '$due_date', '$account_details', '$total_amount',
+        '$due_date', '$next_deadlines', '$account_details', '$total_amount', '$statuss',
         '$file1', '$file2', '$file3', '$file4'
     )";
+    
 
     if ($conn->query($sql) === TRUE) {
         echo "New record created successfully";

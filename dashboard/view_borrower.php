@@ -20,8 +20,9 @@ $query = "SELECT `fname`, `mname`, `lname`, `birthdate`, `gender`, `cellphonenum
           `college`, `course`, `yearofstudy`, `graduationdate`, `monthly_allowance`, `source_of_allowance`, 
           `monthly_expenses`, `school_community`, `spending_pattern`, `monthly_savings`, `career_goals`, 
           `loan_amount`, `loan_purpose`, `loan_description`, `payment_mode`, `payment_frequency`, `due_date`, 
-          `account_details`, `total_amount`, `cor1_path`, `cor2_path`, `cor3_path`, `cor4_path`
-          FROM borrower_info WHERE user_id = $user_id";
+          `account_details`, `total_amount`, `next_deadlines`, `cor1_path`, `cor2_path`, `cor3_path`, `cor4_path`
+          FROM borrower_info WHERE id = $user_id";
+
 
 $result = $conn->query($query);
 

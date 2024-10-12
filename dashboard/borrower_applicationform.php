@@ -1,7 +1,11 @@
 <?php
 session_start(); // Start session to access session variables
 
+include 'check_application.php';
+
 ?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -92,9 +96,18 @@ session_start(); // Start session to access session variables
             <div class="user-info d-flex align-items-center my-3 text-center">
                 <img src="red.jpg" alt="User Profile Picture" class="img-fluid rounded-circle" style="width: 50px; height: 50px; margin-right: 10px;">
                 <div class="user-details">
-    <div class="username"><?php echo isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Guest'; ?></div>
-    <div class="email"><?php echo isset($_SESSION['email']) ? $_SESSION['email'] : 'user@example.com'; ?></div>
+    <div class="username">
+        <?php 
+        echo isset($_SESSION['first_name']) && isset($_SESSION['last_name']) 
+            ? $_SESSION['first_name'] . ' ' . $_SESSION['last_name'] 
+            : 'Guest'; 
+        ?>
+    </div>
+    <div class="email">
+        <?php echo isset($_SESSION['email']) ? $_SESSION['email'] : 'user@example.com'; ?>
+    </div>
 </div>
+
           
            
                
@@ -102,34 +115,33 @@ session_start(); // Start session to access session variables
             <br>
         
             <div class="list-group list-group-flush my-3">
-                <a href="admindashboard.php" class="list-group-item list-group-item-action active">
-                    <i class="fas fa-home me-2"></i>Home
-                </a>
-                <a href="admin_applications.php" class="list-group-item">
-                    <i class="fas fa-folder-open m  e-2"></i>Applications
-                </a>
-                <a href="#" class="list-group-item">
-                    <i class="fas fa-hand-holding-usd me-2"></i>Lenders
-                </a>
-                <a href="#" class="list-group-item">
-                    <i class="fas fa-users me-2"></i>Borrowers
-                </a>
-                <a href="#" class="list-group-item">
-                    <i class="fas fa-file-alt me-2"></i>Loans
-                </a>
-                <a href="#" class="list-group-item">
-                    <i class="fas fa-envelope me-2"></i>Messages
-                </a>
-                <a href="#" class="list-group-item">
-                    <i class="fas fa-chart-line me-2"></i>Reports
-                </a>
-                <a href="#" class="list-group-item">
-                    <i class="fas fa-cog me-2"></i>Settings
-                </a>
-                <a href="#" class="list-group-item list-group-item-action text-danger fw-bold">
-                    <i class="fas fa-power-off me-2"></i>Logout
-                </a>
-            </div>
+    <a href="admindashboard.php" class="list-group-item list-group-item-action active">
+        <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+    </a>
+    <a href="#" class="list-group-item">
+        <i class="fas fa-envelope me-2"></i>Messages
+    </a>
+    <a href="#" class="list-group-item">
+        <i class="fas fa-plus-circle me-2"></i>Add Credit
+    </a>
+    <a href="#" class="list-group-item">
+        <i class="fas fa-minus-circle me-2"></i>Withdraw Credit
+    </a>
+    <a href="#" class="list-group-item">
+        <i class="fas fa-exchange-alt me-2"></i>Transactions
+    </a>
+    <a href="#" class="list-group-item">
+        <i class="fas fa-cog me-2"></i>Settings
+    </a>
+    <a href="#" class="list-group-item">
+        <i class="fas fa-address-book me-2"></i>Contact Us
+    </a>
+    <a href="#" class="list-group-item list-group-item-action text-danger fw-bold">
+        <i class="fas fa-power-off me-2"></i>Logout
+    </a>
+</div>
+
+
             
             
         </div>
@@ -171,7 +183,13 @@ session_start(); // Start session to access session variables
                 <div class="row justify-content-center">
                     <div class="col-12 col-sm-12 col-md-10 col-lg-10 col-xl-9 text-center p-0 mt-3 mb-2">
                         <div class="card px-0 pt-0 pb-0 mt-3 mb-3">
-
+                        <?php
+// If the user has a pending application, show the message
+if ($has_pending_application) {
+    echo "<p>Your application is pending.</p>";
+} else {
+    // Show the form if there is no pending application
+    ?>
                             <form id="msform" action="borrower_apform_data.php" method="post" enctype="multipart/form-data">
                                 <!-- progressbar -->
                               
@@ -601,8 +619,14 @@ session_start(); // Start session to access session variables
   <input type="hidden" id="hiddenDueDate" name="due_date">
   <input type="hidden" id="hiddenAccountDetails" name="account_details">
   <input type="hidden" id="hiddenTotalAmount" name="total_amount">
+  <input type="hidden" id="hiddenNextDeadlines" name="next_deadlines">
+
                                 
                             </form>
+
+                            <?php
+}
+?>
 
 
                             
@@ -612,7 +636,7 @@ session_start(); // Start session to access session variables
             </div>
 
      <!-- Bootstrap Modal -->
-<div class="modal fade" id="summaryModal" tabindex="-1" aria-labelledby="summaryModalLabel" aria-hidden="true">
+     <div class="modal fade" id="summaryModal" tabindex="-1" aria-labelledby="summaryModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -620,12 +644,15 @@ session_start(); // Start session to access session variables
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p><strong>Payment Mode:</strong> <span id="modalPaymentMode"></span></p>
-                <p><strong>Frequency:</strong> <span id="modalFrequency"></span></p>
-                <p><strong>Selected Due Date:</strong> <span id="modalDueDate"></span></p>
-                <p><strong>Account Details:</strong> <span id="modalAccountDetails"></span></p>
-                <p><strong>Total Amount to be Paid:</strong> <span id="modalTotalAmount"></span></p>
-            </div>
+    <p><strong>Payment Mode:</strong> <span id="modalPaymentMode"></span></p>
+    <p><strong>Frequency:</strong> <span id="modalFrequency"></span></p>
+    <p><strong>Selected Due Date:</strong> <span id="modalDueDate"></span></p>
+    <p><strong>Next Deadlines:</strong> <span id="modalNextDeadlines"></span></p>
+    <p><strong>Account Details:</strong> <span id="modalAccountDetails"></span></p>
+    <p><strong>Total Amount to be Paid:</strong> <span id="modalTotalAmount"></span></p>
+    <p><strong>Total Interest Earned:</strong> <span id="modalTotalInterest"></span></p> <!-- New line for interest -->
+</div>
+
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="submitForm()">Submit</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -633,6 +660,44 @@ session_start(); // Start session to access session variables
         </div>
     </div>
 </div>
+
+<script>
+// Example function to calculate due dates
+function calculateDueDates() {
+    const frequency = document.getElementById('modalFrequency').innerText;
+    const dueDateString = document.getElementById('modalDueDate').innerText;
+    
+    const dueDate = new Date(dueDateString);
+    const today = new Date();
+    
+    let nextDeadlines = [];
+
+    // Calculate next due dates based on frequency
+    if (frequency === 'Daily') {
+        while (today <= dueDate) {
+            nextDeadlines.push(new Date(today).toLocaleDateString());
+            today.setDate(today.getDate() + 1);
+        }
+    } else if (frequency === 'Weekly') {
+        while (today <= dueDate) {
+            nextDeadlines.push(new Date(today).toLocaleDateString());
+            today.setDate(today.getDate() + 7);
+        }
+    } else if (frequency === 'Monthly') {
+        while (today <= dueDate) {
+            nextDeadlines.push(new Date(today).toLocaleDateString());
+            today.setMonth(today.getMonth() + 1);
+        }
+    }
+
+    // Update the modal with the calculated deadlines
+    document.getElementById('modalNextDeadlines').innerText = nextDeadlines.join(', ');
+}
+
+// Call the function when the modal is shown
+document.getElementById('summaryModal').addEventListener('show.bs.modal', calculateDueDates);
+</script>
+
 
 
 
@@ -797,8 +862,7 @@ session_start(); // Start session to access session variables
     });
 
     // Function to handle submission and showing the modal
-   // Function to handle submission and showing the modal
-function showSummaryModal() {
+    function showSummaryModal() {
     const paymentModeValue = paymentMode.value;
     const frequencyValue = paymentFrequency.value;
     const dueDate = dueDateInput.value; // This will be empty for Installments
@@ -847,21 +911,26 @@ function showSummaryModal() {
         return;
     }
 
+    let interest = 0; // Initialize interest variable
+
     // Calculate total amount based on the payment mode
     if (paymentModeValue === 'Lump Sum') {
         const interestRatePerDay = 0.04 / 7; // Weekly interest rate of 4%, converted to daily rate
-        const interest = interestRatePerDay * principal * noOfDays; // Interest calculation
+        interest = interestRatePerDay * principal * noOfDays; // Interest calculation
         totalAmountToBePaid = principal + interest; // Add interest to the principal
     } else if (paymentModeValue === 'Installment') {
         if (frequencyValue === 'Daily') {
             const dailyInterestRate = (0.04 / 7); // 4% per week divided by 7 days
-            totalAmountToBePaid = ((dailyInterestRate * principal * noOfDays) + principal) / noOfDays;
+            interest = dailyInterestRate * principal * noOfDays;
+            totalAmountToBePaid = ((interest) + principal) / noOfDays;
         } else if (frequencyValue === 'Weekly') {
             const weeks = parseInt(dueDateOptions.value);
-            totalAmountToBePaid = ((0.04 * principal * weeks) + principal) / weeks;
+            interest = 0.04 * principal * weeks; // Total interest for the weeks
+            totalAmountToBePaid = ((interest) + principal) / weeks;
         } else if (frequencyValue === 'Monthly') {
             const months = parseInt(dueDateOptions.value);
-            totalAmountToBePaid = ((0.04 * principal * 4 * months) + principal) / months;
+            interest = 0.04 * principal * 4 * months; // Total interest for the months
+            totalAmountToBePaid = ((interest) + principal) / months;
         }
     }
 
@@ -872,10 +941,14 @@ function showSummaryModal() {
     document.getElementById('modalAccountDetails').textContent = accountDetails; // Display Account Details
     document.getElementById('modalTotalAmount').textContent = totalAmountToBePaid.toFixed(2); // Show 2 decimal places
 
+    // Show the interest amount
+    document.getElementById('modalTotalInterest').textContent = interest.toFixed(2); // Show interest amount
+
     // Show the modal using Bootstrap
     const summaryModal = new bootstrap.Modal(document.getElementById('summaryModal'));
     summaryModal.show();
 }
+
 
 
     // Function to reset form fields
@@ -950,13 +1023,14 @@ function showSummaryModal() {
 
 
 <script>
-    function updateHiddenInputs() {
+   function updateHiddenInputs() {
         // Get the values from the modal and assign them to the hidden fields
         document.getElementById('hiddenPaymentMode').value = document.getElementById('modalPaymentMode').innerText;
         document.getElementById('hiddenFrequency').value = document.getElementById('modalFrequency').innerText;
         document.getElementById('hiddenDueDate').value = document.getElementById('modalDueDate').innerText;
         document.getElementById('hiddenAccountDetails').value = document.getElementById('modalAccountDetails').innerText;
         document.getElementById('hiddenTotalAmount').value = document.getElementById('modalTotalAmount').innerText;
+        document.getElementById('hiddenNextDeadlines').value = document.getElementById('modalNextDeadlines').innerText; // Add next deadlines
     }
 
     function submitForm() {

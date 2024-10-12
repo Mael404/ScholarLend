@@ -15,7 +15,7 @@ if ($conn->connect_error) {
 }
 
 // Query to fetch all required data
-$sql = "SELECT fname, mname, lname, email, birthdate, user_id FROM borrower_info";
+$sql = "SELECT fname, mname, lname, email, birthdate, id FROM borrower_info";
 $result = $conn->query($sql);
 
 ?>
@@ -33,6 +33,7 @@ $result = $conn->query($sql);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    
     <link rel="stylesheet" href="styles.css" />
     <title>ScholarLend - Admin</title>
 
@@ -102,7 +103,7 @@ $result = $conn->query($sql);
 .modal-content {
     border-radius: 15px;
     box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
-    margin-left: 20%;
+   
 }
 
 .modal-header {
@@ -171,9 +172,17 @@ $result = $conn->query($sql);
             <div class="user-info d-flex align-items-center my-3 text-center">
                 <img src="red.jpg" alt="User Profile Picture" class="img-fluid rounded-circle" style="width: 50px; height: 50px; margin-right: 10px;">
                 <div class="user-details">
-    <div class="username"><?php echo isset($_SESSION['first_name']) ? $_SESSION['first_name'] : 'Guest'; ?></div>
-    <div class="email"><?php echo isset($_SESSION['email']) ? $_SESSION['email'] : 'user@example.com'; ?></div>
-</div>       
+    <div class="username">
+        <?php 
+        echo isset($_SESSION['first_name']) && isset($_SESSION['last_name']) 
+            ? $_SESSION['first_name'] . ' ' . $_SESSION['last_name'] 
+            : 'Guest'; 
+        ?>
+    </div>
+    <div class="email">
+        <?php echo isset($_SESSION['email']) ? $_SESSION['email'] : 'user@example.com'; ?>
+    </div>
+</div>  
             </div>
 
             <br>
@@ -287,6 +296,7 @@ $result = $conn->query($sql);
      <!-- Data Table Section -->
      <div class="mt-4">
      <div class="table-responsive">
+        
      <table id="applicantsTable" class="table table-bordered table-striped">
     <thead class="table-dark">
         <tr>
@@ -297,7 +307,6 @@ $result = $conn->query($sql);
             <th scope="col">Email</th>
             <th scope="col">Birthdate</th>
             <th scope="col">Actions</th>
-            
         </tr>
     </thead>
     <tbody>
@@ -313,7 +322,15 @@ $result = $conn->query($sql);
                 echo "<td>" . $row['email'] . "</td>";
                 echo "<td>" . $row['birthdate'] . "</td>";
                 echo "<td>
-                        <button type='button' class='btn btn-success' data-bs-toggle='modal' data-bs-target='#borrowerModal' data-id='" . $row['user_id'] . "'>View More</button>
+                        <button type='button' class='btn btn-link' data-bs-toggle='modal' data-bs-target='#borrowerModal' data-id='" . $row['id'] . "'>
+                            <i class='fas fa-eye' style='color: blue;'></i> <!-- Eye icon color changed to blue -->
+                        </button>
+                        <button type='button' class='btn btn-outline-success' onclick='checkApplicant(" . $row['id'] . ")'>
+                            <i class='fas fa-check' style='color: green;'></i> <!-- Check icon color changed to green -->
+                        </button>
+                        <button type='button' class='btn btn-outline-danger' onclick='deleteApplicant(" . $row['id'] . ")'>
+                            <i class='fas fa-trash'></i>
+                        </button>
                       </td>";
                 echo "</tr>";
             }
@@ -325,7 +342,9 @@ $result = $conn->query($sql);
     </tbody>
 </table>
 
-</div>
+
+
+        </div>
 
   </div>
 
@@ -431,9 +450,10 @@ $result = $conn->query($sql);
                             <label for="modal-monthly_savings">&nbsp;&nbsp;Monthly Savings:</label>
                         </div>
                         <div class="form-floating mb-3">
-                            <input type="text" class="form-control" id="modal-career_goals" value="" readonly>
-                            <label for="modal-career_goals">&nbsp;&nbsp;Career Goals:</label>
-                        </div>
+    <textarea class="form-control" id="modal-career_goals" rows="4" readonly></textarea>
+    <label for="modal-career_goals">&nbsp;&nbsp;Career Goals:</label>
+</div>
+
                     </div>
                 </div>
                 <div class="row mt-3">
@@ -464,6 +484,12 @@ $result = $conn->query($sql);
                             <label for="modal-due_date">&nbsp;&nbsp;Due Date:</label>
                         </div>
                         <div class="form-floating mb-3">
+    <input type="text" class="form-control" id="modal-next_deadlines" value="" readonly style="height: 50px; width: 100%;">
+    <label for="modal-next_deadlines">&nbsp;&nbsp;Next Deadlines:</label>
+</div>
+
+
+                        <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="modal-total_amount" value="" readonly>
                             <label for="modal-total_amount">&nbsp;&nbsp;Total Amount:</label>
                         </div>
@@ -490,7 +516,7 @@ $result = $conn->query($sql);
 
 
 
-
+</div>
 
 
 
@@ -539,6 +565,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('modal-payment_frequency').value = data.payment_frequency;
                 document.getElementById('modal-due_date').value = data.due_date;
                 document.getElementById('modal-total_amount').value = data.total_amount;
+                document.getElementById('modal-next_deadlines').value = data.next_deadlines; // New line for next_deadlines
                 document.getElementById('modal-school').value = data.school;
                 document.getElementById('modal-college').value = data.college;
                 document.getElementById('modal-course').value = data.course;
@@ -563,15 +590,14 @@ document.addEventListener('DOMContentLoaded', function () {
         xhr.send();
     });
 });
-</script>
 
 </script>
 
 
 
-    <script>
-        console.log('Image 1 Path:', data.cor1_path);
-console.log('Image 2 Path:', data.cor2_path);
+
+
+    <script>  
 
         var el = document.getElementById("wrapper");
         var toggleButton = document.getElementById("menu-toggle");
@@ -585,7 +611,10 @@ console.log('Image 2 Path:', data.cor2_path);
             "paging": true,
             "searching": true,
             "ordering": true,
-            "info": true
+            "info": true,
+            "responsive": true,
+            
+
         });
     });
     </script>
