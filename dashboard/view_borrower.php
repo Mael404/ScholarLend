@@ -23,12 +23,21 @@ $query = "SELECT `fname`, `mname`, `lname`, `birthdate`, `gender`, `cellphonenum
           `account_details`, `total_amount`, `next_deadlines`, `cor1_path`, `cor2_path`, `cor3_path`, `cor4_path`
           FROM borrower_info WHERE id = $user_id";
 
-
 $result = $conn->query($query);
 
 if ($result->num_rows > 0) {
     // Fetch the borrower details
     $row = $result->fetch_assoc();
+    
+    // Decode the next_deadlines JSON string into an array
+    $next_deadlines_array = json_decode($row['next_deadlines'], true);
+    
+    // Count the number of next deadlines
+    $count_deadlines = is_array($next_deadlines_array) ? count($next_deadlines_array) : 0;
+
+    // Add the count to the response
+    $row['next_deadlines_count'] = $count_deadlines;
+
     echo json_encode($row); // Return the row as a JSON object
 } else {
     echo json_encode(['error' => 'No borrower found with the given ID.']);

@@ -183,12 +183,68 @@ include 'check_application.php';
                 <div class="row justify-content-center">
                     <div class="col-12 col-sm-12 col-md-10 col-lg-10 col-xl-9 text-center p-0 mt-3 mb-2">
                         <div class="card px-0 pt-0 pb-0 mt-3 mb-3">
+                       
                         <?php
+
+
+$user_id = $_SESSION['user_id'];
+
+// Database connection
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "scholarlend_db";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Query to check if the user has a pending application
+$sql_pending = "SELECT * FROM borrower_info WHERE user_id = ? AND status = 'pending'";
+$stmt_pending = $conn->prepare($sql_pending);
+$stmt_pending->bind_param("i", $user_id);
+$stmt_pending->execute();
+$result_pending = $stmt_pending->get_result();
+
+// Check if the query returned any rows
+$has_pending_application = $result_pending->num_rows > 0;
+
+// Query to check if the user has an approved application
+$sql_approved = "SELECT * FROM borrower_info WHERE user_id = ? AND status = 'approved'";
+$stmt_approved = $conn->prepare($sql_approved);
+$stmt_approved->bind_param("i", $user_id);
+$stmt_approved->execute();
+$result_approved = $stmt_approved->get_result();
+
+// Fetch approved application details if exists
+$approved_application = $result_approved->fetch_assoc();
+
+// Close the statements
+$stmt_pending->close();
+$stmt_approved->close();
+$conn->close();
+
 // If the user has a pending application, show the message
 if ($has_pending_application) {
     echo "<p>Your application is pending.</p>";
+} elseif ($approved_application) {
+    // If there is an approved application, show the details
+
+    $due_date = $approved_application['due_date'];
+    $next_deadlines = $approved_application['next_deadlines'];
+    $total_amount = $approved_application['total_amount'];
+
+    echo "<h2>Application Approved!</h2>";
+  
+    echo "<p>Due Date: $due_date</p>";
+    echo "<p>Next Deadlines: $next_deadlines</p>";
+    echo "<p>Total Amount: $total_amount</p>";
 } else {
-    // Show the form if there is no pending application
+    // Show the form if there is no pending or approved application
     ?>
                             <form id="msform" action="borrower_apform_data.php" method="post" enctype="multipart/form-data">
                                 <!-- progressbar -->
@@ -668,25 +724,37 @@ function calculateDueDates() {
     const dueDateString = document.getElementById('modalDueDate').innerText;
     
     const dueDate = new Date(dueDateString);
-    const today = new Date();
+    let today = new Date(); // Create a date object for today
     
+    // Advance both the start and end dates
+    if (frequency === 'Daily') {
+        today.setDate(today.getDate() + 1); // Advance start date by 1 day
+        dueDate.setDate(dueDate.getDate() + 1); // Advance end date by 1 day
+    } else if (frequency === 'Weekly') {
+        today.setDate(today.getDate() + 7); // Advance start date by 1 week
+        dueDate.setDate(dueDate.getDate() + 7); // Advance end date by 1 week
+    } else if (frequency === 'Monthly') {
+        today.setMonth(today.getMonth() + 1); // Advance start date by 1 month
+        dueDate.setMonth(dueDate.getMonth() + 1); // Advance end date by 1 month
+    }
+
     let nextDeadlines = [];
 
     // Calculate next due dates based on frequency
     if (frequency === 'Daily') {
         while (today <= dueDate) {
-            nextDeadlines.push(new Date(today).toLocaleDateString());
-            today.setDate(today.getDate() + 1);
+            nextDeadlines.push(today.toLocaleDateString()); // Add today's date
+            today.setDate(today.getDate() + 1); // Move to the next day
         }
     } else if (frequency === 'Weekly') {
         while (today <= dueDate) {
-            nextDeadlines.push(new Date(today).toLocaleDateString());
-            today.setDate(today.getDate() + 7);
+            nextDeadlines.push(today.toLocaleDateString()); // Add today's date
+            today.setDate(today.getDate() + 7); // Move to the next week
         }
     } else if (frequency === 'Monthly') {
         while (today <= dueDate) {
-            nextDeadlines.push(new Date(today).toLocaleDateString());
-            today.setMonth(today.getMonth() + 1);
+            nextDeadlines.push(today.toLocaleDateString()); // Add today's date
+            today.setMonth(today.getMonth() + 1); // Move to the next month
         }
     }
 
@@ -696,6 +764,7 @@ function calculateDueDates() {
 
 // Call the function when the modal is shown
 document.getElementById('summaryModal').addEventListener('show.bs.modal', calculateDueDates);
+
 </script>
 
 

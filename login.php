@@ -33,30 +33,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($result->num_rows == 1) {
         $user = $result->fetch_assoc();
 
-       // After verifying the password
-if (password_verify($password, $user['password'])) {
-  $_SESSION['user_id'] = $user['user_id'];
-  $_SESSION['first_name'] = $user['first_name'];
-  $_SESSION['last_name'] = $user['last_name'];
-  $_SESSION['email'] = $user['email']; // Add this line
-  $_SESSION['account_role'] = $user['account_role'];
+        // After verifying the password
+        if (password_verify($password, $user['password'])) {
+            // Clear existing session data
+            session_unset(); // Clear all session variables
+            session_destroy(); // Destroy the session
 
-  // Redirect based on role
-  if (strtolower($user['account_role']) == 'lender') {
-      header("Location: lenderdashboard.html");
-  } elseif (strtolower($user['account_role']) == 'borrower') {
-      header("Location: borrower_dashboard.php");
-  } 
-  elseif (strtolower($user['account_role']) == 'admin') {
-    header("Location: dashboard/admin_applications.php");
-} 
-    else {
-      header("Location: dashboard.html");
-  }
+            // Start a new session
+            session_start(); // Start a new session
 
-  exit();
-}
-else {
+            // Set new session variables
+            $_SESSION['user_id'] = $user['user_id'];
+            $_SESSION['first_name'] = $user['first_name'];
+            $_SESSION['last_name'] = $user['last_name'];
+            $_SESSION['email'] = $user['email'];
+            $_SESSION['account_role'] = $user['account_role'];
+
+            // Redirect based on role
+            if (strtolower($user['account_role']) == 'lender') {
+                header("Location: lenderdashboard.html");
+            } elseif (strtolower($user['account_role']) == 'borrower') {
+                header("Location: borrower_dashboard.php");
+            } elseif (strtolower($user['account_role']) == 'admin') {
+                header("Location: dashboard/admin_applications.php");
+            } else {
+                header("Location: dashboard.html");
+            }
+
+            exit();
+        } else {
             // Set error message
             $error_message = "Invalid email or password.";
         }
@@ -68,6 +73,7 @@ else {
 
 $conn->close();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">

@@ -14,13 +14,11 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Query to fetch all required data
-$sql = "SELECT fname, mname, lname, email, birthdate, id FROM borrower_info";
+// Query to fetch data where status is 'Pending'
+$sql = "SELECT fname, mname, lname, email, birthdate, id FROM borrower_info WHERE status = 'Pending'";
+
 $result = $conn->query($sql);
-
 ?>
-
-
 
 
 <!DOCTYPE html>
@@ -254,49 +252,84 @@ $result = $conn->query($sql);
 
   <div class="container mt-4">
     <div class="row">
-      <!-- Total Applicants Card -->
-      <div class="col-md-4">
-        <div class="card text-center rounded">
-          <div class="card-body">
-            <div class="d-flex align-items-center justify-content-center">
-              <i class="fas fa-users fa-2x me-3"></i>
-              <h5 class="card-title">Total Applicants</h5>
-            </div>
-            <p class="card-text fs-4">20</p>
-          </div>
-        </div>
-      </div>
+    <?php
 
-      <!-- Pending Card -->
-      <div class="col-md-4">
-        <div class="card text-center rounded">
-          <div class="card-body">
-            <div class="d-flex align-items-center justify-content-center">
-              <i class="fas fa-hourglass-half fa-2x me-3"></i>
-              <h5 class="card-title">Pending</h5>
-            </div>
-            <p class="card-text fs-4">2</p>
-          </div>
-        </div>
-      </div>
+// Database connection
+$servername = "localhost"; // Replace with your server name
+$username = "root"; // Replace with your database username
+$password = ""; // Replace with your database password
+$dbname = "scholarlend_db";
 
-      <!-- Approved Card -->
-      <div class="col-md-4">
-        <div class="card text-center rounded">
-          <div class="card-body">
-            <div class="d-flex align-items-center justify-content-center">
-              <i class="fas fa-check fa-2x me-3"></i>
-              <h5 class="card-title">Approved</h5>
-            </div>
-            <p class="card-text fs-4">3</p>
-          </div>
-        </div>
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Count total applicants
+$sql_total = "SELECT COUNT(*) AS total_count FROM borrower_info";
+$result_total = $conn->query($sql_total);
+$total_applicants = $result_total->fetch_assoc()['total_count'];
+
+// Count pending applicants
+$sql_pending = "SELECT COUNT(*) AS pending_count FROM borrower_info WHERE status = 'Pending'";
+$result_pending = $conn->query($sql_pending);
+$pending_applicants = $result_pending->fetch_assoc()['pending_count'];
+
+// Count approved applicants
+$sql_approved = "SELECT COUNT(*) AS approved_count FROM borrower_info WHERE status = 'Approved'";
+$result_approved = $conn->query($sql_approved);
+$approved_applicants = $result_approved->fetch_assoc()['approved_count'];
+
+
+?>
+
+<!-- Total Applicants Card -->
+<div class="col-md-4">
+  <div class="card text-center rounded">
+    <div class="card-body">
+      <div class="d-flex align-items-center justify-content-center">
+        <i class="fas fa-users fa-2x me-3"></i>
+        <h5 class="card-title">Total Applicants</h5>
       </div>
+      <p class="card-text fs-4"><?php echo $total_applicants; ?></p>
+    </div>
+  </div>
+</div>
+
+<!-- Pending Applicants Card -->
+<div class="col-md-4">
+  <div class="card text-center rounded">
+    <div class="card-body">
+      <div class="d-flex align-items-center justify-content-center">
+        <i class="fas fa-hourglass-half fa-2x me-3"></i>
+        <h5 class="card-title">Pending</h5>
+      </div>
+      <p class="card-text fs-4"><?php echo $pending_applicants; ?></p>
+    </div>
+  </div>
+</div>
+
+<!-- Approved Applicants Card -->
+<div class="col-md-4">
+  <div class="card text-center rounded">
+    <div class="card-body">
+      <div class="d-flex align-items-center justify-content-center">
+        <i class="fas fa-check fa-2x me-3"></i>
+        <h5 class="card-title">Approved</h5>
+      </div>
+      <p class="card-text fs-4"><?php echo $approved_applicants; ?></p>
+    </div>
+  </div>
+</div>
+
+</div>
    
      <!-- Data Table Section -->
      <div class="mt-4">
      <div class="table-responsive">
-        
      <table id="applicantsTable" class="table table-bordered table-striped">
     <thead class="table-dark">
         <tr>
@@ -313,34 +346,43 @@ $result = $conn->query($sql);
         <?php
         if ($result->num_rows > 0) {
             $counter = 1;
-            while($row = $result->fetch_assoc()) {
+            while ($row = $result->fetch_assoc()) {
+                // Start a new row
                 echo "<tr>";
-                echo "<th scope='row'>" . $counter++ . "</th>";
-                echo "<td>" . $row['fname'] . "</td>";
-                echo "<td>" . $row['mname'] . "</td>";
-                echo "<td>" . $row['lname'] . "</td>";
-                echo "<td>" . $row['email'] . "</td>";
-                echo "<td>" . $row['birthdate'] . "</td>";
+                echo "<th scope='row'>" . $counter++ . "</th>"; // 1st column (index)
+                
+                // 2nd to 6th columns (data fields)
+                echo "<td>" . (isset($row['fname']) ? htmlspecialchars($row['fname']) : '') . "</td>"; // 2nd column
+                echo "<td>" . (isset($row['mname']) ? htmlspecialchars($row['mname']) : '') . "</td>"; // 3rd column
+                echo "<td>" . (isset($row['lname']) ? htmlspecialchars($row['lname']) : '') . "</td>"; // 4th column
+                echo "<td>" . (isset($row['email']) ? htmlspecialchars($row['email']) : '') . "</td>"; // 5th column
+                echo "<td>" . (isset($row['birthdate']) ? htmlspecialchars($row['birthdate']) : '') . "</td>"; // 6th column
+                
+                // 7th column (actions)
                 echo "<td>
-                        <button type='button' class='btn btn-link' data-bs-toggle='modal' data-bs-target='#borrowerModal' data-id='" . $row['id'] . "'>
-                            <i class='fas fa-eye' style='color: blue;'></i> <!-- Eye icon color changed to blue -->
+                        <button type='button' class='btn btn-link' data-bs-toggle='modal' data-bs-target='#borrowerModal' data-id='" . htmlspecialchars($row['id']) . "'>
+                            <i class='fas fa-eye' style='color: blue;'></i>
                         </button>
-                        <button type='button' class='btn btn-outline-success' onclick='checkApplicant(" . $row['id'] . ")'>
-                            <i class='fas fa-check' style='color: green;'></i> <!-- Check icon color changed to green -->
+                        <button type='button' class='btn btn-outline-success' onclick='checkApplicant(" . htmlspecialchars($row['id']) . ")'>
+                            <i class='fas fa-check' style='color: green;'></i>
                         </button>
-                        <button type='button' class='btn btn-outline-danger' onclick='deleteApplicant(" . $row['id'] . ")'>
+                        <button type='button' class='btn btn-outline-danger' onclick='deleteApplicant(" . htmlspecialchars($row['id']) . ")'>
                             <i class='fas fa-trash'></i>
                         </button>
                       </td>";
+                
+                // Close the row
                 echo "</tr>";
             }
         } else {
-            echo "<tr><td colspan='7'>No data found</td></tr>";
+            echo "<tr><td colspan='7'>No pending borrowers found</td></tr>"; // Ensure correct colspan
         }
         $conn->close();
         ?>
     </tbody>
 </table>
+
+
 
 
 
@@ -488,6 +530,12 @@ $result = $conn->query($sql);
     <label for="modal-next_deadlines">&nbsp;&nbsp;Next Deadlines:</label>
 </div>
 
+<div class="form-floating mb-3">
+    <input type="text" class="form-control" id="modal-deadlines_count" value="" readonly style="height: 50px; width: 100%;">
+    <label for="modal-deadlines_count">&nbsp;&nbsp;Number of Deadlines:</label>
+</div>
+
+
 
                         <div class="form-floating mb-3">
                             <input type="text" class="form-control" id="modal-total_amount" value="" readonly>
@@ -534,11 +582,29 @@ $result = $conn->query($sql);
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"></script>
     
    
-    
+<script>
+    function checkApplicant(borrowerId) {
+    if (confirm('Are you sure you want to approve this borrower?')) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'update_status.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                alert('Status updated successfully!');
+                location.reload(); // Refresh the page to reflect changes
+            }
+        };
+        xhr.send('id=' + borrowerId + '&status=Approved');
+    }
+}
+
+</script>
+
+
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     var borrowerModal = document.getElementById('borrowerModal');
-    
+
     borrowerModal.addEventListener('show.bs.modal', function (event) {
         var button = event.relatedTarget;
         var userId = button.getAttribute('data-id');
@@ -580,6 +646,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('modal-spending_pattern').value = data.spending_pattern;
                 document.getElementById('modal-account_details').value = data.account_details;
 
+                // Log next_deadlines to console
+                console.log('Next Deadlines:', data.next_deadlines); // Log the next_deadlines
+                
+                // Split the next_deadlines string into an array
+                var deadlinesArray = data.next_deadlines.split(', ').map(function(date) {
+                    return date.trim(); // Trim any whitespace
+                });
+
+                // Count the number of deadlines
+                var countDeadlines = deadlinesArray.length;
+                console.log('Number of Deadlines:', countDeadlines); // Log the count of deadlines
+
+                // Display the count in the modal
+                document.getElementById('modal-deadlines_count').value = countDeadlines; // New line to set the count in the modal
+
                 // Set the image sources
                 document.getElementById('modal-cor1').src = data.cor1_path || '#';
                 document.getElementById('modal-cor2').src = data.cor2_path || '#';
@@ -590,6 +671,9 @@ document.addEventListener('DOMContentLoaded', function () {
         xhr.send();
     });
 });
+</script>
+
+
 
 </script>
 
