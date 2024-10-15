@@ -187,6 +187,11 @@ include 'check_application.php';
                         <?php
 
 
+// Ensure user is logged in
+if (!isset($_SESSION['user_id'])) {
+    die("User not logged in.");
+}
+
 $user_id = $_SESSION['user_id'];
 
 // Database connection
@@ -233,34 +238,41 @@ if ($has_pending_application) {
     echo "<p>Your application is pending.</p>";
 } elseif ($approved_application) {
     // If there is an approved application, show the details
-
     $due_date = $approved_application['due_date'];
-    $next_deadlines = $approved_application['next_deadlines'];
+    $next_deadlines = $approved_application['next_deadlines']; // Get the raw value
     $total_amount = $approved_application['total_amount'];
 
-// Header with new background color and black text
-echo '<div style="background-color: #dbbf94; border-radius: 9px 9px 0 0; padding: 10px; margin: 20px 0; color: black; font-family: Arial, sans-serif; text-align: center;">';
-echo '<h5 style="font-weight: bolder;">LOAN APPROVED:</h5>'; // Make "LOAN APPROVED" bolder
-echo 'Your loan application is approved. Message us if you have not received the proceeds.'; // Bold the message
-echo '</div>';
+    // Convert the comma-separated string to an array
+    $next_deadlines_array = array_map('trim', explode(',', $next_deadlines));
 
-// Main content with background color
-echo '<div style="background-color: #f4f1ec; border-radius: 0 0 9px 9px; padding: 20px; margin: 0; color: #333; font-family: Arial, sans-serif;">';
-echo "<p>Due Date: <strong>$due_date</strong></p>";
-echo "<p>Next Deadlines: <strong>$next_deadlines</strong></p>";
-echo "<p>Total Amount: <strong>$total_amount</strong></p>";
-echo '</div>';
+    // Display the first deadline
+    $first_deadline = !empty($next_deadlines_array) ? $next_deadlines_array[0] : 'No deadlines available';
 
+    // Header with new background color and black text
+    echo '<div style="background-color: #dbbf94; border-radius: 9px 9px 0 0; padding: 10px; margin: 20px 0; color: black; font-family: Arial, sans-serif; text-align: center;">';
+    echo '<h5 style="font-weight: bolder;">LOAN APPROVED:</h5>'; 
+    echo 'Your loan application is approved. Message us if you have not received the proceeds.'; 
+    echo '</div>';
 
+   
+    echo '<div style="background-color: #f4f1ec; border-radius: 0 0 9px 9px; padding: 20px; margin: 0; color: #333; font-family: Arial, sans-serif;">';
+    echo "<p>Due Date: <strong>$due_date</strong></p>";
+    echo "<p>First Deadline: <strong>$first_deadline</strong></p>";
+    echo "<p>Total Amount: <strong>$total_amount</strong></p>";
 
+    
+    echo '<form action="remove_deadline.php" method="POST" style="display: inline;">'; 
+    echo '<input type="hidden" name="user_id" value="' . $user_id . '">'; 
+    echo '<input type="hidden" name="deadline" value="' . htmlspecialchars($first_deadline) . '">'; 
+    echo '<button type="submit" style="background-color: #131e3d; color: white; padding: 10px 20px; border: none; border-radius: 5px; margin-top: 10px; cursor: pointer;">Pay Now</button>';
+    echo '</form>';
 
-
+    echo '</div>';
 } else {
-    // Show the form if there is no pending or approved application
-    ?>
+
+?>
                             <form id="msform" action="borrower_apform_data.php" method="post" enctype="multipart/form-data">
-                                <!-- progressbar -->
-                              
+                                                     
                                 <ul id="progressbar">
                                     <li id="account" data-step="1" class="active">Personal Information</li>
                                     <li id="personal" data-step="2">Financial and Other Info</li>

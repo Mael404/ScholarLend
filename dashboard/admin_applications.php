@@ -374,9 +374,7 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
                 // Close the row
                 echo "</tr>";
             }
-        } else {
-            echo "<tr><td colspan='7'>No pending borrowers found</td></tr>"; // Ensure correct colspan
-        }
+        } 
         $conn->close();
         ?>
     </tbody>

@@ -1,3 +1,6 @@
+<?php
+session_start()
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -213,7 +216,15 @@
     <section class="container mt-5" style="background-color: #f4f1ec;" >
       <div class="row">
         <div class="col-12 text-center">
-          <h1 style="text-align: left; font-family:'Times New Roman', Times, serif;">Welcome back, <span style="color: #dbbf94;">Username</span></h1>
+          <h1 style="text-align: left; font-family:'Times New Roman', Times, serif;">Welcome back, <?php 
+    echo '<span style="color: #dbbf94;">' . 
+        (isset($_SESSION['first_name']) 
+            ? ucfirst(strtolower($_SESSION['first_name'])) 
+            : 'Guest') . 
+        '</span>'; 
+?>
+
+
           <h1 class="mt-4" style="text-align: left; font-weight:400;">Recommended loans for you</h1>
         </div>
       </div>
