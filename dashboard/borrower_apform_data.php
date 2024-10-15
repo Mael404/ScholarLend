@@ -14,6 +14,7 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+
 // Retrieve and sanitize form data
 $fname = $conn->real_escape_string($_POST['fname']);
 $mname = $conn->real_escape_string($_POST['mname']);
@@ -43,7 +44,18 @@ $due_date = $conn->real_escape_string($_POST['due_date']);
 $account_details = $conn->real_escape_string($_POST['account_details']);
 $total_amount = $conn->real_escape_string($_POST['total_amount']);
 $next_deadlines = $conn->real_escape_string($_POST['next_deadlines']);
+$interest_earned = $conn->real_escape_string($_POST['total_interest']); // Add interest earned
 $statuss = "Pending";
+
+// Count the number of next deadlines
+if (!empty($next_deadlines)) {
+    // Split the string into an array using a comma and space as a delimiter
+    $deadlinesArray = explode(', ', $next_deadlines);
+    // Count the number of dates stored
+    $days_to_next_deadlines = count($deadlinesArray);
+} else {
+    $days_to_next_deadlines = 0; // Default to 0 if no deadlines
+}
 
 // Handle file uploads
 $uploadDir = "uploads/";
@@ -86,18 +98,18 @@ if (!$errorOccurred) {
         course, yearofstudy, graduationdate, monthly_allowance, source_of_allowance, 
         monthly_expenses, school_community, spending_pattern, monthly_savings, 
         career_goals, loan_amount, loan_purpose, loan_description, payment_mode, 
-        payment_frequency, due_date, next_deadlines, account_details, total_amount, status, 
-        cor1_path, cor2_path, cor3_path, cor4_path
+        payment_frequency, due_date, next_deadlines, days_to_next_deadline, account_details, total_amount, 
+        interest_earned, status, cor1_path, cor2_path, cor3_path, cor4_path
     ) VALUES (
         '$user_id', '$fname', '$mname', '$lname', '$birthdate', '$gender', '$cellphonenumber', '$email', 
         '$school', '$college', '$course', '$yearofstudy', '$graduationdate', 
         '$monthly_allowance', '$source_of_allowance', '$monthly_expenses', '$school_community', 
         '$spending_pattern', '$monthly_savings', '$career_goals', '$loan_amount', 
         '$loan_purpose', '$loan_description', '$payment_mode', '$payment_frequency', 
-        '$due_date', '$next_deadlines', '$account_details', '$total_amount', '$statuss',
+        '$due_date', '$next_deadlines', '$days_to_next_deadlines', '$account_details', '$total_amount', 
+        '$interest_earned', '$statuss', 
         '$file1', '$file2', '$file3', '$file4'
     )";
-    
 
     if ($conn->query($sql) === TRUE) {
         echo "New record created successfully";

@@ -238,11 +238,23 @@ if ($has_pending_application) {
     $next_deadlines = $approved_application['next_deadlines'];
     $total_amount = $approved_application['total_amount'];
 
-    echo "<h2>Application Approved!</h2>";
-  
-    echo "<p>Due Date: $due_date</p>";
-    echo "<p>Next Deadlines: $next_deadlines</p>";
-    echo "<p>Total Amount: $total_amount</p>";
+// Header with new background color and black text
+echo '<div style="background-color: #dbbf94; border-radius: 9px 9px 0 0; padding: 10px; margin: 20px 0; color: black; font-family: Arial, sans-serif; text-align: center;">';
+echo '<h5 style="font-weight: bolder;">LOAN APPROVED:</h5>'; // Make "LOAN APPROVED" bolder
+echo 'Your loan application is approved. Message us if you have not received the proceeds.'; // Bold the message
+echo '</div>';
+
+// Main content with background color
+echo '<div style="background-color: #f4f1ec; border-radius: 0 0 9px 9px; padding: 20px; margin: 0; color: #333; font-family: Arial, sans-serif;">';
+echo "<p>Due Date: <strong>$due_date</strong></p>";
+echo "<p>Next Deadlines: <strong>$next_deadlines</strong></p>";
+echo "<p>Total Amount: <strong>$total_amount</strong></p>";
+echo '</div>';
+
+
+
+
+
 } else {
     // Show the form if there is no pending or approved application
     ?>
@@ -676,6 +688,9 @@ if ($has_pending_application) {
   <input type="hidden" id="hiddenAccountDetails" name="account_details">
   <input type="hidden" id="hiddenTotalAmount" name="total_amount">
   <input type="hidden" id="hiddenNextDeadlines" name="next_deadlines">
+  <input type="hidden" id="hiddenTotalInterest" name="total_interest"> <!-- Add this line -->
+
+
 
                                 
                             </form>
@@ -1092,15 +1107,18 @@ document.getElementById('summaryModal').addEventListener('show.bs.modal', calcul
 
 
 <script>
-   function updateHiddenInputs() {
-        // Get the values from the modal and assign them to the hidden fields
-        document.getElementById('hiddenPaymentMode').value = document.getElementById('modalPaymentMode').innerText;
-        document.getElementById('hiddenFrequency').value = document.getElementById('modalFrequency').innerText;
-        document.getElementById('hiddenDueDate').value = document.getElementById('modalDueDate').innerText;
-        document.getElementById('hiddenAccountDetails').value = document.getElementById('modalAccountDetails').innerText;
-        document.getElementById('hiddenTotalAmount').value = document.getElementById('modalTotalAmount').innerText;
-        document.getElementById('hiddenNextDeadlines').value = document.getElementById('modalNextDeadlines').innerText; // Add next deadlines
-    }
+  function updateHiddenInputs() {
+    // Get the values from the modal and assign them to the hidden fields
+    document.getElementById('hiddenPaymentMode').value = document.getElementById('modalPaymentMode').innerText;
+    document.getElementById('hiddenFrequency').value = document.getElementById('modalFrequency').innerText;
+    document.getElementById('hiddenDueDate').value = document.getElementById('modalDueDate').innerText;
+    document.getElementById('hiddenAccountDetails').value = document.getElementById('modalAccountDetails').innerText;
+    document.getElementById('hiddenTotalAmount').value = document.getElementById('modalTotalAmount').innerText;
+    document.getElementById('hiddenNextDeadlines').value = document.getElementById('modalNextDeadlines').innerText; // Add next deadlines
+    document.getElementById('hiddenTotalInterest').value = document.getElementById('modalTotalInterest').innerText; // Add total interest
+}
+
+
 
     function submitForm() {
         // Update the hidden inputs before form submission
