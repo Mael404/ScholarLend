@@ -13,6 +13,7 @@ $conn = new mysqli($host, $user, $pass, $db);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
+
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
 // Retrieve and sanitize form data
@@ -44,17 +45,21 @@ $due_date = $conn->real_escape_string($_POST['due_date']);
 $account_details = $conn->real_escape_string($_POST['account_details']);
 $total_amount = $conn->real_escape_string($_POST['total_amount']);
 $next_deadlines = $conn->real_escape_string($_POST['next_deadlines']);
-$interest_earned = $conn->real_escape_string($_POST['total_interest']); // Add interest earned
+$interest_earned = $conn->real_escape_string($_POST['total_interest']); 
 $statuss = "Pending";
 
-// Count the number of next deadlines
 if (!empty($next_deadlines)) {
-    // Split the string into an array using a comma and space as a delimiter
     $deadlinesArray = explode(', ', $next_deadlines);
-    // Count the number of dates stored
     $days_to_next_deadlines = count($deadlinesArray);
 } else {
-    $days_to_next_deadlines = 0; // Default to 0 if no deadlines
+    $days_to_next_deadlines = 0;
+}
+
+// Calculate admin share
+if ($days_to_next_deadlines > 0 && $interest_earned > 0) {
+    $share_admin = ( ($interest_earned / $days_to_next_deadlines) * 0.30 );
+} else {
+    $share_admin = 0; // Handle edge cases where days_to_next_deadlines or interest_earned is zero
 }
 
 // Handle file uploads
@@ -69,7 +74,6 @@ foreach ($files as $fileInput) {
         $fileName = basename($_FILES[$fileInput]['name']);
         $destPath = $uploadDir . $fileName;
 
-        // Move the uploaded file to the destination directory
         if (move_uploaded_file($fileTmpPath, $destPath)) {
             $uploadedFiles[$fileInput] = $destPath;
         } else {
@@ -86,20 +90,18 @@ foreach ($files as $fileInput) {
 
 // Only insert into the database if all files were uploaded successfully
 if (!$errorOccurred) {
-    // Prepare file paths for database insertion
     $file1 = isset($uploadedFiles['cor1']) ? $conn->real_escape_string($uploadedFiles['cor1']) : null;
     $file2 = isset($uploadedFiles['cor2']) ? $conn->real_escape_string($uploadedFiles['cor2']) : null;
     $file3 = isset($uploadedFiles['cor3']) ? $conn->real_escape_string($uploadedFiles['cor3']) : null;
     $file4 = isset($uploadedFiles['cor4']) ? $conn->real_escape_string($uploadedFiles['cor4']) : null;
 
-    // Insert into the database
     $sql = "INSERT INTO borrower_info (
         user_id, fname, mname, lname, birthdate, gender, cellphonenumber, email, school, college, 
         course, yearofstudy, graduationdate, monthly_allowance, source_of_allowance, 
         monthly_expenses, school_community, spending_pattern, monthly_savings, 
         career_goals, loan_amount, loan_purpose, loan_description, payment_mode, 
         payment_frequency, due_date, next_deadlines, days_to_next_deadline, account_details, total_amount, 
-        interest_earned, status, cor1_path, cor2_path, cor3_path, cor4_path
+        interest_earned, share_admin, status, cor1_path, cor2_path, cor3_path, cor4_path
     ) VALUES (
         '$user_id', '$fname', '$mname', '$lname', '$birthdate', '$gender', '$cellphonenumber', '$email', 
         '$school', '$college', '$course', '$yearofstudy', '$graduationdate', 
@@ -107,7 +109,7 @@ if (!$errorOccurred) {
         '$spending_pattern', '$monthly_savings', '$career_goals', '$loan_amount', 
         '$loan_purpose', '$loan_description', '$payment_mode', '$payment_frequency', 
         '$due_date', '$next_deadlines', '$days_to_next_deadlines', '$account_details', '$total_amount', 
-        '$interest_earned', '$statuss', 
+        '$interest_earned', '$share_admin', '$statuss', 
         '$file1', '$file2', '$file3', '$file4'
     )";
 

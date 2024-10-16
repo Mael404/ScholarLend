@@ -592,7 +592,7 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
                 location.reload(); // Refresh the page to reflect changes
             }
         };
-        xhr.send('id=' + borrowerId + '&status=Approved');
+        xhr.send('id=' + borrowerId + '&status=Posted');
     }
 }
 

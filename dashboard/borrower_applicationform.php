@@ -2,6 +2,7 @@
 session_start(); // Start session to access session variables
 
 include 'check_application.php';
+include 'display_user_wallet.php';
 
 ?>
 
@@ -150,34 +151,39 @@ include 'check_application.php';
 
         <!-- Page Content -->
         <div id="page-content-wrapper">
-            <nav class="navbar navbar-expand-lg navbar-light bg-transparent py-4 px-4">
-                <div class="d-flex align-items-center">
-                    <i class="fas fa-align-left primary-text fs-4 me-3" id="menu-toggle"></i>
-                    <h2 class="fs-2 m-0" style="font-family: 'Times New Roman', Times, serif; font-weight: bold;">ONLINE APPLICATION FORM</h2>
-                </div>
+        <nav class="navbar navbar-expand-lg navbar-light bg-transparent py-4 px-4">
+    <div class="container-fluid">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-align-left primary-text fs-4 me-3" id="menu-toggle"></i>
+            <h2 class="fs-2 m-0" style="font-family: 'Times New Roman', Times, serif; font-weight: bold;">
+                ONLINE APPLICATION FORM
+            </h2>
+        </div>
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+       
 
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle second-text fw-bold" href="#" id="navbarDropdown"
-                                role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user me-2"></i>Example User
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="#">Profile</a></li>
-                                <li><a class="dropdown-item" href="#">Settings</a></li>
-                                <li><a class="dropdown-item" href="#">Logout</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
-            </nav>
+        <!-- Wallet Section (Positioned Where User Dropdown Was) -->
+        <a class="nav-link wallet-link second-text fw-bold ms-auto" href="#">
+    <i class="fas fa-wallet me-2"></i>Balance: 
+    <span class="wallet-balance">PHP <?php echo number_format($wallet_balance, 2); ?></span>
+</a>
+
+    </div>
+</nav>
+
+<!-- Optional CSS for wallet styling -->
+<style>
+    .wallet-link {
+        color: black;
+        font-size: 1.1rem;
+        background-color: #dbbf94;
+        border-radius: 9px;
+    }
+    .wallet-balance {
+        font-weight: bold;
+    }
+</style>
+
 
             <div class="container-fluid px-4">
                 <div class="row justify-content-center">
@@ -185,7 +191,6 @@ include 'check_application.php';
                         <div class="card px-0 pt-0 pb-0 mt-3 mb-3">
                        
                         <?php
-
 
 // Ensure user is logged in
 if (!isset($_SESSION['user_id'])) {
@@ -225,22 +230,32 @@ $stmt_approved->bind_param("i", $user_id);
 $stmt_approved->execute();
 $result_approved = $stmt_approved->get_result();
 
-// Fetch approved application details if exists
-$approved_application = $result_approved->fetch_assoc();
+// Query to check if the application status is "Posted"
+$sql_posted = "SELECT * FROM borrower_info WHERE user_id = ? AND status = 'posted'";
+$stmt_posted = $conn->prepare($sql_posted);
+$stmt_posted->bind_param("i", $user_id);
+$stmt_posted->execute();
+$result_posted = $stmt_posted->get_result();
+$has_posted_application = $result_posted->num_rows > 0;
+
+// Fetch approved or posted application details if exists
+$posted_or_approved_application = $result_posted->fetch_assoc() ?: $result_approved->fetch_assoc();
 
 // Close the statements
 $stmt_pending->close();
 $stmt_approved->close();
+$stmt_posted->close();
 $conn->close();
 
 // If the user has a pending application, show the message
 if ($has_pending_application) {
-    echo "<p>Your application is pending.</p>";
-} elseif ($approved_application) {
-    // If there is an approved application, show the details
-    $due_date = $approved_application['due_date'];
-    $next_deadlines = $approved_application['next_deadlines']; // Get the raw value
-    $total_amount = $approved_application['total_amount'];
+    echo '<p style="background: linear-gradient(135deg, #dbbf94, #ccac82); padding: 20px; border-radius: 9px; color: white; font-size: 22px; text-align: center; width: 80%; margin: 20px auto; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); border: 1px solid #b08a63;">Your application is pending.</p>';
+
+} elseif ($posted_or_approved_application) {
+    // If there is a posted or approved application, show the details
+    $due_date = $posted_or_approved_application['due_date'];
+    $next_deadlines = $posted_or_approved_application['next_deadlines']; // Get the raw value
+    $total_amount = $posted_or_approved_application['total_amount'];
 
     // Convert the comma-separated string to an array
     $next_deadlines_array = array_map('trim', explode(',', $next_deadlines));
@@ -248,29 +263,96 @@ if ($has_pending_application) {
     // Display the first deadline
     $first_deadline = !empty($next_deadlines_array) ? $next_deadlines_array[0] : 'No deadlines available';
 
-    // Header with new background color and black text
-    echo '<div style="background-color: #dbbf94; border-radius: 9px 9px 0 0; padding: 10px; margin: 20px 0; color: black; font-family: Arial, sans-serif; text-align: center;">';
-    echo '<h5 style="font-weight: bolder;">LOAN APPROVED:</h5>'; 
-    echo 'Your loan application is approved. Message us if you have not received the proceeds.'; 
+    if ($has_posted_application) {
+        // If the application status is "Posted", show the message and summary
+        echo '<p style="background:#dbbf94; padding: 10px; border-radius: 9px; color: white; font-size: 22px; text-align: center; width: 90%; margin: 20px auto;">';
+        echo 'Your application has been successfully posted. Please wait for a lender to review and fund your request.';
+        echo '</p>';
+        
+        // Display the application summary
+echo '<div style="background-color: #f4f1ec; border-radius: 9px; padding: 15px; margin: 10px auto; color: #333; font-family: Arial, sans-serif; width: 90%;">';
+
+echo '<h2 style="font-family: Georgia, serif; font-weight: bold; color: #131e3d; margin-bottom: 10px; text-align:left;">Your Loans</h2>';
+
+echo '<div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0;">';
+    // Amount section
+    echo '<div style="text-align: left;">';
+    echo '<p style="font-size: 15px; color: #131e3d; font-weight: 200; margin: 0;">AMOUNT</p>';
+    echo '<p style="font-size: 36px; color: #cdad7d; font-weight: bold; margin: 5px 0;">₱' . number_format($total_amount, 0) . '</p>'; // No decimal places
+    echo '</div>';
+    
+    // First payment section
+    echo '<div style="text-align: center;">';
+    echo '<p style="font-size: 15px; color: #131e3d; font-weight: 200; margin: 0;">FIRST PAYMENT IS DUE ON</p>';
+    echo '<p style="font-size: 24px; color: #a6a6a6; font-weight: bold; margin: 5px 0;">' . date('M. j, Y', strtotime($first_deadline)) . '</p>'; // Format the date
     echo '</div>';
 
-   
-    echo '<div style="background-color: #f4f1ec; border-radius: 0 0 9px 9px; padding: 20px; margin: 0; color: #333; font-family: Arial, sans-serif;">';
-    echo "<p>Due Date: <strong>$due_date</strong></p>";
-    echo "<p>First Deadline: <strong>$first_deadline</strong></p>";
-    echo "<p>Total Amount: <strong>$total_amount</strong></p>";
-
-    
+    // Pay Now button
+    echo '<div style="text-align: right;">';
     echo '<form action="remove_deadline.php" method="POST" style="display: inline;">'; 
     echo '<input type="hidden" name="user_id" value="' . $user_id . '">'; 
     echo '<input type="hidden" name="deadline" value="' . htmlspecialchars($first_deadline) . '">'; 
     echo '<button type="submit" style="background-color: #131e3d; color: white; padding: 10px 20px; border: none; border-radius: 5px; margin-top: 10px; cursor: pointer;">Pay Now</button>';
     echo '</form>';
-
     echo '</div>';
+echo '</div>';
+
+// View Detailed Repayment Schedule button
+echo '<div style="text-align: center; margin-top: 0px;">';
+echo '<button style="background-color: #dbbf94; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold;">VIEW DETAILED REPAYMENT SCHEDULE</button>';
+echo '</div>';
+
+echo '</div>';
+
+    } else {
+       // Display the application summary
+echo '<div style="background-color: #f4f1ec; border-radius: 9px; padding: 15px; margin: 10px auto; color: #333; font-family: Arial, sans-serif; width: 90%;">';
+
+echo '<h2 style="font-family: Georgia, serif; font-weight: bold; color: #131e3d; margin-bottom: 10px; text-align:left;">Your Loans</h2>';
+
+echo '<div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0;">';
+
+// Amount section
+echo '<div style="text-align: left;">';
+echo '<p style="font-size: 15px; color: #131e3d; font-weight: 200; margin: 0;">AMOUNT</p>';
+echo '<p style="font-size: 36px; color: #cdad7d; font-weight: bold; margin: 5px 0;">₱' . number_format($total_amount, 0) . '</p>'; // No decimal places
+echo '</div>';
+
+// First payment section
+echo '<div style="text-align: center;">';
+echo '<p style="font-size: 15px; color: #131e3d; font-weight: 200; margin: 0;">FIRST PAYMENT IS DUE ON</p>';
+// Check if the first_deadline is empty
+if (!empty($first_deadline)) {
+    echo '<p style="font-size: 24px; color: #a6a6a6; font-weight: bold; margin: 5px 0;">' . date('M. j, Y', strtotime($first_deadline)) . '</p>'; // Format the date
 } else {
+    echo '<p style="font-size: 24px; color: #a6a6a6; font-weight: bold; margin: 5px 0;">&nbsp;</p>'; // Display empty space if no date
+}
+echo '</div>';
+
+// Pay Now button
+echo '<div style="text-align: right;">';
+echo '<form action="remove_deadline.php" method="POST" style="display: inline;">'; 
+echo '<input type="hidden" name="user_id" value="' . $user_id . '">'; 
+echo '<input type="hidden" name="deadline" value="' . htmlspecialchars($first_deadline) . '">'; 
+echo '<button type="submit" style="background-color: #131e3d; color: white; padding: 10px 20px; border: none; border-radius: 5px; margin-top: 10px; cursor: pointer;">Pay Now</button>';
+echo '</form>';
+echo '</div>';
+
+echo '</div>'; // Close flex container
+
+// View Detailed Repayment Schedule button
+echo '<div style="text-align: center; margin-top: 0px;">';
+echo '<button style="background-color: #dbbf94; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold;">VIEW DETAILED REPAYMENT SCHEDULE</button>';
+echo '</div>';
+
+echo '</div>'; // Close main container
+
+    }
+} else {
+    echo 'No active applications.';
 
 ?>
+
                             <form id="msform" action="borrower_apform_data.php" method="post" enctype="multipart/form-data">
                                                      
                                 <ul id="progressbar">
@@ -419,7 +501,7 @@ if ($has_pending_application) {
                                 </fieldset>
                                 
                                 
-                                
+                              
                                 <fieldset>
                                     <!-- Financial Information -->
                                     <div class="form-card">
@@ -727,14 +809,14 @@ if ($has_pending_application) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-    <p><strong>Payment Mode:</strong> <span id="modalPaymentMode"></span></p>
-    <p><strong>Frequency:</strong> <span id="modalFrequency"></span></p>
-    <p><strong>Selected Due Date:</strong> <span id="modalDueDate"></span></p>
-    <p><strong>Next Deadlines:</strong> <span id="modalNextDeadlines"></span></p>
-    <p><strong>Account Details:</strong> <span id="modalAccountDetails"></span></p>
-    <p><strong>Total Amount to be Paid:</strong> <span id="modalTotalAmount"></span></p>
-    <p><strong>Total Interest Earned:</strong> <span id="modalTotalInterest"></span></p> <!-- New line for interest -->
-</div>
+                <p><strong>Payment Mode:</strong> <span id="modalPaymentMode"></span></p>
+                <p><strong>Frequency:</strong> <span id="modalFrequency"></span></p>
+                <p><strong>Selected Due Date:</strong> <span id="modalDueDate"></span></p>
+                <p><strong>Next Deadlines:</strong> <span id="modalNextDeadlines"></span></p>
+                <p><strong>Account Details:</strong> <span id="modalAccountDetails"></span></p>
+                <p><strong>Total Amount to be Paid:</strong> <span id="modalTotalAmount"></span></p>
+                <p><strong>Total Interest Earned:</strong> <span id="modalTotalInterest"></span></p>
+            </div>
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" onclick="submitForm()">Submit</button>
@@ -1139,10 +1221,19 @@ document.getElementById('summaryModal').addEventListener('show.bs.modal', calcul
         // Submit the form
         document.getElementById('msform').submit();
     }
+    function updateNextDeadline() {
+    var dueDate = document.getElementById("modalDueDate").innerText;
+    var nextDeadline = document.getElementById("modalNextDeadlines").innerText;
 
+    // If next_deadline is empty, copy the value of dueDate
+    if (!nextDeadline.trim()) {
+        document.getElementById("modalNextDeadlines").innerText = dueDate;
+    }
+}
     // Add event listener to the modal for when it's shown
     document.getElementById('summaryModal').addEventListener('shown.bs.modal', function () {
         updateHiddenInputs();
+        updateNextDeadline();
     });
 </script>
 
