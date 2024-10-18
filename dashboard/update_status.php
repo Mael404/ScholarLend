@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Update query to change status to Approved
-    $sql = "UPDATE borrower_info SET status = ? WHERE id = ?";
+    $sql = "UPDATE borrower_info SET status = ? WHERE transaction_id = ?";
 
     // Prepare and bind parameters
     if ($stmt = $conn->prepare($sql)) {

@@ -15,7 +15,7 @@ if ($conn->connect_error) {
 }
 
 // Query to fetch data where status is 'Pending'
-$sql = "SELECT fname, mname, lname, email, birthdate, id FROM borrower_info WHERE status = 'Pending'";
+$sql = "SELECT fname, mname, lname, email, birthdate, transaction_id FROM borrower_info WHERE status = 'Pending'";
 
 $result = $conn->query($sql);
 ?>
@@ -279,7 +279,7 @@ $result_pending = $conn->query($sql_pending);
 $pending_applicants = $result_pending->fetch_assoc()['pending_count'];
 
 // Count approved applicants
-$sql_approved = "SELECT COUNT(*) AS approved_count FROM borrower_info WHERE status = 'Approved'";
+$sql_approved = "SELECT COUNT(*) AS approved_count FROM borrower_info WHERE status = 'Posted'";
 $result_approved = $conn->query($sql_approved);
 $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
 
@@ -360,13 +360,13 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
                 
                 // 7th column (actions)
                 echo "<td>
-                        <button type='button' class='btn btn-link' data-bs-toggle='modal' data-bs-target='#borrowerModal' data-id='" . htmlspecialchars($row['id']) . "'>
+                        <button type='button' class='btn btn-link' data-bs-toggle='modal' data-bs-target='#borrowerModal' data-id='" . htmlspecialchars($row['transaction_id']) . "'>
                             <i class='fas fa-eye' style='color: blue;'></i>
                         </button>
-                        <button type='button' class='btn btn-outline-success' onclick='checkApplicant(" . htmlspecialchars($row['id']) . ")'>
+                        <button type='button' class='btn btn-outline-success' onclick='checkApplicant(" . htmlspecialchars($row['transaction_id']) . ")'>
                             <i class='fas fa-check' style='color: green;'></i>
                         </button>
-                        <button type='button' class='btn btn-outline-danger' onclick='deleteApplicant(" . htmlspecialchars($row['id']) . ")'>
+                        <button type='button' class='btn btn-outline-danger' onclick='deleteApplicant(" . htmlspecialchars($row['transaction_id']) . ")'>
                             <i class='fas fa-trash'></i>
                         </button>
                       </td>";
@@ -609,7 +609,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Use AJAX to fetch the data
         var xhr = new XMLHttpRequest();
-        xhr.open('GET', 'view_borrower.php?id=' + userId, true);
+        xhr.open('GET', 'view_borrower.php?transaction_id=' + userId, true);
         xhr.onload = function () {
             if (this.status == 200) {
                 var data = JSON.parse(this.responseText);

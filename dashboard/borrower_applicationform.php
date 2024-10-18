@@ -1,7 +1,7 @@
 <?php
 session_start(); // Start session to access session variables
 
-include 'check_application.php';
+
 include 'display_user_wallet.php';
 
 ?>
@@ -192,6 +192,7 @@ include 'display_user_wallet.php';
                        
                         <?php
 
+
 // Ensure user is logged in
 if (!isset($_SESSION['user_id'])) {
     die("User not logged in.");
@@ -241,16 +242,30 @@ $has_posted_application = $result_posted->num_rows > 0;
 // Fetch approved or posted application details if exists
 $posted_or_approved_application = $result_posted->fetch_assoc() ?: $result_approved->fetch_assoc();
 
+if ($posted_or_approved_application) {
+    // Store the transaction_id in the session for further operations
+    $_SESSION['transaction_id'] = $posted_or_approved_application['transaction_id'];
+
+    $next_deadlines = $posted_or_approved_application['next_deadlines'];
+
+    // If next_deadlines is empty, update the status to "Completed"
+    if (empty(trim($next_deadlines))) {
+        $sql_update_status = "UPDATE borrower_info SET status = 'Completed' WHERE user_id = ? AND transaction_id = ? AND (status = 'approved' OR status = 'posted')";
+        $stmt_update_status = $conn->prepare($sql_update_status);
+        $stmt_update_status->bind_param("is", $user_id, $_SESSION['transaction_id']);
+        $stmt_update_status->execute();
+        $stmt_update_status->close();
+    }
+}
+
 // Close the statements
 $stmt_pending->close();
 $stmt_approved->close();
 $stmt_posted->close();
-$conn->close();
 
 // If the user has a pending application, show the message
 if ($has_pending_application) {
     echo '<p style="background: linear-gradient(135deg, #dbbf94, #ccac82); padding: 20px; border-radius: 9px; color: white; font-size: 22px; text-align: center; width: 80%; margin: 20px auto; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); border: 1px solid #b08a63;">Your application is pending.</p>';
-
 } elseif ($posted_or_approved_application) {
     // If there is a posted or approved application, show the details
     $due_date = $posted_or_approved_application['due_date'];
@@ -268,90 +283,98 @@ if ($has_pending_application) {
         echo '<p style="background:#dbbf94; padding: 10px; border-radius: 9px; color: white; font-size: 22px; text-align: center; width: 90%; margin: 20px auto;">';
         echo 'Your application has been successfully posted. Please wait for a lender to review and fund your request.';
         echo '</p>';
-        
+
         // Display the application summary
-echo '<div style="background-color: #f4f1ec; border-radius: 9px; padding: 15px; margin: 10px auto; color: #333; font-family: Arial, sans-serif; width: 90%;">';
+        echo '<div style="background-color: #f4f1ec; border-radius: 9px; padding: 15px; margin: 10px auto; color: #333; font-family: Arial, sans-serif; width: 90%;">';
 
-echo '<h2 style="font-family: Georgia, serif; font-weight: bold; color: #131e3d; margin-bottom: 10px; text-align:left;">Your Loans</h2>';
+        echo '<h2 style="font-family: Georgia, serif; font-weight: bold; color: #131e3d; margin-bottom: 10px; text-align:left;">Your Loans</h2>';
 
-echo '<div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0;">';
-    // Amount section
-    echo '<div style="text-align: left;">';
-    echo '<p style="font-size: 15px; color: #131e3d; font-weight: 200; margin: 0;">AMOUNT</p>';
-    echo '<p style="font-size: 36px; color: #cdad7d; font-weight: bold; margin: 5px 0;">₱' . number_format($total_amount, 0) . '</p>'; // No decimal places
-    echo '</div>';
-    
-    // First payment section
-    echo '<div style="text-align: center;">';
-    echo '<p style="font-size: 15px; color: #131e3d; font-weight: 200; margin: 0;">FIRST PAYMENT IS DUE ON</p>';
-    echo '<p style="font-size: 24px; color: #a6a6a6; font-weight: bold; margin: 5px 0;">' . date('M. j, Y', strtotime($first_deadline)) . '</p>'; // Format the date
-    echo '</div>';
+        echo '<div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0;">';
+        // Amount section
+        echo '<div style="text-align: left;">';
+        echo '<p style="font-size: 15px; color: #131e3d; font-weight: 200; margin: 0;">AMOUNT</p>';
+        echo '<p style="font-size: 36px; color: #cdad7d; font-weight: bold; margin: 5px 0;">₱' . number_format($total_amount, 0) . '</p>'; // No decimal places
+        echo '</div>';
 
-    // Pay Now button
-    echo '<div style="text-align: right;">';
-    echo '<form action="remove_deadline.php" method="POST" style="display: inline;">'; 
-    echo '<input type="hidden" name="user_id" value="' . $user_id . '">'; 
-    echo '<input type="hidden" name="deadline" value="' . htmlspecialchars($first_deadline) . '">'; 
-    echo '<button type="submit" style="background-color: #131e3d; color: white; padding: 10px 20px; border: none; border-radius: 5px; margin-top: 10px; cursor: pointer;">Pay Now</button>';
-    echo '</form>';
-    echo '</div>';
-echo '</div>';
+        // First payment section
+        echo '<div style="text-align: center;">';
+        echo '<p style="font-size: 15px; color: #131e3d; font-weight: 200; margin: 0;">FIRST PAYMENT IS DUE ON</p>';
+        echo '<p style="font-size: 24px; color: #a6a6a6; font-weight: bold; margin: 5px 0;">' . date('M. j, Y', strtotime($first_deadline)) . '</p>'; // Format the date
+        echo '</div>';
 
-// View Detailed Repayment Schedule button
-echo '<div style="text-align: center; margin-top: 0px;">';
-echo '<button style="background-color: #dbbf94; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold;">VIEW DETAILED REPAYMENT SCHEDULE</button>';
-echo '</div>';
+        // Pay Now button
+        echo '<div style="text-align: right;">';
+        echo '<form action="remove_deadline.php" method="POST" style="display: inline;">'; 
+        echo '<input type="hidden" name="user_id" value="' . $user_id . '">'; 
+        echo '<input type="hidden" name="deadline" value="' . htmlspecialchars($first_deadline) . '">'; 
+        echo '<input type="hidden" name="transaction_id" value="' . $_SESSION['transaction_id'] . '">'; // Include transaction_id here
+        echo '<button type="submit" disabled style="background-color: #ccc; color: white; padding: 10px 20px; border: none; border-radius: 5px; margin-top: 10px; cursor: not-allowed;">Pay Now</button>';
+        echo '</form>';
+        echo '</div>';
 
-echo '</div>';
+        echo '</div>';
+
+        // View Detailed Repayment Schedule button
+        echo '<div style="text-align: center; margin-top: 0px;">';
+        echo '<button style="background-color: #dbbf94; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold;">VIEW DETAILED REPAYMENT SCHEDULE</button>';
+        echo '</div>';
+
+        echo '</div>'; // Close application summary div
 
     } else {
-       // Display the application summary
-echo '<div style="background-color: #f4f1ec; border-radius: 9px; padding: 15px; margin: 10px auto; color: #333; font-family: Arial, sans-serif; width: 90%;">';
+        // Display the application summary if not posted
+        echo '<div style="background-color: #f4f1ec; border-radius: 9px; padding: 15px; margin: 10px auto; color: #333; font-family: Arial, sans-serif; width: 90%;">';
 
-echo '<h2 style="font-family: Georgia, serif; font-weight: bold; color: #131e3d; margin-bottom: 10px; text-align:left;">Your Loans</h2>';
+        echo '<h2 style="font-family: Georgia, serif; font-weight: bold; color: #131e3d; margin-bottom: 10px; text-align:left;">Your Loans</h2>';
 
-echo '<div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0;">';
+        echo '<div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0;">';
 
-// Amount section
-echo '<div style="text-align: left;">';
-echo '<p style="font-size: 15px; color: #131e3d; font-weight: 200; margin: 0;">AMOUNT</p>';
-echo '<p style="font-size: 36px; color: #cdad7d; font-weight: bold; margin: 5px 0;">₱' . number_format($total_amount, 0) . '</p>'; // No decimal places
-echo '</div>';
+        // Amount section
+        echo '<div style="text-align: left;">';
+        echo '<p style="font-size: 15px; color: #131e3d; font-weight: 200; margin: 0;">AMOUNT</p>';
+        echo '<p style="font-size: 36px; color: #cdad7d; font-weight: bold; margin: 5px 0;">₱' . number_format($total_amount, 0) . '</p>'; // No decimal places
+        echo '</div>';
 
-// First payment section
-echo '<div style="text-align: center;">';
-echo '<p style="font-size: 15px; color: #131e3d; font-weight: 200; margin: 0;">FIRST PAYMENT IS DUE ON</p>';
-// Check if the first_deadline is empty
-if (!empty($first_deadline)) {
-    echo '<p style="font-size: 24px; color: #a6a6a6; font-weight: bold; margin: 5px 0;">' . date('M. j, Y', strtotime($first_deadline)) . '</p>'; // Format the date
-} else {
-    echo '<p style="font-size: 24px; color: #a6a6a6; font-weight: bold; margin: 5px 0;">&nbsp;</p>'; // Display empty space if no date
-}
-echo '</div>';
+        // First payment section
+        echo '<div style="text-align: center;">';
+        echo '<p style="font-size: 15px; color: #131e3d; font-weight: 200; margin: 0;">FIRST PAYMENT IS DUE ON</p>';
+        // Check if the first_deadline is empty
+        if (!empty($first_deadline)) {
+            echo '<p style="font-size: 24px; color: #a6a6a6; font-weight: bold; margin: 5px 0;">' . date('M. j, Y', strtotime($first_deadline)) . '</p>'; // Format the date
+        } else {
+            echo '<p style="font-size: 24px; color: #a6a6a6; font-weight: bold; margin: 5px 0;">&nbsp;</p>'; // Display empty space if no date
+        }
+        echo '</div>';
 
-// Pay Now button
-echo '<div style="text-align: right;">';
-echo '<form action="remove_deadline.php" method="POST" style="display: inline;">'; 
-echo '<input type="hidden" name="user_id" value="' . $user_id . '">'; 
-echo '<input type="hidden" name="deadline" value="' . htmlspecialchars($first_deadline) . '">'; 
-echo '<button type="submit" style="background-color: #131e3d; color: white; padding: 10px 20px; border: none; border-radius: 5px; margin-top: 10px; cursor: pointer;">Pay Now</button>';
-echo '</form>';
-echo '</div>';
+        // Pay Now button
+        echo '<div style="text-align: right;">';
+        echo '<form action="remove_deadline.php" method="POST" style="display: inline;">'; 
+        echo '<input type="hidden" name="user_id" value="' . $user_id . '">'; 
+        echo '<input type="hidden" name="deadline" value="' . htmlspecialchars($first_deadline) . '">'; 
+        echo '<input type="hidden" name="transaction_id" value="' . $_SESSION['transaction_id'] . '">'; // Include transaction_id here
+        echo '<button type="submit" style="background-color: #131e3d; color: white; padding: 10px 20px; border: none; border-radius: 5px; margin-top: 10px; cursor: pointer;">Pay Now</button>';
+        echo '</form>';
+        echo '</div>';
 
-echo '</div>'; // Close flex container
+        echo '</div>'; // Close flex container
 
-// View Detailed Repayment Schedule button
-echo '<div style="text-align: center; margin-top: 0px;">';
-echo '<button style="background-color: #dbbf94; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold;">VIEW DETAILED REPAYMENT SCHEDULE</button>';
-echo '</div>';
+        // View Detailed Repayment Schedule button
+        echo '<div style="text-align: center; margin-top: 0px;">';
+        echo '<button style="background-color: #dbbf94; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold;">VIEW DETAILED REPAYMENT SCHEDULE</button>';
+        echo '</div>';
 
-echo '</div>'; // Close main container
+        echo '</div>'; // Close main container
 
     }
 } else {
-    echo 'No active applications.';
+    // Handle case when there are no applications
 
+
+// Close the database connection
+$conn->close();
 ?>
+
+
 
                             <form id="msform" action="borrower_apform_data.php" method="post" enctype="multipart/form-data">
                                                      
