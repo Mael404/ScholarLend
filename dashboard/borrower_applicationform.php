@@ -823,6 +823,8 @@ $conn->close();
                 </div>
             </div>
 
+
+            
      <!-- Bootstrap Modal -->
      <div class="modal fade" id="summaryModal" tabindex="-1" aria-labelledby="summaryModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -848,6 +850,27 @@ $conn->close();
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="termsandcon" tabindex="-1" role="dialog" aria-labelledby="termsandconLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="termsandconLabel">Terms and Conditions</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Your terms and conditions content goes here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="confirmSubmission()">I Accept</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 <script>
 // Example function to calculate due dates
@@ -1222,43 +1245,49 @@ document.getElementById('summaryModal').addEventListener('show.bs.modal', calcul
 
 </script>
 
-
 <script>
-  function updateHiddenInputs() {
-    // Get the values from the modal and assign them to the hidden fields
-    document.getElementById('hiddenPaymentMode').value = document.getElementById('modalPaymentMode').innerText;
-    document.getElementById('hiddenFrequency').value = document.getElementById('modalFrequency').innerText;
-    document.getElementById('hiddenDueDate').value = document.getElementById('modalDueDate').innerText;
-    document.getElementById('hiddenAccountDetails').value = document.getElementById('modalAccountDetails').innerText;
-    document.getElementById('hiddenTotalAmount').value = document.getElementById('modalTotalAmount').innerText;
-    document.getElementById('hiddenNextDeadlines').value = document.getElementById('modalNextDeadlines').innerText; // Add next deadlines
-    document.getElementById('hiddenTotalInterest').value = document.getElementById('modalTotalInterest').innerText; // Add total interest
-}
-
-
+    function updateHiddenInputs() {
+        // Get the values from the modal and assign them to the hidden fields
+        document.getElementById('hiddenPaymentMode').value = document.getElementById('modalPaymentMode').innerText;
+        document.getElementById('hiddenFrequency').value = document.getElementById('modalFrequency').innerText;
+        document.getElementById('hiddenDueDate').value = document.getElementById('modalDueDate').innerText;
+        document.getElementById('hiddenAccountDetails').value = document.getElementById('modalAccountDetails').innerText;
+        document.getElementById('hiddenTotalAmount').value = document.getElementById('modalTotalAmount').innerText;
+        document.getElementById('hiddenNextDeadlines').value = document.getElementById('modalNextDeadlines').innerText; // Add next deadlines
+        document.getElementById('hiddenTotalInterest').value = document.getElementById('modalTotalInterest').innerText; // Add total interest
+    }
 
     function submitForm() {
         // Update the hidden inputs before form submission
         updateHiddenInputs();
 
-        // Submit the form
-        document.getElementById('msform').submit();
+        // Show the terms and conditions modal
+        $('#termsandcon').modal('show');
     }
-    function updateNextDeadline() {
-    var dueDate = document.getElementById("modalDueDate").innerText;
-    var nextDeadline = document.getElementById("modalNextDeadlines").innerText;
 
-    // If next_deadline is empty, copy the value of dueDate
-    if (!nextDeadline.trim()) {
-        document.getElementById("modalNextDeadlines").innerText = dueDate;
+    function updateNextDeadline() {
+        var dueDate = document.getElementById("modalDueDate").innerText;
+        var nextDeadline = document.getElementById("modalNextDeadlines").innerText;
+
+        // If next_deadline is empty, copy the value of dueDate
+        if (!nextDeadline.trim()) {
+            document.getElementById("modalNextDeadlines").innerText = dueDate;
+        }
     }
-}
+
     // Add event listener to the modal for when it's shown
     document.getElementById('summaryModal').addEventListener('shown.bs.modal', function () {
         updateHiddenInputs();
         updateNextDeadline();
     });
 </script>
+
+<script>
+    function confirmSubmission() {
+        document.getElementById('msform').submit();
+    }
+</script>
+
 
 </body>
 

@@ -5,26 +5,32 @@ session_start();
 include 'condb.php';
 $transaction_id = $_GET['transaction_id']; // Assuming transaction_id is passed via GET request
 
-$query = "SELECT created_at, total_amount, payment_frequency, days_to_next_deadline FROM borrower_info WHERE transaction_id = ?";
+$query = "SELECT created_at, total_amount, payment_frequency, days_to_next_deadline, fname, lname, course, career_goals FROM borrower_info WHERE transaction_id = ?";
+
 $stmt = $conn->prepare($query);
 $stmt->bind_param('i', $transaction_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $loan = $result->fetch_assoc(); // Fetching the loan details
 
-// Check if the parameters are set
-if (isset($_GET['transaction_id'], $_GET['fname'], $_GET['loan_description'], $_GET['loan_amount'])) {
+// Set the variables from the fetched data
+$fname = htmlspecialchars($loan['fname'] ?? "Unknown Borrower");
+$lname = htmlspecialchars($loan['lname'] ?? ""); // Assuming lname is also fetched
+$course = htmlspecialchars($loan['course'] ?? "Course not specified");
+$career_goals = htmlspecialchars($loan['career_goals'] ?? "No goals specified.");
+
+// Optional: Check if other parameters are set, if needed
+if (isset($_GET['transaction_id'], $_GET['loan_description'], $_GET['loan_amount'])) {
     $transaction_id = $_GET['transaction_id'];
-    $fname = htmlspecialchars($_GET['fname']); // Sanitize the input
     $loan_description = htmlspecialchars($_GET['loan_description']); // Sanitize the input
     $loan_amount = htmlspecialchars($_GET['loan_amount']); // Sanitize the input
 } else {
-    // Handle the case where parameters are missing
-    $fname = "Unknown Borrower";
+    // Default values if parameters are missing
     $loan_description = "No description available.";
     $loan_amount = "0.00"; // Default value
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -38,6 +44,8 @@ if (isset($_GET['transaction_id'], $_GET['fname'], $_GET['loan_description'], $_
   <!-- Favicons -->
   <link href="assets/img/favicon.png" rel="icon">
   <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com" rel="preconnect">
@@ -63,7 +71,7 @@ if (isset($_GET['transaction_id'], $_GET['fname'], $_GET['loan_description'], $_
   <main class="main">
 
     <section id="hero" class="hero section light-background" style="position: relative; background-image: url('assets/img/hero-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 100vh;">
-        <div class="overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #131e3d; opacity: 0.5;"></div>
+        <div class="overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #131e3d; opacity: 0.7;"></div>
     <div class="container mt-5">
     <!-- Borrower Profile Section -->
     <div class="row">
@@ -72,9 +80,9 @@ if (isset($_GET['transaction_id'], $_GET['fname'], $_GET['loan_description'], $_
     <div class="borrower-profile card p-4" style="border-radius: 10px; background-color: #fff; min-height: 400px; position: relative; display: flex; flex-direction: column;">
     <div class="d-flex align-items-center mb-3 position-relative">
         <!-- Image container with overlay -->
-        <div class="borrower-image-container" style="position: relative; width: 60px; height: 60px;">
-            <img src="borrower-image.jpg" alt="<?php echo $fname; ?>" class="rounded-circle" style="width: 100%; height: 100%; object-fit: cover;">
-        </div>
+        <div style="width: 60px; height: 60px; display: flex; justify-content: center; align-items: center; background-color: #f0f0f0; border-radius: 50%;">
+    <i class="fas fa-user" style="font-size: 40px; color: #333;"></i>
+</div>
         <div class="ms-3">
             <h5><?php echo $fname; ?></h5>
             <p class="text-muted mb-0">Junior</p>
@@ -125,15 +133,15 @@ if (isset($_GET['transaction_id'], $_GET['fname'], $_GET['loan_description'], $_
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="borrowerProfileModalLabel">Borrower A</h5>
+        <h5 class="modal-title" id="borrowerProfileModalLabel">Borrower Profile</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <h5>Borrower A</h5>
-        <p class="text-muted">Junior BS Entrepreneurship</p>
+        <h5><?php echo htmlspecialchars($fname); ?> <?php echo isset($lname) ? htmlspecialchars($lname) : ''; ?></h5>
+        <p class="text-muted"><?php echo isset($course) ? htmlspecialchars($course) : 'Course not specified'; ?></p>
 
         <h6>Career goals and plans</h6>
-        <p>My goal is to launch a tech startup that addresses a market need after gaining experience through internships and startup competitions. Long-term, I plan to scale the business and mentor aspiring entrepreneurs.</p>
+        <p><?php echo isset($career_goals) ? htmlspecialchars($career_goals) : 'No goals specified.'; ?></p>
         
         <h6>Access documents here:</h6>
         <ul>
@@ -148,6 +156,7 @@ if (isset($_GET['transaction_id'], $_GET['fname'], $_GET['loan_description'], $_
     </div>
   </div>
 </div>
+
 
 
 <!-- Modal for Loan Details -->
@@ -195,7 +204,6 @@ if (isset($_GET['transaction_id'], $_GET['fname'], $_GET['loan_description'], $_
     <span style="float: right;"><?php echo ucfirst($loan['payment_frequency']); ?></span>
 </li>
 
-          <li><strong>Frequency of payment</strong> <span style="float: right;"><?php echo ucfirst($loan['payment_frequency']); ?></span></li>
           <li><strong>Amount paid per installment</strong> 
     <span style="float: right;">₱<?php echo number_format($loan['total_amount'], 2); ?></span>
 </li>
