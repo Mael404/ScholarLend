@@ -1,0 +1,219 @@
+<?php
+// Start the session
+session_start();
+
+// Check if the parameters are set
+if (isset($_GET['transaction_id'], $_GET['fname'], $_GET['loan_description'], $_GET['loan_amount'])) {
+    $transaction_id = $_GET['transaction_id'];
+    $fname = htmlspecialchars($_GET['fname']); // Sanitize the input
+    $loan_description = htmlspecialchars($_GET['loan_description']); // Sanitize the input
+    $loan_amount = htmlspecialchars($_GET['loan_amount']); // Sanitize the input
+} else {
+    // Handle the case where parameters are missing
+    $fname = "Unknown Borrower";
+    $loan_description = "No description available.";
+    $loan_amount = "0.00"; // Default value
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Starter Page - Butterfly Bootstrap Template</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Jost:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+  <!-- Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet">
+
+  <style>
+
+.container {
+    padding: 20px;
+    background-color: #f4f1ec;
+}
+
+.card-profile, .card-loan-details {
+    background-color: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+h4 {
+    font-weight: bold;
+}
+
+.borrower-info img.avatar-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: block;
+    margin: 10px auto;
+}
+
+.borrower-info h5 {
+    font-weight: bold;
+    text-align: center;
+}
+
+.borrower-info p {
+    text-align: center;
+}
+
+.borrower-info ul {
+    list-style-type: none;
+    padding: 0;
+    text-align: center;
+}
+
+.borrower-info ul li a {
+    color: #0056b3;
+    text-decoration: none;
+}
+
+.borrower-info ul li a:hover {
+    text-decoration: underline;
+}
+
+.loan-info p {
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.detailed-schedule-link {
+    font-weight: bold;
+    color: #0056b3;
+    display: block;
+    text-align: center;
+    margin-top: 20px;
+    text-decoration: none;
+}
+
+.detailed-schedule-link:hover {
+    text-decoration: underline;
+}
+
+.go-back-link {
+    display: block;
+    text-align: left;
+    margin-top: 30px;
+    color: #a1a1a1;
+    text-decoration: none;
+}
+
+.go-back-link:hover {
+    text-decoration: underline;
+}
+
+  </style>
+
+</head>
+
+<body class="starter-page-page">
+
+  <main class="main">
+
+    <section id="hero" style="background-color: #f4f1ec; height: 100vh;">
+    
+    <div class="container">
+    <div class="row justify-content-center">
+        <!-- Borrower Profile -->
+        <div class="col-md-5 card-profile">
+            <h4 class="text-center">Borrower profile</h4>
+           
+            <div class="borrower-info">
+                <img src="path_to_avatar_image" class="avatar-img" alt="Borrower" style="text-align: left;">
+                <h5 style="text-align: left;">Borrower A</h5>
+                <p style="text-align: left;">Junior BS Entrepreneurship</p>
+                <h6 style="text-align: left;">Career goals and plans</h6>
+                <p>My goal is to launch a tech startup that addresses a market need after gaining experience...</p>
+                <p>Access documents here:</p>
+                <ul>
+                    <li><a href="#">Risk assessment Report</a></li>
+                    <li><a href="#">Credit score Breakdown</a></li>
+                    <li><a href="#">Academic Transcript</a></li>
+                </ul>
+            </div>
+            <a href="#" class="go-back-link">← Go Back</a>
+        </div>
+
+        <!-- Loan Details -->
+        <div class="col-md-5 card-loan-details">
+         
+            <h4 class="text-center">Loan details</h4>
+            <div class="loan-info">
+                <p><strong>Loan amount:</strong> ₱2,000.00</p>
+                <p><strong>Application date:</strong> August 22, 2024</p>
+                <p><strong>Loan length:</strong> 3 months</p>
+                <p><strong>Frequency of payment:</strong> Monthly</p>
+                <p><strong>Amount paid per installment:</strong> ₱906.67</p>
+                <p><strong>Is the borrower paying interest?</strong> Yes</p>
+            </div>
+            <a href="#" class="detailed-schedule-link">DETAILED REPAYMENT SCHEDULE →</a>
+            <a href="#" class="go-back-link">← Go Back</a>
+        </div>
+    </div>
+</div>
+
+   
+
+  </section>
+  
+   
+   <!-- CSS for responsiveness -->
+   
+   
+   
+   
+    
+    
+    
+
+  </main>
+  
+  
+  
+  
+
+
+
+
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
+  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+
+  <!-- Main JS File -->
+  <script src="assets/js/main.js"></script>
+
+</body>
+
+</html>

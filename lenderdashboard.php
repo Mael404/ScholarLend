@@ -1,3 +1,48 @@
+<?php
+// Start output buffering
+ob_start();
+
+// Start the session
+session_start();
+
+$servername = "localhost";
+$username = "root";
+$password = "";
+$dbname = "scholarlend_db";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Check if the user is logged in
+if (isset($_SESSION['first_name'])) {
+    $firstName = $_SESSION['first_name'];
+    $walletBalance = $_SESSION['wallet_balance']; // Get the wallet balance from the session
+
+    // Fetch all posted loans
+    $sql = "SELECT transaction_id, fname, course, loan_amount, loan_description FROM borrower_info WHERE status = 'posted'"; // Use fname in the query
+    $result = $conn->query($sql);
+
+    // Check if any rows were returned
+    if ($result->num_rows == 0) {
+        echo "<p>No loans found with posted status.</p>";
+    }
+
+    $borrowerLoans = [];
+    while ($row = $result->fetch_assoc()) {
+        $borrowerLoans[] = $row; // Store each loan in an array
+    }
+} else {
+    $firstName = "User"; // Fallback in case the user is not logged in
+    $walletBalance = 0; // Fallback value for wallet balance
+    $borrowerLoans = []; // No loans if the user is not logged in
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -184,11 +229,11 @@
       
             <!-- Balance Display -->
             <li class="nav-item d-flex align-items-center mx-3">
-              <span style="font-size: 1.2rem; color: #323246; background-color: #dbbf94; border-radius: 10px; padding: 7px 17px; text-align: center; font-weight: bold;">
-                ₱ 00.00
-              </span>
-            </li>
-            
+    <span style="font-size: 1.2rem; color: #323246; background-color: #dbbf94; border-radius: 10px; padding: 7px 17px; text-align: center; font-weight: bold;">
+        ₱ <?php echo number_format($_SESSION['wallet_balance'], 2); ?> <!-- Display the wallet balance -->
+    </span>
+</li>
+
       
             <li class="nav-item d-flex align-items-center mx-3">
               <div style="background-color: black; border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; cursor: pointer;">
@@ -213,7 +258,9 @@
     <section class="container mt-5" style="background-color: #f4f1ec;" >
       <div class="row">
         <div class="col-12 text-center">
-          <h1 style="text-align: left; font-family:'Times New Roman', Times, serif;">Welcome back, <span style="color: #dbbf94;">Username</span></h1>
+        <h1 style="text-align: left; font-family:'Times New Roman', Times, serif;">
+        Welcome back, <span style="color: #dbbf94;"><?php echo htmlspecialchars($firstName); ?></span>
+    </h1>
           <h1 class="mt-4" style="text-align: left; font-weight:400;">Recommended loans for you</h1>
         </div>
       </div>
@@ -223,123 +270,35 @@
           <!-- First Slide (active) -->
           <div class="carousel-item active">
             <div class="row">
-              <!-- First Card -->
-              <div class="col-12 col-md-4 mb-4">
-                <div class="card h-100">
-                  <div class="image-container">
-                    <img src="assets/img/hero-bg.jpg" class="card-img-top" alt="Loan 1">
+
+
+
+            <?php foreach ($borrowerLoans as $loan): ?>
+        <div class="col-12 col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="image-container">
+                    <img src="assets/img/hero-bg.jpg" class="card-img-top" alt="Loan">
                     <div class="overlay">
-                      <p><i class="bi bi-book"></i> BS Accountancy</p>
+                        <p><i class="bi bi-book"></i> <?php echo htmlspecialchars($loan['course']); ?></p>
                     </div>
-                  </div>
-                  <div class="card-body d-flex flex-column">
-     
-                    <p class="card-text">Php 2,000 helps Borrower A to settle their rent due next week. (Provide a short description about the loan.)</p>
-                    <div class="mt-auto text-end">
-                      <a href="#" class="btn btn-primary" style="background-color: #131E3D;">View Loan</a>
-                    </div>
-                  </div>
                 </div>
-              </div>
-              <!-- Second Card -->
-              <div class="col-12 col-md-4 mb-4">
-                <div class="card h-100">
-                  <div class="image-container">
-                    <img src="assets/img/hero-bg.jpg" class="card-img-top" alt="Loan 2">
-                    <div class="overlay">
-                      <p><i class="bi bi-book"></i> BS Accountancy</p>
-                    </div>
-                  </div>
-                  <div class="card-body d-flex flex-column">
-              
-                    <p class="card-text">Php 1,500 helps Borrower B to buy their reference books (Provide a short description about the loan.)</p>
+                <div class="card-body d-flex flex-column">
+                    <p class="card-text">Transaction ID: <?php echo htmlspecialchars($loan['transaction_id']); ?></p> <!-- Display transaction ID -->
+                    <p class="card-text">Php <?php echo number_format($loan['loan_amount'], 2); ?> is requested by <?php echo htmlspecialchars($loan['fname']); ?> to meet their financial needs. (<?php echo htmlspecialchars($loan['loan_description']); ?>)</p>
+
                     <div class="mt-auto text-end">
-                      <a href="#" class="btn btn-primary" style="background-color: #131E3D;">View Loan</a>
+                    <a href="lenderviewloan.php?transaction_id=<?php echo htmlspecialchars($loan['transaction_id']); ?>&fname=<?php echo urlencode($loan['fname']); ?>&loan_description=<?php echo urlencode($loan['loan_description']); ?>&loan_amount=<?php echo urlencode($loan['loan_amount']); ?>" class="btn btn-primary" style="background-color: #131E3D;">View Loan</a>
+
+
                     </div>
-                  </div>
                 </div>
-              </div>
-              <!-- Third Card -->
-              <div class="col-12 col-md-4 mb-4">
-                <div class="card h-100">
-                  <div class="image-container">
-                    <img src="assets/img/hero-bg.jpg" class="card-img-top" alt="Loan 3">
-                    <div class="overlay">
-                      <p><i class="bi bi-book"></i> BS Accountancy</p>
-                    </div>
-                  </div>
-                  <div class="card-body d-flex flex-column">
-                    
-                    <p class="card-text">Php 1,000 helps Borrower C to purchase their prescription medicine (Provide a short description about the loan.)</p>
-                    <div class="mt-auto text-end">
-                      <a href="#" class="btn btn-primary" style="background-color: #131E3D;">View Loan</a>
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
-          </div>
-      
-          <!-- Second Slide -->
-          <div class="carousel-item">
-            <div class="row">
-              <!-- Fourth Card -->
-              <div class="col-12 col-md-4 mb-4">
-                <div class="card h-100">
-                  <div class="image-container">
-                    <img src="assets/img/hero-bg.jpg" class="card-img-top" alt="Loan 4">
-                    <div class="overlay">
-                      <p><i class="bi bi-book"></i> BS Accountancy</p>
-                    </div>
-                  </div>
-                  <div class="card-body d-flex flex-column">
-                 
-                    <p class="card-text">Details about loan option 4.</p>
-                    <div class="mt-auto text-end">
-                      <a href="#" class="btn btn-primary" style="background-color: #131E3D;">View Loan</a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Fifth Card -->
-              <div class="col-12 col-md-4 mb-4">
-                <div class="card h-100">
-                  <div class="image-container">
-                    <img src="assets/img/hero-bg.jpg" class="card-img-top" alt="Loan 5">
-                    <div class="overlay">
-                      <p><i class="bi bi-book"></i> BS Accountancy</p>
-                    </div>
-                  </div>
-                  <div class="card-body d-flex flex-column">
-             
-                    <p class="card-text">Details about loan option 5.</p>
-                    <div class="mt-auto text-end">
-                      <a href="#" class="btn btn-primary" style="background-color: #131E3D;">View Loan</a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Sixth Card -->
-              <div class="col-12 col-md-4 mb-4">
-                <div class="card h-100">
-                  <div class="image-container">
-                    <img src="assets/img/hero-bg.jpg" class="card-img-top" alt="Loan 6">
-                    <div class="overlay">
-                      <p><i class="bi bi-book"></i> BS Accountancy</p>
-                    </div>  
-                  </div>
-                  <div class="card-body d-flex flex-column">
-                 
-                    <p class="card-text">Details about loan option 6.</p>
-                    <div class="mt-auto text-end">
-                      <a href="#" class="btn btn-primary" style="background-color: #131E3D;">View Loan</a>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
+    <?php endforeach; ?>
+
+
+
+             
       
         <!-- Carousel controls -->
         <button class="carousel-control-prev" type="button" data-bs-target="#loanCarousel" data-bs-slide="prev">
