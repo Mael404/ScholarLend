@@ -1,9 +1,16 @@
 <?php
 session_start(); // Start session to access session variables
 
-
 include 'display_user_wallet.php';
-
+if (isset($_SESSION['insufficient_balance'])) {
+    echo "<script>
+            document.addEventListener('DOMContentLoaded', function() {
+                var myModal = new bootstrap.Modal(document.getElementById('insufficientBalanceModal'));
+                myModal.show();
+            });
+          </script>";
+    unset($_SESSION['insufficient_balance']); // Clear the session variable after displaying the modal
+}
 ?>
 
 
@@ -15,6 +22,7 @@ include 'display_user_wallet.php';
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
     <link rel="stylesheet" href="styles.css" />
     <title>ScholarLend - Admin</title>
@@ -823,7 +831,23 @@ $conn->close();
                 </div>
             </div>
 
-
+            <div class="modal fade" id="insufficientBalanceModal" tabindex="-1" role="dialog" aria-labelledby="insufficientBalanceModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="insufficientBalanceModalLabel">Insufficient Balance</h5>
+             
+                </button>
+            </div>
+            <div class="modal-body">
+                Insufficient balance to make the payment. Please top up your wallet and try again.
+            </div>
+            <div class="modal-footer">
+             
+            </div>
+        </div>
+    </div>
+</div>
             
      <!-- Bootstrap Modal -->
      <div class="modal fade" id="summaryModal" tabindex="-1" aria-labelledby="summaryModalLabel" aria-hidden="true">
@@ -840,7 +864,9 @@ $conn->close();
                 <p><strong>Next Deadlines:</strong> <span id="modalNextDeadlines"></span></p>
                 <p><strong>Account Details:</strong> <span id="modalAccountDetails"></span></p>
                 <p><strong>Total Amount to be Paid:</strong> <span id="modalTotalAmount"></span></p>
-                <p><strong>Total Interest Earned:</strong> <span id="modalTotalInterest"></span></p>
+            
+                <p style="display: none;"><strong>Total Interest Earned:</strong> <span id="modalTotalInterest"></span></p>
+
             </div>
 
             <div class="modal-footer">
@@ -934,9 +960,6 @@ document.getElementById('summaryModal').addEventListener('show.bs.modal', calcul
                 
 
                    
-
-            
-
       
  
   

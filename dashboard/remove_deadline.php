@@ -118,7 +118,10 @@ if ($row) {
         header("Location: borrower_applicationform.php");
         exit();
     } else {
-        echo "Insufficient balance to make the payment.";
+        // Set session variable for insufficient balance
+        $_SESSION['insufficient_balance'] = true;
+        header("Location: borrower_applicationform.php");
+        exit();
     }
 } else {
     echo "No loan found for the given user ID and transaction ID.";
