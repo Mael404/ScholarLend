@@ -1,6 +1,7 @@
 <?php
 session_start();
 // Database connection
+include 'display_user_wallet.php';
 $servername = "localhost"; // Replace with your server name
 $username = "root"; // Replace with your database username
 $password = ""; // Replace with your database password
@@ -227,29 +228,24 @@ $result = $conn->query($sql);
       <h2 class="fs-2 m-0" style="font-family: 'Times New Roman', Times, serif;">Applications</h2>
     </div>
 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-      data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-      aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-   
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle second-text fw-bold" href="#" id="navbarDropdown"
-                                role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="fas fa-user me-2"></i>Example User
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <li><a class="dropdown-item" href="#">Profile</a></li>
-                                <li><a class="dropdown-item" href="#">Settings</a></li>
-                                <li><a class="dropdown-item" href="#">Logout</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                </div>
+    
+    <a class="nav-link wallet-link second-text fw-bold ms-auto" href="#">
+    <i class="fas fa-wallet me-2"></i>Balance: 
+    <span class="wallet-balance">PHP <?php echo number_format($wallet_balance, 2); ?></span>
+</a>
+    
   </nav>
-
+  <style>
+    .wallet-link {
+        color: black;
+        font-size: 1.1rem;
+        background-color: #dbbf94;
+        border-radius: 9px;
+    }
+    .wallet-balance {
+        font-weight: bold;
+    }
+</style>
   <div class="container mt-4">
     <div class="row">
     <?php

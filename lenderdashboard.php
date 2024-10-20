@@ -29,7 +29,7 @@ if (isset($_SESSION['first_name'])) {
 
     // Check if any rows were returned
     if ($result->num_rows == 0) {
-        echo "<p>No loans found with posted status.</p>";
+     
     }
 
     $borrowerLoans = [];
@@ -231,11 +231,18 @@ if (isset($_SESSION['first_name'])) {
 </li>
 
       
-            <li class="nav-item d-flex align-items-center mx-3">
-              <div style="background-color: black; border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; cursor: pointer;">
-                <i class="bi bi-person" style="font-size: 1.5rem; color: white;"></i>
-              </div>
-            </li>
+<li class="nav-item d-flex align-items-center mx-3">
+    <div id="profile-icon" style="background-color: black; border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; cursor: pointer;">
+        <i class="bi bi-person" style="font-size: 1.5rem; color: white;"></i>
+    </div>
+</li>
+
+<script>
+    document.getElementById('profile-icon').addEventListener('click', function() {
+        window.location.href = 'lender.php';
+    });
+</script>
+
             
             
           </ul>
@@ -269,7 +276,14 @@ if (isset($_SESSION['first_name'])) {
 
 
 
-            <?php foreach ($borrowerLoans as $loan): ?>
+            <?php if (empty($borrowerLoans)): ?>
+    <div class="col-12">
+        <div class="alert text-center p-5" role="alert" style="background-color: #f4f1ec; font-size: 2.3rem; border-radius: 10px; height:30vh">
+            No loans available.
+        </div>
+    </div>
+<?php else: ?>
+    <?php foreach ($borrowerLoans as $loan): ?>
         <div class="col-12 col-md-4 mb-4">
             <div class="card h-100">
                 <div class="image-container">
@@ -283,14 +297,14 @@ if (isset($_SESSION['first_name'])) {
                     <p class="card-text">Php <?php echo number_format($loan['loan_amount'], 2); ?> is requested by <?php echo htmlspecialchars($loan['fname']); ?> to meet their financial needs. (<?php echo htmlspecialchars($loan['loan_description']); ?>)</p>
 
                     <div class="mt-auto text-end">
-                    <a href="lenderviewloan.php?transaction_id=<?php echo htmlspecialchars($loan['transaction_id']); ?>&fname=<?php echo urlencode($loan['fname']); ?>&loan_description=<?php echo urlencode($loan['loan_description']); ?>&loan_amount=<?php echo urlencode($loan['loan_amount']); ?>" class="btn btn-primary" style="background-color: #131E3D;">View Loan</a>
-
-
+                        <a href="lenderviewloan.php?transaction_id=<?php echo htmlspecialchars($loan['transaction_id']); ?>&fname=<?php echo urlencode($loan['fname']); ?>&loan_description=<?php echo urlencode($loan['loan_description']); ?>&loan_amount=<?php echo urlencode($loan['loan_amount']); ?>" class="btn btn-primary" style="background-color: #131E3D;">View Loan</a>
                     </div>
                 </div>
             </div>
         </div>
     <?php endforeach; ?>
+<?php endif; ?>
+
 
 
 
