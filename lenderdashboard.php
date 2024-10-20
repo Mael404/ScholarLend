@@ -220,11 +220,7 @@ if (isset($_SESSION['first_name'])) {
               <a class="nav-link dropdown-toggle" href="#" id="aboutDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 About
               </a>
-              <ul class="dropdown-menu" aria-labelledby="aboutDropdown">
-                <li><a class="dropdown-item" href="#">Our Story</a></li>
-                <li><a class="dropdown-item" href="#">Team</a></li>
-                <li><a class="dropdown-item" href="#">Contact</a></li>
-              </ul>
+             
             </li>
       
             <!-- Balance Display -->

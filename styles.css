@@ -1,0 +1,319 @@
+:root {
+  --main-bg-color: #009d63;
+  --main-text-color: #009d63;
+  --second-text-color: #bbbec5;
+  --second-bg-color: #c1efde;
+}
+
+.primary-text {
+  color: black;
+}
+
+.second-text {
+  color: var(--second-text-color);
+}
+
+.primary-bg {
+  background-color: var(--main-bg-color);
+}
+
+.secondary-bg {
+  background-color: var(--second-bg-color);
+}
+
+.rounded-full {
+  border-radius: 100%;
+}
+
+
+
+#sidebar-wrapper {
+  min-height: 100vh; /* Ensures the sidebar takes full viewport height */
+  margin-left: -25rem; /* Initially hidden */
+  transition: margin 0.25s ease-out;
+  border-right: 4px solid #f0f0f0; /* Adds a 4px border on the left with a gray color */
+}
+
+
+#sidebar-wrapper .sidebar-heading {
+  padding: 0.875rem 1.25rem;
+  font-size: 1.2rem;
+}
+
+#sidebar-wrapper .list-group {
+  width: 25rem;
+}
+
+#page-content-wrapper {
+  min-width: 100vw; /* Full width by default */
+}
+
+#wrapper.toggled #sidebar-wrapper {
+  margin-left: 0; /* Show the sidebar */
+}
+
+#wrapper.toggled #page-content-wrapper {
+  min-width: calc(100vw - 25rem); /* Adjust to account for sidebar width */
+}
+
+#menu-toggle {
+  cursor: pointer;
+}
+
+.list-group-item {
+  border: none;
+  padding: 20px 30px;
+}
+
+.list-group-item.active {
+  background-color: transparent;
+  color: var(--main-text-color);
+  font-weight:100;
+  border: none;
+}
+
+.list-group-item {
+  border-radius: 8px; /* Add border radius to list items */
+  transition: background-color 0.3s ease; /* Smooth transition effect */
+}
+
+.list-group-item:hover {
+  background-color: brown; /* Set background color on hover */
+  color: black; /* Set text color on hover */
+}
+
+@media (min-width: 768px) {
+  #sidebar-wrapper {
+    margin-left: 0; /* Always visible on larger screens */
+  }
+
+  #page-content-wrapper {
+    min-width: 0;
+    width: 100%; /* Full width on larger screens */
+  }
+
+  #wrapper.toggled #sidebar-wrapper {
+    margin-left: -25rem; /* Hide on toggle */
+  }
+}
+
+
+
+/* INPUT FORM ***************************************************************************************/
+#heading {
+  text-transform: uppercase;
+  color: #dbbf94;
+  font-weight: normal;
+}
+
+#msform {
+  text-align: center;
+  position: relative;
+  margin-top: 0px;
+  width: 100%; /* This will make it take up all the available width */
+  max-width: 1400px; /* Increase this to make the form wider */
+  margin: 0 auto; /* This will center it on the page */
+}
+
+
+
+#msform fieldset {
+  width: 100%;
+  max-width: 100%; /* Ensure it doesn’t limit its own width */
+  background-color: #f4f1ec; /* Add your desired background color */
+  padding: 20px;
+  box-sizing: border-box; /* Ensures padding doesn’t add to width */
+  border-radius: 9px;
+}
+
+
+
+.form-card {
+  text-align: center;
+}
+
+#msform fieldset:not(:first-of-type) {
+  display: none;
+}
+
+#msform input,
+#msform textarea {
+  padding: 8px 15px;
+  border: 1px solid #ccc;
+  border-radius: 0;
+  margin-bottom: 25px;
+  margin-top: 2px;
+  width: 100%;
+  box-sizing: border-box;
+ 
+  color: #2C3E50;
+  
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+
+#msform input:focus,
+#msform textarea:focus {
+  box-shadow: none !important;
+  border: 1px solid #dbbf94;
+  outline-width: 0;
+}
+
+#msform .action-button,
+#msform .action-button-previous {
+  width: 100px;
+  font-weight: bold;
+  color: white;
+  border: none;
+  border-radius: 0;
+  cursor: pointer;
+  padding: 10px 5px;
+  margin: 10px;
+  float: right;
+}
+
+#msform .action-button {
+  background: #dbbf94;
+}
+
+#msform .action-button:hover,
+#msform .action-button:focus {
+  background-color: #dbbf94;
+}
+
+#msform .action-button-previous {
+  background: #616161;
+}
+
+#msform .action-button-previous:hover,
+#msform .action-button-previous:focus {
+  background-color: #000000;
+}
+
+.card {
+  z-index: 0;
+  border: none;
+  position: relative;
+}
+
+.fs-title {
+  font-size: 25px;
+  color: #000000;
+  text-align: left;
+  font-family: 'Times New Roman', Times, serif;
+  font-weight: 900;
+  white-space: nowrap; /* Prevent text from wrapping to the next line */
+margin-bottom: 30px;
+  text-overflow: ellipsis; /* Add an ellipsis ("...") if the text overflows */
+}
+
+
+.purple-text {
+  color: #dbbf94;
+  font-weight: normal;
+}
+
+.steps {
+  font-size: 25px;
+  color: gray;
+  margin-bottom: 10px;
+  font-weight: normal;
+  text-align: right;
+}
+
+.fieldlabels {
+  color: gray;
+  text-align: left;
+}
+
+#progressbar {
+  margin-bottom: 30px;
+  overflow: hidden;
+  color: lightgrey;
+}
+
+#progressbar li {
+  list-style-type: none;
+  font-size: 15px;
+  width: calc(25% - 15px); /* Adjusted width to accommodate gap */
+  float: left;
+  position: relative;
+  font-weight: 400;
+  margin-right: 10px; /* Adds gap between items */
+}
+
+#progressbar li:last-child {
+  margin-right: 0; /* Remove margin from the last item */
+}
+
+#progressbar li:before {
+  content: attr(data-step); /* Using data attribute to get the step number */
+  width: 50px;
+  height: 50px;
+  line-height: 45px;
+  display: block;
+  font-size: 20px;
+  color: #ffffff;
+  background: #dbbf94;
+  border-radius: 50%;
+  margin: 0 auto 10px auto;
+  padding: 2px;
+}
+
+#progressbar li:after {
+  content: '';
+  width: calc(100% + 15px); /* Extend the line to account for gaps */
+  height: 2px;
+  background: lightgray;
+  position: absolute;
+  left: -7.5px; /* Center the line */
+  top: 25px;
+  z-index: -1;
+}
+
+#progressbar li.active:before,
+#progressbar li.active:after {
+  background: #131e3d;
+}
+
+.progress {
+  height: 20px;
+}
+
+.progress-bar {
+  background-color: #dbbf94;
+}
+
+.fit-image {
+  width: 100%;
+  object-fit: cover;
+}
+
+/* INPUT FORM ***************************************************************************************/
+
+
+
+
+/* PADDING IN THE FLOATING INPUT */
+.form-floating select {
+  padding-top: 1.0rem; /* Adjust padding to match with floating label */
+}
+
+.form-floating label {
+  padding-top: 10px; /* Adjust top padding for label */
+  padding-bottom: 0px; /* Adjust bottom padding for label */
+}
+
+.form-floating .form-control, 
+.form-floating .form-select {
+  margin-top: 0px; /* Remove unnecessary top margin */
+}
+/* PADDING IN THE FLOATING INPUT */
+
+.form-floating input[type="file"] {
+  padding-top: 2.5rem; /* Adjust padding to prevent overlap */
+}
+
+.form-floating label {
+  padding-top: 10px; /* Keep label padding for spacing */
+}
