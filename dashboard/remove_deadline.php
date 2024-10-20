@@ -1,17 +1,18 @@
 <?php
-session_start(); // Start the session
+session_start();
 
 // Check if the user_id is set in the session
 if (!isset($_SESSION['user_id'])) {
-    die("User not logged in."); // Stop execution if user is not logged in
+    die("User not logged in.");
 }
 
 $user_id = $_POST['user_id'];
 $deadline_to_remove = $_POST['deadline'];
+$transaction_id = $_POST['transaction_id'];
 
 // Ensure transaction_id is in the session
 if (!isset($_SESSION['transaction_id'])) {
-    die("Transaction ID not found in session."); // Stop execution if transaction ID is missing
+    die("Transaction ID not found in session.");
 }
 
 // Database connection
@@ -19,8 +20,6 @@ $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "scholarlend_db";
-
-// Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
 // Check connection
@@ -28,42 +27,100 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch current next deadlines and transaction_id
-$sql = "SELECT next_deadlines FROM borrower_info WHERE user_id = ? AND transaction_id = ?";
+// Step 1: Fetch the borrower balance
+$sql = "SELECT wallet_balance FROM users_tb WHERE user_id = ?";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param("is", $user_id, $_SESSION['transaction_id']); // Bind user_id and transaction_id
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$borrower = $result->fetch_assoc();
+
+if (!$borrower) {
+    die("Borrower not found.");
+}
+
+$borrower_balance = $borrower['wallet_balance'];
+
+// Fetch loan amount, lender_id, and share_admin from borrower_info
+$sql = "SELECT lender_id, total_amount, share_admin FROM borrower_info WHERE user_id = ? AND transaction_id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("is", $user_id, $transaction_id);
 $stmt->execute();
 $result = $stmt->get_result();
 $row = $result->fetch_assoc();
 
 if ($row) {
-    $next_deadlines = $row['next_deadlines'];
-    
-    // Convert the comma-separated string to an array
-    $next_deadlines_array = array_map('trim', explode(',', $next_deadlines));
-    
-    // Remove the specified deadline (current date)
-    if (($key = array_search(trim($deadline_to_remove), $next_deadlines_array)) !== false) {
-        unset($next_deadlines_array[$key]);
+    $lender_id = $row['lender_id'];
+    $loan_amount = $row['total_amount'];
+    $share_admin = $row['share_admin'];
+
+    if ($borrower_balance >= $loan_amount) {
+        // Step 2: Deduct from borrower's balance and add to lender's balance
+        $conn->begin_transaction(); // Start transaction
+
+        // Update borrower balance
+        $updateBorrower = "UPDATE users_tb SET wallet_balance = wallet_balance - ? WHERE user_id = ?";
+        $stmtBorrower = $conn->prepare($updateBorrower);
+        $stmtBorrower->bind_param('di', $loan_amount, $user_id);
+        $stmtBorrower->execute();
+
+        // Update lender balance (minus the admin's share)
+        $amount_for_lender = $loan_amount - $share_admin;
+        $updateLender = "UPDATE users_tb SET wallet_balance = wallet_balance + ? WHERE user_id = ?";
+        $stmtLender = $conn->prepare($updateLender);
+        $stmtLender->bind_param('di', $amount_for_lender, $lender_id);
+        $stmtLender->execute();
+
+        // Step 3: Deduct admin share from lender's wallet and add to admin
+        $updateLenderForAdmin = "UPDATE users_tb SET wallet_balance = wallet_balance - ? WHERE user_id = ?";
+        $stmtLenderForAdmin = $conn->prepare($updateLenderForAdmin);
+        $stmtLenderForAdmin->bind_param('di', $share_admin, $lender_id);
+        $stmtLenderForAdmin->execute();
+
+        // Step 4: Transfer admin share to the admin
+        $adminQuery = "UPDATE users_tb SET wallet_balance = wallet_balance + ? WHERE account_role = 'Admin'";
+        $stmtAdmin = $conn->prepare($adminQuery);
+        $stmtAdmin->bind_param('d', $share_admin);
+        $stmtAdmin->execute();
+
+        $conn->commit(); // Commit transaction
+
+        // Remove deadline logic as before
+        $sql = "SELECT next_deadlines FROM borrower_info WHERE user_id = ? AND transaction_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("is", $user_id, $_SESSION['transaction_id']);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+
+        if ($row) {
+            $next_deadlines = $row['next_deadlines'];
+            $next_deadlines_array = array_map('trim', explode(',', $next_deadlines));
+
+            // Remove the specified deadline
+            if (($key = array_search(trim($deadline_to_remove), $next_deadlines_array)) !== false) {
+                unset($next_deadlines_array[$key]);
+            }
+
+            $new_deadlines = implode(', ', array_values($next_deadlines_array));
+            $update_sql = "UPDATE borrower_info SET next_deadlines = ? WHERE user_id = ? AND transaction_id = ?";
+            $update_stmt = $conn->prepare($update_sql);
+            $update_stmt->bind_param("sis", $new_deadlines, $user_id, $_SESSION['transaction_id']);
+            $update_stmt->execute();
+        }
+
+        // Close statements and connection
+        $stmt->close();
+        $update_stmt->close();
+        $conn->close();
+
+        // Redirect back to borrower_applicationform.php
+        header("Location: borrower_applicationform.php");
+        exit();
+    } else {
+        echo "Insufficient balance to make the payment.";
     }
-
-    // Update the database with the remaining deadlines
-    $new_deadlines = implode(', ', array_values($next_deadlines_array)); // Convert back to string
-    $update_sql = "UPDATE borrower_info SET next_deadlines = ? WHERE user_id = ? AND transaction_id = ?";
-    $update_stmt = $conn->prepare($update_sql);
-    $update_stmt->bind_param("sis", $new_deadlines, $user_id, $_SESSION['transaction_id']); // Bind new deadlines, user_id, and transaction_id
-    $update_stmt->execute();
-
-    // Close the statements
-    $stmt->close();
-    $update_stmt->close();
 } else {
-    echo "No application found for the given user ID and transaction ID."; // Optional error message
+    echo "No loan found for the given user ID and transaction ID.";
 }
-
-$conn->close();
-
-// Redirect back to the previous page or show a success message
-header("Location: borrower_applicationform.php");
-exit();
 ?>

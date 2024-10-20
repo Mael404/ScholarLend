@@ -77,6 +77,8 @@ if (isset($_GET['transaction_id'], $_GET['loan_description'], $_GET['loan_amount
     <div class="row">
     <div class="col-12 col-md-8 mb-4">
     
+
+    
     <div class="borrower-profile card p-4" style="border-radius: 10px; background-color: #fff; min-height: 400px; position: relative; display: flex; flex-direction: column;">
     <div class="d-flex align-items-center mb-3 position-relative">
         <!-- Image container with overlay -->
@@ -105,13 +107,25 @@ if (isset($_GET['transaction_id'], $_GET['loan_description'], $_GET['loan_amount
     </div>
 
     <!-- Help Fund Section -->
-    <div class="col-12 col-md-4">
+  
+<div class="col-12 col-md-4">
     <div class="help-fund card p-4" style="background-color: #fff; border-radius: 10px;">
         <h5>Help fund this loan</h5>
-        <div class="input-group mt-3">
-            <input type="text" class="form-control" value="<?php echo $loan_amount; ?>" readonly>
-            <button class="btn" style="background-color: #dbbf94; color: #323246; border: none; margin-left: 10px;">Lend now</button>
-        </div>
+        
+        <!-- Start the form -->
+        <form id="lendForm" method="post" action="process_lend.php">
+
+            <div class="input-group mt-3">
+                <input type="text" class="form-control" value="<?php echo $loan_amount; ?>" readonly>
+                <!-- Hidden input fields for loan_amount and transaction_id -->
+                <input type="hidden" name="loan_amount" value="<?php echo $loan_amount; ?>">
+                <input type="hidden" name="transaction_id" value="<?php echo $transaction_id; ?>">
+                
+                <!-- Submit button for the form -->
+                <button type="submit" name="lendNow" class="btn" style="background-color: #dbbf94; color: #323246; border: none; margin-left: 10px;">Lend now</button>
+            </div>
+        </form>
+        
         <button class="btn mt-3" style="background-color: #192a4d; color: white; width: 100%;">Invest funds</button>
 
         <!-- Borrower Profile and Loan Details -->
@@ -127,7 +141,6 @@ if (isset($_GET['transaction_id'], $_GET['loan_description'], $_GET['loan_amount
         </div>
     </div>
 </div>
-
 <!-- Modal for Borrower Profile -->
 <div class="modal fade" id="borrowerProfileModal" tabindex="-1" aria-labelledby="borrowerProfileModalLabel" aria-hidden="true">
   <div class="modal-dialog">
