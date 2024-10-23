@@ -154,33 +154,7 @@ $result = $conn->query($sql);
     padding: 8px 12px; /* Padding for better spacing */
     display: inline-block; /* To make the background wrap around the text */
 }
-/* card tab */
-.card {
-      background-color: #f8f9fa;
-      border-radius: 10px;
-    }
 
-    .nav-tabs .nav-link.active {
-      background-color: #f8f9fa;
-      border-color: #f8f9fa;
-      font-weight: bold;
-    }
-
-    h5 {
-      font-weight: bold;
-    }
-
-    p {
-      margin-bottom: 0.5rem;
-    }
-
-    .tab-content {
-      border: 1px solid #e9ecef;
-      border-top: none;
-      background-color: #fff;
-      padding: 1rem;
-      border-radius: 0 0 10px 10px;
-    }
 
     </style>
 </head>
@@ -411,7 +385,8 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
   </div>
 
   
-  <div class="modal fade" id="borrowerModal" tabindex="-1" aria-labelledby="borrowerModalLabel" aria-hidden="true">
+<!-- Borrower Modal -->
+<div class="modal fade" id="borrowerModal" tabindex="-1" aria-labelledby="borrowerModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -419,122 +394,167 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="card p-3 mb-3">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <p class="mb-0">Borrower</p>
-                            <h5 class="font-weight-bold" id="modal-borrower-name">[Name]</h5>
-                            <p id="modal-borrower-phone">[Phone]</p>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="section-title">Personal Information</h6>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-fname" value="" readonly>
+                            <label for="modal-fname">&nbsp;&nbsp;First Name:</label>
                         </div>
-                        <div class="col-md-3">
-                            <p class="mb-0">Requested</p>
-                            <h5 class="font-weight-bold" id="modal-loan-amount">₱[Loan Amount]</h5>
-                            <p id="modal-loan-duration">[Duration]</p>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-mname" value="" readonly>
+                            <label for="modal-mname">&nbsp;&nbsp;Middle Name:</label>
                         </div>
-                        <div class="col-md-3">
-                            <p class="mb-0">Total Interest</p>
-                            <h5 class="font-weight-bold" id="modal-total-interest">₱[Interest]</h5>
-                            <p id="modal-interest-duration">[Duration]</p>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-lname" value="" readonly>
+                            <label for="modal-lname">&nbsp;&nbsp;Last Name:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-birthdate" value="" readonly>
+                            <label for="modal-birthdate">&nbsp;&nbsp;Birthdate:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-gender" value="" readonly>
+                            <label for="modal-gender">&nbsp;&nbsp;Gender:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-cellphonenumber" value="" readonly>
+                            <label for="modal-cellphonenumber">&nbsp;&nbsp;Cell Phone:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-email" value="" readonly>
+                            <label for="modal-email">&nbsp;&nbsp;Email:</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <h6 class="section-title">Community & Spending</h6>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-school_community" value="" readonly>
+                            <label for="modal-school_community">&nbsp;&nbsp;School Community:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-spending_pattern" value="" readonly>
+                            <label for="modal-spending_pattern">&nbsp;&nbsp;Spending Pattern:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-account_details" value="" readonly>
+                            <label for="modal-account_details">&nbsp;&nbsp;Account Details:</label>
                         </div>
                     </div>
                 </div>
-
-                <!-- Tabs for different sections -->
-                <ul class="nav nav-tabs">
-                    <li class="nav-item">
-                        <a class="nav-link active" data-bs-toggle="tab" href="#personal-info">Personal Information</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#educational-info">Educational Background</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#financial-info">Financial & Other Information</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#attachments">Attachments</a>
-                    </li>
-                </ul>
-
-                <div class="tab-content p-3">
-                    <div id="personal-info" class="tab-pane fade show active">
-                        <h5>Personal Information</h5>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <p><strong>First Name:</strong> <span id="modal-fname">[First Name]</span></p>
-                                <p><strong>Middle Name:</strong> <span id="modal-mname">[Middle Name]</span></p>
-                                <p><strong>Last Name:</strong> <span id="modal-lname">[Last Name]</span></p>
-                                <p><strong>Birth Date:</strong> <span id="modal-birthdate">[Birth Date]</span></p>
-                                <p><strong>Gender:</strong> <span id="modal-gender">[Gender]</span></p>
-                                <p><strong>Phone/Cellphone Number:</strong> <span id="modal-cellphonenumber">[Phone]</span></p>
-                            </div>
-                            <div class="col-md-6">
-                                <p><strong>Email:</strong> <span id="modal-email">[Email]</span></p>
-                                <p><strong>Current Address:</strong> <span id="modal-current-address">[Current Address]</span></p>
-                                <p><strong>Permanent Address:</strong> <span id="modal-permanent-address">[Permanent Address]</span></p>
-                            </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <h6 class="section-title">Education</h6>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-school" value="" readonly>
+                            <label for="modal-school">&nbsp;&nbsp;School:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-college" value="" readonly>
+                            <label for="modal-college">&nbsp;&nbsp;College:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-course" value="" readonly>
+                            <label for="modal-course">&nbsp;&nbsp;Course:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-yearofstudy" value="" readonly>
+                            <label for="modal-yearofstudy">&nbsp;&nbsp;Year of Study:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-graduationdate" value="" readonly>
+                            <label for="modal-graduationdate">&nbsp;&nbsp;Graduation Date:</label>
                         </div>
                     </div>
-                    <div id="educational-info" class="tab-pane fade">
-    <h5>Educational Background</h5>
-    <div class="row">
-        <div class="col-md-6">
-            <p><strong>School/University:</strong> <span id="modal-school">Bicol University</span></p>
-            <p><strong>College:</strong> <span id="modal-college">CBEM</span></p>
-            <p><strong>Program:</strong> <span id="modal-course">Accountancy</span></p>
-        </div>
-        <div class="col-md-6">
-            <p><strong>Year of Study:</strong> <span id="modal-yearofstudy">Senior</span></p>
-            <p><strong>Expected Graduation Date:</strong> <span id="modal-graduationdate">2025</span></p>
-            <p><strong>GWA:</strong> <span id="modal-gwa">2.40</span></p>
-        </div>
-    </div>
+                    <div class="col-md-6">
+                        <h6 class="section-title">Financial Information</h6>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-monthly_allowance" value="" readonly>
+                            <label for="modal-monthly_allowance">&nbsp;&nbsp;Monthly Allowance:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-source_of_allowance" value="" readonly>
+                            <label for="modal-source_of_allowance">&nbsp;&nbsp;Source of Allowance:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-monthly_expenses" value="" readonly>
+                            <label for="modal-monthly_expenses">&nbsp;&nbsp;Monthly Expenses:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-monthly_savings" value="" readonly>
+                            <label for="modal-monthly_savings">&nbsp;&nbsp;Monthly Savings:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+    <textarea class="form-control" id="modal-career_goals" rows="4" readonly></textarea>
+    <label for="modal-career_goals">&nbsp;&nbsp;Career Goals:</label>
 </div>
 
-
-<div id="financial-info" class="tab-pane fade">
-    <h5>Financial & Other Information</h5>
-    <div class="row">
-        <div class="col-md-6">
-            <p><strong>Monthly Allowance:</strong> <span id="modal-monthly-allowance">₱[Monthly Allowance]</span></p>
-            <p><strong>Source of Allowance:</strong> <span id="modal-source-of-allowance">[Source]</span></p>
-            <p><strong>Monthly Expenses:</strong> <span id="modal-monthly-expenses">₱[Expenses]</span></p>
-            <p><strong>Affiliated Organization:</strong> <span id="modal-affiliated-organization">[Organization]</span></p>
-            <p><strong>Spending Pattern:</strong> <span id="modal-spending-pattern">[Pattern]</span></p>
-            <p><strong>Savings Behavior:</strong> <span id="modal-savings-behavior">[Behavior]</span></p>
-        </div>
-        <div class="col-md-6">
-            <p><strong>Career Goals and Plans:</strong></p>
-            <p id="modal-career-goals">[Career Goals]</p>
-        </div>
-    </div>
-</div>
-
-
-
-        <div id="attachments" class="tab-pane fade">
-    <h5>Attachments</h5>
-    <div class="row">
-        <div class="col-md-3">
-            <img id="modal-cor1" src="#" alt="Attachment 1" class="img-fluid mb-2" />
-        </div>
-        <div class="col-md-3">
-            <img id="modal-cor2" src="#" alt="Attachment 2" class="img-fluid mb-2" />
-        </div>
-        <div class="col-md-3">
-            <img id="modal-cor3" src="#" alt="Attachment 3" class="img-fluid mb-2" />
-        </div>
-        <div class="col-md-3">
-            <img id="modal-cor4" src="#" alt="Attachment 4" class="img-fluid mb-2" />
-        </div>
-    </div>
-</div>
-
+                    </div>
                 </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <h6 class="section-title">Loan Details</h6>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-loan_amount" value="" readonly>
+                            <label for="modal-loan_amount">&nbsp;&nbsp;Loan Amount:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-loan_purpose" value="" readonly>
+                            <label for="modal-loan_purpose">&nbsp;&nbsp;Loan Purpose:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-loan_description" value="" readonly>
+                            <label for="modal-loan_description">&nbsp;&nbsp;Loan Description:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-payment_mode" value="" readonly>
+                            <label for="modal-payment_mode">&nbsp;&nbsp;Payment Mode:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-payment_frequency" value="" readonly>
+                            <label for="modal-payment_frequency">&nbsp;&nbsp;Payment Frequency:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-due_date" value="" readonly>
+                            <label for="modal-due_date">&nbsp;&nbsp;Due Date:</label>
+                        </div>
+                        <div class="form-floating mb-3">
+    <input type="text" class="form-control" id="modal-next_deadlines" value="" readonly style="height: 50px; width: 100%;">
+    <label for="modal-next_deadlines">&nbsp;&nbsp;Next Deadlines:</label>
+</div>
+
+<div class="form-floating mb-3">
+    <input type="text" class="form-control" id="modal-deadlines_count" value="" readonly style="height: 50px; width: 100%;">
+    <label for="modal-deadlines_count">&nbsp;&nbsp;Number of Deadlines:</label>
+</div>
+
+
+
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="modal-total_amount" value="" readonly>
+                            <label for="modal-total_amount">&nbsp;&nbsp;Total Amount:</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-4 text-center">
+                    <div class="col-md-12">
+                        <h6 class="section-title">COR Image Uploads</h6>
+                        <div class="image-uploads">
+                            <img id="modal-cor1" class="img-fluid mb-2" alt="COR1 Image">
+                            <img id="modal-cor2" class="img-fluid mb-2" alt="COR2 Image">
+                            <img id="modal-cor3" class="img-fluid mb-2" alt="COR3 Image">
+                            <img id="modal-cor4" class="img-fluid mb-2" alt="COR4 Image">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
 </div>
-
 
 
 
@@ -575,7 +595,7 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
 </script>
 
 
-<<script>
+<script>
 document.addEventListener('DOMContentLoaded', function () {
     var borrowerModal = document.getElementById('borrowerModal');
 
@@ -591,60 +611,49 @@ document.addEventListener('DOMContentLoaded', function () {
                 var data = JSON.parse(this.responseText);
 
                 // Populate the modal fields with fetched data
-                document.getElementById('modal-borrower-name').textContent = data.fname + ' ' + data.lname;
-                document.getElementById('modal-borrower-phone').textContent = data.cellphonenumber;
-                document.getElementById('modal-loan-amount').textContent = '₱' + data.loan_amount;
-                document.getElementById('modal-total-interest').textContent = '₱' + data.interest_earned;
+                document.getElementById('modal-fname').value = data.fname;
+                document.getElementById('modal-mname').value = data.mname;
+                document.getElementById('modal-lname').value = data.lname;
+                document.getElementById('modal-birthdate').value = data.birthdate;
+                document.getElementById('modal-gender').value = data.gender;
+                document.getElementById('modal-cellphonenumber').value = data.cellphonenumber;
+                document.getElementById('modal-email').value = data.email;
+                document.getElementById('modal-loan_amount').value = data.loan_amount;
+                document.getElementById('modal-loan_purpose').value = data.loan_purpose;
+                document.getElementById('modal-loan_description').value = data.loan_description;
+                document.getElementById('modal-payment_mode').value = data.payment_mode;
+                document.getElementById('modal-payment_frequency').value = data.payment_frequency;
+                document.getElementById('modal-due_date').value = data.due_date;
+                document.getElementById('modal-total_amount').value = data.total_amount;
+                document.getElementById('modal-next_deadlines').value = data.next_deadlines; // New line for next_deadlines
+                document.getElementById('modal-school').value = data.school;
+                document.getElementById('modal-college').value = data.college;
+                document.getElementById('modal-course').value = data.course;
+                document.getElementById('modal-yearofstudy').value = data.yearofstudy;
+                document.getElementById('modal-graduationdate').value = data.graduationdate;
+                document.getElementById('modal-monthly_allowance').value = data.monthly_allowance;
+                document.getElementById('modal-source_of_allowance').value = data.source_of_allowance;
+                document.getElementById('modal-monthly_expenses').value = data.monthly_expenses;
+                document.getElementById('modal-monthly_savings').value = data.monthly_savings;
+                document.getElementById('modal-career_goals').value = data.career_goals;
+                document.getElementById('modal-school_community').value = data.school_community;
+                document.getElementById('modal-spending_pattern').value = data.spending_pattern;
+                document.getElementById('modal-account_details').value = data.account_details;
 
-                // Determine the correct duration labels based on payment frequency
-                var paymentFrequency = data.payment_frequency;
-                var loanDurationLabel = '';
-                var interestDurationLabel = '';
+                // Log next_deadlines to console
+                console.log('Next Deadlines:', data.next_deadlines); // Log the next_deadlines
+                
+                // Split the next_deadlines string into an array
+                var deadlinesArray = data.next_deadlines.split(', ').map(function(date) {
+                    return date.trim(); // Trim any whitespace
+                });
 
-                if (paymentFrequency === 'Daily') {
-                    loanDurationLabel = data.days_to_next_deadline + ' Days';
-                    interestDurationLabel = data.days_to_next_deadline + ' Days';
-                } else if (paymentFrequency === 'Weekly') {
-                    loanDurationLabel = data.days_to_next_deadline + ' Weeks';
-                    interestDurationLabel = data.days_to_next_deadline + ' Weeks';
-                } else if (paymentFrequency === 'Monthly') {
-                    loanDurationLabel = data.days_to_next_deadline + ' Months';
-                    interestDurationLabel = data.days_to_next_deadline + ' Months';
-                } else {
-                    loanDurationLabel = data.days_to_next_deadline + ' Unknown'; // Fallback for unexpected values
-                }
+                // Count the number of deadlines
+                var countDeadlines = deadlinesArray.length;
+                console.log('Number of Deadlines:', countDeadlines); // Log the count of deadlines
 
-                // Populate loan and interest duration
-                document.getElementById('modal-loan-duration').textContent = loanDurationLabel;
-                document.getElementById('modal-interest-duration').textContent = interestDurationLabel;
-
-                // Personal Information
-                document.getElementById('modal-fname').textContent = data.fname;
-                document.getElementById('modal-mname').textContent = data.mname;
-                document.getElementById('modal-lname').textContent = data.lname;
-                document.getElementById('modal-birthdate').textContent = data.birthdate;
-                document.getElementById('modal-gender').textContent = data.gender;
-                document.getElementById('modal-cellphonenumber').textContent = data.cellphonenumber;
-                document.getElementById('modal-email').textContent = data.email;
-                document.getElementById('modal-current-address').textContent = data.current_address;
-                document.getElementById('modal-permanent-address').textContent = data.permanent_address;
-
-                // Populate educational information
-                document.getElementById('modal-school').textContent = data.school;
-                document.getElementById('modal-college').textContent = data.college;
-                document.getElementById('modal-course').textContent = data.course;
-                document.getElementById('modal-yearofstudy').textContent = data.yearofstudy;
-                document.getElementById('modal-graduationdate').textContent = data.graduationdate;
-                document.getElementById('modal-gwa').textContent = data.gwa;
-
-                // Financial & Other Information
-                document.getElementById('modal-monthly-allowance').textContent = '₱' + data.monthly_allowance;
-                document.getElementById('modal-source-of-allowance').textContent = data.source_of_allowance;
-                document.getElementById('modal-monthly-expenses').textContent = '₱' + data.monthly_expenses;
-                document.getElementById('modal-affiliated-organization').textContent = data.school_community;
-                document.getElementById('modal-spending-pattern').textContent = data.spending_pattern;
-                document.getElementById('modal-savings-behavior').textContent = data.monthly_savings;
-                document.getElementById('modal-career-goals').textContent = data.career_goals;
+                // Display the count in the modal
+                document.getElementById('modal-deadlines_count').value = countDeadlines; // New line to set the count in the modal
 
                 // Set the image sources
                 document.getElementById('modal-cor1').src = data.cor1_path || '#';
@@ -657,7 +666,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
-
 
 
 

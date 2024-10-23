@@ -469,6 +469,26 @@ $conn->close();
                                                 </div>
                                             </div>
                                         </div>
+
+                                       <!-- Current Address in 12 -->
+<div class="row">
+    <div class="col-md-12 mb-3">
+        <div class="form-floating">
+            <input type="text" class="form-control form-control-sm" id="current_address" name="current_address" placeholder="Current Address" style="font-size: 0.9rem;" required>
+            <label for="current_address">Current Address</label>
+        </div>
+    </div>
+</div>
+
+<!-- Permanent Address in 12 -->
+<div class="row">
+    <div class="col-md-12 mb-3">
+        <div class="form-floating">
+            <input type="text" class="form-control form-control-sm" id="permanent_address" name="permanent_address" placeholder="Permanent Address" style="font-size: 0.9rem;" required>
+            <label for="permanent_address">Permanent Address</label>
+        </div>
+    </div>
+</div>
                                 
                                         <!-- Educational Background -->
                                         <div class="row">

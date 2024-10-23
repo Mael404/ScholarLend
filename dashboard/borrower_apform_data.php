@@ -45,7 +45,9 @@ $due_date = $conn->real_escape_string($_POST['due_date']);
 $account_details = $conn->real_escape_string($_POST['account_details']);
 $total_amount = $conn->real_escape_string($_POST['total_amount']);
 $next_deadlines = $conn->real_escape_string($_POST['next_deadlines']);
-$interest_earned = $conn->real_escape_string($_POST['total_interest']); 
+$interest_earned = $conn->real_escape_string($_POST['total_interest']);
+$current_address = $conn->real_escape_string($_POST['current_address']); // Capture current address
+$permanent_address = $conn->real_escape_string($_POST['permanent_address']); // Capture permanent address
 $statuss = "Pending";
 
 if (!empty($next_deadlines)) {
@@ -101,7 +103,8 @@ if (!$errorOccurred) {
         monthly_expenses, school_community, spending_pattern, monthly_savings, 
         career_goals, loan_amount, loan_purpose, loan_description, payment_mode, 
         payment_frequency, due_date, next_deadlines, days_to_next_deadline, account_details, total_amount, 
-        interest_earned, share_admin, status, cor1_path, cor2_path, cor3_path, cor4_path
+        interest_earned, share_admin, status, cor1_path, cor2_path, cor3_path, cor4_path, 
+        current_address, permanent_address
     ) VALUES (
         '$user_id', '$fname', '$mname', '$lname', '$birthdate', '$gender', '$cellphonenumber', '$email', 
         '$school', '$college', '$course', '$yearofstudy', '$graduationdate', 
@@ -110,7 +113,8 @@ if (!$errorOccurred) {
         '$loan_purpose', '$loan_description', '$payment_mode', '$payment_frequency', 
         '$due_date', '$next_deadlines', '$days_to_next_deadlines', '$account_details', '$total_amount', 
         '$interest_earned', '$share_admin', '$statuss', 
-        '$file1', '$file2', '$file3', '$file4'
+        '$file1', '$file2', '$file3', '$file4', 
+        '$current_address', '$permanent_address'
     )";
 
     if ($conn->query($sql) === TRUE) {

@@ -20,7 +20,7 @@ $query = "SELECT `fname`, `mname`, `lname`, `birthdate`, `gender`, `cellphonenum
           `college`, `course`, `yearofstudy`, `graduationdate`, `monthly_allowance`, `source_of_allowance`, 
           `monthly_expenses`, `school_community`, `spending_pattern`, `monthly_savings`, `career_goals`, 
           `loan_amount`, `loan_purpose`, `loan_description`, `payment_mode`, `payment_frequency`, `due_date`, 
-          `account_details`, `total_amount`, `next_deadlines`, `cor1_path`, `cor2_path`, `cor3_path`, `cor4_path`
+          `account_details`, `total_amount`,`interest_earned`, `next_deadlines`,`days_to_next_deadline`, `cor1_path`, `cor2_path`, `cor3_path`, `cor4_path`, `current_address`, `permanent_address`
           FROM borrower_info WHERE transaction_id = $user_id";
 
 $result = $conn->query($query);
@@ -39,6 +39,7 @@ if ($result->num_rows > 0) {
     $row['next_deadlines_count'] = $count_deadlines;
 
     echo json_encode($row); // Return the row as a JSON object
+    
 } else {
     echo json_encode(['error' => 'No borrower found with the given ID.']);
 }
