@@ -114,7 +114,53 @@ if (isset($_POST['lendNow'])) {
                 echo "Failed to deduct funds from lender.";
             }
         } else {
-            echo "Lender does not have enough balance.";
+            echo '
+                        <!DOCTYPE html>
+                        <html lang="en">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+                            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+                            <title>Success</title>
+                        </head>
+                        <body>
+                            <!-- Modal -->
+                            <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel">Error</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            Not Enough Balance!
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                    
+                            <script>
+                                // Show the modal when the page loads
+                                var successModal = new bootstrap.Modal(document.getElementById("successModal"), {});
+                                successModal.show();
+                    
+                                // Redirect after the modal is closed or after a delay (3 seconds)
+                                successModal._element.addEventListener("hidden.bs.modal", function () {
+                                    window.location.href = "lenderdashboard.php";
+                                });
+                    
+                                // Alternatively, redirect after 3 seconds automatically
+                                setTimeout(function() {
+                                    window.location.href = "lenderdashboard.php";
+                                }, 3000); // 3 seconds
+                            </script>
+                        </body>
+                        </html>';
+                        exit; // Stop further script execution
         }
     } else {
         echo "Borrower not found.";

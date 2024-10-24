@@ -210,7 +210,7 @@ $result = $conn->query($sql);
 </div>  
             </div>
 
-            <br>
+          
         
             <div class="list-group list-group-flush my-3">
                 <a href="admindashboard.php" class="list-group-item list-group-item-action ">
@@ -448,7 +448,7 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
                         <a class="nav-link" data-bs-toggle="tab" href="#educational-info">Educational Background</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" data-bs-toggle="tab" href="#financial-info">Financial & Other Information</a>
+                        <a class="nav-link" data-bs-toggle="tab" href="#financial-info">Financial & Other Info</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" data-bs-toggle="tab" href="#attachments">Attachments</a>
