@@ -16,6 +16,13 @@ if ($conn->connect_error) {
 
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 
+// Generate a unique 6-digit transaction ID
+do {
+    $transaction_id = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+    $checkQuery = "SELECT transaction_id FROM borrower_info WHERE transaction_id = '$transaction_id'";
+    $result = $conn->query($checkQuery);
+} while ($result->num_rows > 0); // Repeat if transaction ID is not unique
+
 // Retrieve and sanitize form data
 $fname = $conn->real_escape_string($_POST['fname']);
 $mname = $conn->real_escape_string($_POST['mname']);
@@ -46,8 +53,8 @@ $account_details = $conn->real_escape_string($_POST['account_details']);
 $total_amount = $conn->real_escape_string($_POST['total_amount']);
 $next_deadlines = $conn->real_escape_string($_POST['next_deadlines']);
 $interest_earned = $conn->real_escape_string($_POST['total_interest']);
-$current_address = $conn->real_escape_string($_POST['current_address']); // Capture current address
-$permanent_address = $conn->real_escape_string($_POST['permanent_address']); // Capture permanent address
+$current_address = $conn->real_escape_string($_POST['current_address']);
+$permanent_address = $conn->real_escape_string($_POST['permanent_address']);
 $statuss = "Pending";
 
 if (!empty($next_deadlines)) {
@@ -58,11 +65,7 @@ if (!empty($next_deadlines)) {
 }
 
 // Calculate admin share
-if ($days_to_next_deadlines > 0 && $interest_earned > 0) {
-    $share_admin = ( ($interest_earned / $days_to_next_deadlines) * 0.30 );
-} else {
-    $share_admin = 0; // Handle edge cases where days_to_next_deadlines or interest_earned is zero
-}
+$share_admin = ($days_to_next_deadlines > 0 && $interest_earned > 0) ? ($interest_earned / $days_to_next_deadlines) * 0.30 : 0;
 
 // Handle file uploads
 $uploadDir = "uploads/";
@@ -98,27 +101,25 @@ if (!$errorOccurred) {
     $file4 = isset($uploadedFiles['cor4']) ? $conn->real_escape_string($uploadedFiles['cor4']) : null;
 
     $sql = "INSERT INTO borrower_info (
-        user_id, fname, mname, lname, birthdate, gender, cellphonenumber, email, school, college, 
-        course, yearofstudy, graduationdate, monthly_allowance, source_of_allowance, 
-        monthly_expenses, school_community, spending_pattern, monthly_savings, 
-        career_goals, loan_amount, loan_purpose, loan_description, payment_mode, 
-        payment_frequency, due_date, next_deadlines, days_to_next_deadline, account_details, total_amount, 
-        interest_earned, share_admin, status, cor1_path, cor2_path, cor3_path, cor4_path, 
-        current_address, permanent_address
+        transaction_id, user_id, fname, mname, lname, birthdate, gender, cellphonenumber, email, school, 
+        college, course, yearofstudy, graduationdate, monthly_allowance, source_of_allowance, 
+        monthly_expenses, school_community, spending_pattern, monthly_savings, career_goals, 
+        loan_amount, loan_purpose, loan_description, payment_mode, payment_frequency, due_date, 
+        next_deadlines, days_to_next_deadline, account_details, total_amount, interest_earned, 
+        share_admin, status, cor1_path, cor2_path, cor3_path, cor4_path, current_address, permanent_address
     ) VALUES (
-        '$user_id', '$fname', '$mname', '$lname', '$birthdate', '$gender', '$cellphonenumber', '$email', 
-        '$school', '$college', '$course', '$yearofstudy', '$graduationdate', 
-        '$monthly_allowance', '$source_of_allowance', '$monthly_expenses', '$school_community', 
-        '$spending_pattern', '$monthly_savings', '$career_goals', '$loan_amount', 
-        '$loan_purpose', '$loan_description', '$payment_mode', '$payment_frequency', 
-        '$due_date', '$next_deadlines', '$days_to_next_deadlines', '$account_details', '$total_amount', 
-        '$interest_earned', '$share_admin', '$statuss', 
-        '$file1', '$file2', '$file3', '$file4', 
-        '$current_address', '$permanent_address'
+        '$transaction_id', '$user_id', '$fname', '$mname', '$lname', '$birthdate', '$gender', 
+        '$cellphonenumber', '$email', '$school', '$college', '$course', '$yearofstudy', 
+        '$graduationdate', '$monthly_allowance', '$source_of_allowance', '$monthly_expenses', 
+        '$school_community', '$spending_pattern', '$monthly_savings', '$career_goals', 
+        '$loan_amount', '$loan_purpose', '$loan_description', '$payment_mode', 
+        '$payment_frequency', '$due_date', '$next_deadlines', '$days_to_next_deadlines', 
+        '$account_details', '$total_amount', '$interest_earned', '$share_admin', '$statuss', 
+        '$file1', '$file2', '$file3', '$file4', '$current_address', '$permanent_address'
     )";
 
     if ($conn->query($sql) === TRUE) {
-        echo "New record created successfully";
+        echo "New record created successfully with Transaction ID: $transaction_id";
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }

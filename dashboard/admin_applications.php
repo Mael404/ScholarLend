@@ -16,8 +16,7 @@ if ($conn->connect_error) {
 }
 
 // Query to fetch data where status is 'Pending'
-$sql = "SELECT fname, mname, lname, email, birthdate, transaction_id FROM borrower_info WHERE status = 'Pending'";
-
+$sql = "SELECT fname, mname, lname, transaction_id, status, created_at FROM borrower_info";
 $result = $conn->query($sql);
 ?>
 
@@ -352,48 +351,55 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
      <!-- Data Table Section -->
      <div class="mt-4">
      <div class="table-responsive">
+   
      <table id="applicantsTable" class="table table-bordered table-striped">
     <thead class="table-dark">
         <tr>
-            <th scope="col">#</th>
-            <th scope="col">First Name</th>
-            <th scope="col">Middle Name</th>
-            <th scope="col">Last Name</th>
-            <th scope="col">Email</th>
-            <th scope="col">Birthdate</th>
-            <th scope="col">Actions</th>
+            <th scope="col" class="text-center">Created On</th>
+            <th scope="col" class="text-center">Application ID</th>
+            <th scope="col" class="text-center">Customer Name</th>
+            <th scope="col" class="text-center">Status</th>
+            <th scope="col" class="text-center">Action</th>
         </tr>
     </thead>
     <tbody>
         <?php
         if ($result->num_rows > 0) {
-            $counter = 1;
             while ($row = $result->fetch_assoc()) {
-                // Start a new row
                 echo "<tr>";
-                echo "<th scope='row'>" . $counter++ . "</th>"; // 1st column (index)
-                
-                // 2nd to 6th columns (data fields)
-                echo "<td>" . (isset($row['fname']) ? htmlspecialchars($row['fname']) : '') . "</td>"; // 2nd column
-                echo "<td>" . (isset($row['mname']) ? htmlspecialchars($row['mname']) : '') . "</td>"; // 3rd column
-                echo "<td>" . (isset($row['lname']) ? htmlspecialchars($row['lname']) : '') . "</td>"; // 4th column
-                echo "<td>" . (isset($row['email']) ? htmlspecialchars($row['email']) : '') . "</td>"; // 5th column
-                echo "<td>" . (isset($row['birthdate']) ? htmlspecialchars($row['birthdate']) : '') . "</td>"; // 6th column
-                
-                // 7th column (actions)
-                echo "<td>
-                        <button type='button' class='btn btn-link' data-bs-toggle='modal' data-bs-target='#borrowerModal' data-id='" . htmlspecialchars($row['transaction_id']) . "'>
-                            <i class='fas fa-eye' style='color: blue;'></i>
-                        </button>
-                        <button type='button' class='btn btn-outline-success' onclick='checkApplicant(" . htmlspecialchars($row['transaction_id']) . ")'>
-                            <i class='fas fa-check' style='color: green;'></i>
-                        </button>
-                        <button type='button' class='btn btn-outline-danger' onclick='deleteApplicant(" . htmlspecialchars($row['transaction_id']) . ")'>
-                            <i class='fas fa-trash'></i>
-                        </button>
-                      </td>";
-                
-                // Close the row
+
+                // Created On (Application Date) column
+                echo "<td class='text-center'>" . (isset($row['created_at']) ? date("F j, Y", strtotime($row['created_at'])) : '') . "</td>";
+
+
+                // Application ID (Transaction ID) column
+                echo "<td class='text-center'>" . htmlspecialchars($row['transaction_id']) . "</td>";
+
+                // Customer Name (Full Name) column
+                $fullName = trim(
+                    (isset($row['fname']) ? $row['fname'] : '') . ' ' . 
+                    (isset($row['mname']) ? $row['mname'] : '') . ' ' . 
+                    (isset($row['lname']) ? $row['lname'] : '')
+                );
+                $fullName = ucwords(strtolower($fullName));
+                echo "<td class='text-center'>" . htmlspecialchars($fullName) . "</td>";
+
+                // Status column
+                echo "<td class='text-center'>" . (isset($row['status']) ? htmlspecialchars($row['status']) : '') . "</td>";
+
+                // Action column
+                echo "<td class='text-center'>
+                    <button type='button' class='btn btn-link text-primary' style='font-size: 0.9em;' data-bs-toggle='modal' data-bs-target='#borrowerModal' data-id='" . htmlspecialchars($row['transaction_id']) . "'>
+                        <i class='fas fa-eye'></i>
+                    </button>
+                    <button type='button' class='btn btn-outline-success mx-1' style='font-size: 0.9em; padding: 0.2rem 0.4rem;' onclick='checkApplicant(" . htmlspecialchars($row['transaction_id']) . ")'>
+                        <i class='fas fa-check'></i>
+                    </button>
+                    <button type='button' class='btn btn-outline-danger' style='font-size: 0.9em; padding: 0.2rem 0.4rem;' onclick='deleteApplicant(" . htmlspecialchars($row['transaction_id']) . ")'>
+                        <i class='fas fa-trash'></i>
+                    </button>
+                  </td>";
+
                 echo "</tr>";
             }
         } 
@@ -401,6 +407,8 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
         ?>
     </tbody>
 </table>
+
+
 
 
 
@@ -414,12 +422,21 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
   <div class="modal fade" id="borrowerModal" tabindex="-1" aria-labelledby="borrowerModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="borrowerModalLabel">Borrower Information</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
             <div class="modal-body">
-                <div class="card p-3 mb-3">
+                <div class="mb-3">
+                    <h5 class="modal-title fw-bold">Application <span id="modal-application-id">082202</span></h5>
+                    <div class="alert alert-success py-2 px-3 mt-2 d-flex justify-content-between" style="background-color: #4CAF50; color: white;">
+    <span>Credit Scoring: Green zone</span>
+    <a href="#" class="text-white" style="text-decoration: none;">
+        View Credit Scoring <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+
+
+
+
+                </div>
+                <div class="card p-3 mb-3" style="background-color: #f4f1ec;">
                     <div class="row">
                         <div class="col-md-6">
                             <p class="mb-0">Borrower</p>
@@ -511,23 +528,72 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
 
 
 
-        <div id="attachments" class="tab-pane fade">
+<div id="attachments" class="tab-pane fade">
     <h5>Attachments</h5>
     <div class="row">
         <div class="col-md-3">
-            <img id="modal-cor1" src="#" alt="Attachment 1" class="img-fluid mb-2" />
+            <a href="#" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="showImage('modal-cor1')">
+                <img id="modal-cor1" src="path/to/image1.jpg" alt="Attachment 1" class="img-fluid mb-2" />
+            </a>
         </div>
         <div class="col-md-3">
-            <img id="modal-cor2" src="#" alt="Attachment 2" class="img-fluid mb-2" />
+            <a href="#" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="showImage('modal-cor2')">
+                <img id="modal-cor2" src="path/to/image2.jpg" alt="Attachment 2" class="img-fluid mb-2" />
+            </a>
         </div>
         <div class="col-md-3">
-            <img id="modal-cor3" src="#" alt="Attachment 3" class="img-fluid mb-2" />
+            <a href="#" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="showImage('modal-cor3')">
+                <img id="modal-cor3" src="path/to/image3.jpg" alt="Attachment 3" class="img-fluid mb-2" />
+            </a>
         </div>
         <div class="col-md-3">
-            <img id="modal-cor4" src="#" alt="Attachment 4" class="img-fluid mb-2" />
+            <a href="#" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="showImage('modal-cor4')">
+                <img id="modal-cor4" src="path/to/image4.jpg" alt="Attachment 4" class="img-fluid mb-2" />
+            </a>
         </div>
     </div>
 </div>
+
+<!-- Modal -->
+<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog" id="imageModalDialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <img id="modalImage" src="#" alt="Attachment Preview" class="img-fluid" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showImage(imageId) {
+        const imageElement = document.getElementById(imageId);
+        const modalImage = document.getElementById("modalImage");
+        
+        // Set the modal image src to the clicked image src
+        modalImage.src = imageElement.src;
+
+        // Load the image and adjust modal size based on natural dimensions
+        modalImage.onload = function() {
+            const naturalWidth = modalImage.naturalWidth;
+            const naturalHeight = modalImage.naturalHeight;
+            const maxWidth = window.innerWidth * 0.9; // Limit modal width to 90% of viewport width
+            const maxHeight = window.innerHeight * 0.9; // Limit modal height to 90% of viewport height
+            
+            const width = Math.min(naturalWidth, maxWidth);
+            const height = Math.min(naturalHeight, maxHeight);
+
+            const modalDialog = document.getElementById("imageModalDialog");
+            modalDialog.style.width = width + "px";
+            modalDialog.style.height = height + "px";
+        };
+    }
+</script>
+
 
                 </div>
             </div>
@@ -611,7 +677,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     loanDurationLabel = data.days_to_next_deadline + ' Months';
                     interestDurationLabel = data.days_to_next_deadline + ' Months';
                 } else {
-                    loanDurationLabel = data.days_to_next_deadline + ' Unknown'; // Fallback for unexpected values
+                    loanDurationLabel = data.days_to_next_deadline + ' Lump Sum'; // Fallback for unexpected values
                 }
 
                 // Populate loan and interest duration
@@ -663,6 +729,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
 </script>
 
+<script>
+    // Event listener for when the modal is shown
+    var borrowerModal = document.getElementById('borrowerModal');
+    borrowerModal.addEventListener('show.bs.modal', function (event) {
+        // Get the button that triggered the modal
+        var button = event.relatedTarget; // Button that triggered the modal
+
+        // Extract info from data-* attributes
+        var transactionId = button.getAttribute('data-id');
+
+        // Update the modal's content
+        var modalTitle = borrowerModal.querySelector('.modal-title #modal-application-id');
+        modalTitle.textContent = transactionId;
+
+        // Optional: Fetch more data based on transactionId here if needed
+        // For example, you could make an AJAX request to get additional details
+    });
+</script>
 
 
 
