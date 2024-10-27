@@ -301,7 +301,8 @@ if ($has_pending_application) {
         // Amount section
         echo '<div style="text-align: left;">';
         echo '<p style="font-size: 15px; color: #131e3d; font-weight: 200; margin: 0;">AMOUNT</p>';
-        echo '<p style="font-size: 36px; color: #cdad7d; font-weight: bold; margin: 5px 0;">₱' . number_format($total_amount, 0) . '</p>'; // No decimal places
+        echo '<p style="font-size: 36px; color: #cdad7d; font-weight: bold; margin: 5px 0;">₱' . number_format($total_amount, 2) . '</p>';
+
         echo '</div>';
 
         // First payment section
@@ -340,7 +341,8 @@ if ($has_pending_application) {
         // Amount section
         echo '<div style="text-align: left;">';
         echo '<p style="font-size: 15px; color: #131e3d; font-weight: 200; margin: 0;">AMOUNT</p>';
-        echo '<p style="font-size: 36px; color: #cdad7d; font-weight: bold; margin: 5px 0;">₱' . number_format($total_amount, 0) . '</p>'; // No decimal places
+        echo '<p style="font-size: 36px; color: #cdad7d; font-weight: bold; margin: 5px 0;">₱' . number_format($total_amount, 2) . '</p>';
+
         echo '</div>';
 
         // First payment section
@@ -833,7 +835,7 @@ $conn->close();
   <input type="hidden" id="hiddenAccountDetails" name="account_details">
   <input type="hidden" id="hiddenTotalAmount" name="total_amount">
   <input type="hidden" id="hiddenNextDeadlines" name="next_deadlines">
-  <input type="hidden" id="hiddenTotalInterest" name="total_interest"> <!-- Add this line -->
+  
 
 
 
@@ -885,7 +887,7 @@ $conn->close();
                 <p><strong>Account Details:</strong> <span id="modalAccountDetails"></span></p>
                 <p><strong>Total Amount to be Paid:</strong> <span id="modalTotalAmount"></span></p>
             
-                <p style="display: none;"><strong>Total Interest Earned:</strong> <span id="modalTotalInterest"></span></p>
+                
 
             </div>
 
@@ -1209,7 +1211,7 @@ document.getElementById('summaryModal').addEventListener('show.bs.modal', calcul
     document.getElementById('modalTotalAmount').textContent = totalAmountToBePaid.toFixed(2); // Show 2 decimal places
 
     // Show the interest amount
-    document.getElementById('modalTotalInterest').textContent = interest.toFixed(2); // Show interest amount
+
 
     // Show the modal using Bootstrap
     const summaryModal = new bootstrap.Modal(document.getElementById('summaryModal'));
@@ -1297,7 +1299,7 @@ document.getElementById('summaryModal').addEventListener('show.bs.modal', calcul
         document.getElementById('hiddenAccountDetails').value = document.getElementById('modalAccountDetails').innerText;
         document.getElementById('hiddenTotalAmount').value = document.getElementById('modalTotalAmount').innerText;
         document.getElementById('hiddenNextDeadlines').value = document.getElementById('modalNextDeadlines').innerText; // Add next deadlines
-        document.getElementById('hiddenTotalInterest').value = document.getElementById('modalTotalInterest').innerText; // Add total interest
+       
     }
 
     function submitForm() {

@@ -43,29 +43,42 @@ $school_community = $conn->real_escape_string($_POST['school_community']);
 $spending_pattern = $conn->real_escape_string($_POST['spending-pattern']);
 $monthly_savings = $conn->real_escape_string($_POST['monthly-savings']);
 $career_goals = $conn->real_escape_string($_POST['career-goals']);
-$loan_amount = $conn->real_escape_string($_POST['loan_amount']);
+$loan_amount = (float) $conn->real_escape_string($_POST['loan_amount']);
 $loan_purpose = $conn->real_escape_string($_POST['loan_purpose']);
 $loan_description = $conn->real_escape_string($_POST['loan_description']);
 $payment_mode = $conn->real_escape_string($_POST['payment_mode']);
 $payment_frequency = $conn->real_escape_string($_POST['frequency']);
 $due_date = $conn->real_escape_string($_POST['due_date']);
 $account_details = $conn->real_escape_string($_POST['account_details']);
-$total_amount = $conn->real_escape_string($_POST['total_amount']);
+$total_amount = (float) $conn->real_escape_string($_POST['total_amount']);
 $next_deadlines = $conn->real_escape_string($_POST['next_deadlines']);
-$interest_earned = $conn->real_escape_string($_POST['total_interest']);
 $current_address = $conn->real_escape_string($_POST['current_address']);
 $permanent_address = $conn->real_escape_string($_POST['permanent_address']);
 $statuss = "Pending";
 
 if (!empty($next_deadlines)) {
     $deadlinesArray = explode(', ', $next_deadlines);
-    $days_to_next_deadlines = count($deadlinesArray);
+    $days_to_next_deadline = count($deadlinesArray);
 } else {
-    $days_to_next_deadlines = 0;
+    $days_to_next_deadline = 0;
 }
 
-// Calculate admin share
-$share_admin = ($days_to_next_deadlines > 0 && $interest_earned > 0) ? ($interest_earned / $days_to_next_deadlines) * 0.30 : 0;
+// Calculate interest earned
+$interest_earned = ($total_amount * $days_to_next_deadline) - $loan_amount;
+
+if ($days_to_next_deadline > 0) {
+    $admin_share_base = ($total_amount * $days_to_next_deadline) - $loan_amount;
+    $share_admin = ($admin_share_base * 0.3) / $days_to_next_deadline; // No rounding here
+} else {
+    $share_admin = 0; // Handle case where there are no deadlines
+}
+
+// Truncate to two decimal places
+$share_admin = floor($share_admin * 100) / 100; // Truncate to two decimal places
+
+// Optionally, format it for display (optional)
+$share_admin_formatted = number_format($share_admin, 2, '.', ''); // For display purposes
+
 
 // Handle file uploads
 $uploadDir = "uploads/";
@@ -93,6 +106,9 @@ foreach ($files as $fileInput) {
     }
 }
 
+// Calculate outstanding balance with precise decimal calculation
+$outstanding_balance = $loan_amount + ($interest_earned - floatval($share_admin*$days_to_next_deadline));
+
 // Only insert into the database if all files were uploaded successfully
 if (!$errorOccurred) {
     $file1 = isset($uploadedFiles['cor1']) ? $conn->real_escape_string($uploadedFiles['cor1']) : null;
@@ -106,16 +122,18 @@ if (!$errorOccurred) {
         monthly_expenses, school_community, spending_pattern, monthly_savings, career_goals, 
         loan_amount, loan_purpose, loan_description, payment_mode, payment_frequency, due_date, 
         next_deadlines, days_to_next_deadline, account_details, total_amount, interest_earned, 
-        share_admin, status, cor1_path, cor2_path, cor3_path, cor4_path, current_address, permanent_address
+        share_admin, status, cor1_path, cor2_path, cor3_path, cor4_path, current_address, 
+        permanent_address, outstanding_balance
     ) VALUES (
         '$transaction_id', '$user_id', '$fname', '$mname', '$lname', '$birthdate', '$gender', 
         '$cellphonenumber', '$email', '$school', '$college', '$course', '$yearofstudy', 
         '$graduationdate', '$monthly_allowance', '$source_of_allowance', '$monthly_expenses', 
         '$school_community', '$spending_pattern', '$monthly_savings', '$career_goals', 
         '$loan_amount', '$loan_purpose', '$loan_description', '$payment_mode', 
-        '$payment_frequency', '$due_date', '$next_deadlines', '$days_to_next_deadlines', 
+        '$payment_frequency', '$due_date', '$next_deadlines', '$days_to_next_deadline', 
         '$account_details', '$total_amount', '$interest_earned', '$share_admin', '$statuss', 
-        '$file1', '$file2', '$file3', '$file4', '$current_address', '$permanent_address'
+        '$file1', '$file2', '$file3', '$file4', '$current_address', '$permanent_address', 
+        '$outstanding_balance'
     )";
 
     if ($conn->query($sql) === TRUE) {

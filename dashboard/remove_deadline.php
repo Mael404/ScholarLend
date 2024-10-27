@@ -41,8 +41,8 @@ if (!$borrower) {
 
 $borrower_balance = $borrower['wallet_balance'];
 
-// Fetch loan amount, lender_id, and share_admin from borrower_info
-$sql = "SELECT lender_id, total_amount, share_admin FROM borrower_info WHERE user_id = ? AND transaction_id = ?";
+// Fetch loan amount, lender_id, share_admin, and outstanding_balance from borrower_info
+$sql = "SELECT lender_id, total_amount, share_admin, outstanding_balance FROM borrower_info WHERE user_id = ? AND transaction_id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("is", $user_id, $transaction_id);
 $stmt->execute();
@@ -53,19 +53,23 @@ if ($row) {
     $lender_id = $row['lender_id'];
     $loan_amount = $row['total_amount'];
     $share_admin = $row['share_admin'];
+    $current_outstanding_balance = $row['outstanding_balance'];
 
     if ($borrower_balance >= $loan_amount) {
-        // Step 2: Deduct from borrower's balance and add to lender's balance
-        $conn->begin_transaction(); // Start transaction
+        // Start transaction
+        $conn->begin_transaction();
 
-        // Update borrower balance
+        // Step 2: Deduct from borrower's balance and add to lender's balance
         $updateBorrower = "UPDATE users_tb SET wallet_balance = wallet_balance - ? WHERE user_id = ?";
         $stmtBorrower = $conn->prepare($updateBorrower);
         $stmtBorrower->bind_param('di', $loan_amount, $user_id);
         $stmtBorrower->execute();
 
+        // Calculate the precise outstanding balance (subtract total_amount and add share_admin)
+        $new_outstanding_balance = bcadd(bcsub((string) $current_outstanding_balance, (string) $loan_amount, 2), (string) $share_admin, 2);
+
         // Update lender balance (minus the admin's share)
-        $amount_for_lender = $loan_amount - $share_admin;
+        $amount_for_lender = bcsub((string) $loan_amount, (string) $share_admin, 2);
         $updateLender = "UPDATE users_tb SET wallet_balance = wallet_balance + ? WHERE user_id = ?";
         $stmtLender = $conn->prepare($updateLender);
         $stmtLender->bind_param('di', $amount_for_lender, $lender_id);
@@ -82,6 +86,12 @@ if ($row) {
         $stmtAdmin = $conn->prepare($adminQuery);
         $stmtAdmin->bind_param('d', $share_admin);
         $stmtAdmin->execute();
+
+        // Step 5: Update outstanding balance in borrower_info
+        $updateOutstandingBalance = "UPDATE borrower_info SET outstanding_balance = ? WHERE user_id = ? AND transaction_id = ?";
+        $stmtOutstanding = $conn->prepare($updateOutstandingBalance);
+        $stmtOutstanding->bind_param('dis', $new_outstanding_balance, $user_id, $transaction_id);
+        $stmtOutstanding->execute();
 
         $conn->commit(); // Commit transaction
 
