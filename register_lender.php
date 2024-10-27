@@ -7,7 +7,7 @@ require 'PHPMailer-master/src/PHPMailer.php';
 require 'PHPMailer-master/src/SMTP.php';
 
 // Start the session
-session_start(); // Start the session at the beginning
+session_start();
 
 // Database connection
 $conn = new mysqli("localhost", "root", "", "scholarlend_db");
@@ -32,26 +32,27 @@ $email_check_sql = "SELECT * FROM users_tb WHERE email = '$email' AND is_verifie
 $email_check_result = $conn->query($email_check_sql);
 
 if ($email_check_result->num_rows > 0) {
-   
-    header("Location: email_failed.php"); 
-    exit(); 
+    header("Location: email_failed.php");
+    exit();
 } else {
     // Generate OTP
     $otp = rand(100000, 999999);
-    $otp_expiry = date('Y-m-d H:i:s', strtotime('+10 minutes')); 
+    $otp_expiry = date('Y-m-d H:i:s', strtotime('+10 minutes'));
 
- 
-    $sql = "INSERT INTO users_tb (first_name, middle_name, last_name, birthdate, phone_number, email, password, otp, otp_expiry, account_role) 
-            VALUES ('$firstName', '$middleName', '$lastName', '$birthdate', '$phoneNumber', '$email', '$password', '$otp', '$otp_expiry', '$accountRole')";
+    // Generate a unique 11-digit custom ID
+    $customID = '02000' . str_pad(mt_rand(0, 999999), 6, '0', STR_PAD_LEFT);
 
+    // Prepare SQL statement with custom ID as the user_id
+    $sql = "INSERT INTO users_tb (user_id, first_name, middle_name, last_name, birthdate, phone_number, email, password, otp, otp_expiry, account_role) 
+            VALUES ('$customID', '$firstName', '$middleName', '$lastName', '$birthdate', '$phoneNumber', '$email', '$password', '$otp', '$otp_expiry', '$accountRole')";
+
+    // Execute the SQL query
     if ($conn->query($sql) === TRUE) {
-       
-        $_SESSION['otp'] = $otp; 
+        $_SESSION['otp'] = $otp;
         $_SESSION['email'] = $email;
 
-       
+        // Email content
         $subject = "Your OTP for Account Registration";
-
         $message = "
         <html>
         <head>
@@ -87,26 +88,22 @@ if ($email_check_result->num_rows > 0) {
             </style>
         </head>
         <body>
-            <h1>Welcome to the ScholarLend!</h1>
+            <h1>Welcome to ScholarLend!</h1>
             <p>Your One-Time Password (OTP) for secure registration is ready:</p>
             <div class='otp'>Your OTP is: <strong>$otp</strong></div>
-            <p>Please enter this OTP to complete your registration process. If you did not request this, please contact your IT support.</p>
+            <p>Please enter this OTP to complete your registration process. If you did not request this, please contact IT support.</p>
             <div class='footer'>Thank you for being a valuable part of our team!</div>
         </body>
         </html>
         ";
-        
-        
 
-        // After sending the OTP successfully
+        // Send email and redirect upon success
         if (send_mail($email, $subject, $message)) {
-            // Redirect to user_otp.php without the OTP in the URL
             header("Location: user_otp.php");
-            exit(); // Ensure no further code is executed
+            exit();
         } else {
-            // Redirect anyway even if email fails
             header("Location: user_otp.php");
-            exit(); // Ensure no further code is executed
+            exit();
         }
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
@@ -116,28 +113,23 @@ if ($email_check_result->num_rows > 0) {
 $conn->close();
 
 // Function to send email using PHPMailer
-function send_mail($recipient, $subject, $message)
-{
+function send_mail($recipient, $subject, $message) {
     $mail = new PHPMailer();
     $mail->IsSMTP();
-    $mail->SMTPDebug  = 0;
-    $mail->SMTPAuth   = TRUE;
+    $mail->SMTPDebug = 0;
+    $mail->SMTPAuth = TRUE;
     $mail->SMTPSecure = "tls";
-    $mail->Port       = 587;
-    $mail->Host       = "smtp.gmail.com";
-    $mail->Username   = "maelaquino141@gmail.com";  
-    $mail->Password   = "aytbbzlqaordegbl";          
+    $mail->Port = 587;
+    $mail->Host = "smtp.gmail.com";
+    $mail->Username = "maelaquino141@gmail.com";
+    $mail->Password = "aytbbzlqaordegbl";
 
     $mail->IsHTML(true);
     $mail->AddAddress($recipient, "Esteemed Customer");
     $mail->SetFrom("ScholarLend@gmail.com", "ScholarLend");
     $mail->Subject = $subject;
-    $mail->MsgHTML($message);  
+    $mail->MsgHTML($message);
 
-    if (!$mail->Send()) {
-        return false;
-    } else {
-        return true;
-    }
+    return $mail->Send();
 }
 ?>

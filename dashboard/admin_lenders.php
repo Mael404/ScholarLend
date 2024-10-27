@@ -271,6 +271,21 @@ $result = $conn->query($sql);
         font-weight: bold;
     }
 </style>
+
+
+<?php
+// Database connection
+$conn = new mysqli("localhost", "username", "password", "scholarlend_db");
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch lenders' information
+$sql = "SELECT user_id FROM users_tb WHERE account_role = 'Lender'";
+$result = $conn->query($sql);
+?>
+
 <div class="container mt-4">
     <div class="row">
         <div class="col-12">
@@ -293,6 +308,92 @@ $result = $conn->query($sql);
             </div>
         </div>
     </div>
+
+    <!-- Lenders Table -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <table id="lendersTable" class="table table-bordered table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th scope="col" class="text-center">User ID</th>
+                        <th scope="col" class="text-center">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    if ($result->num_rows > 0) {
+                        while ($row = $result->fetch_assoc()) {
+                            echo "<tr>";
+                            echo "<td class='text-center'>" . htmlspecialchars($row['user_id']) . "</td>";
+                            echo "<td class='text-center'>
+                                    <button type='button' class='btn btn-link text-primary' style='font-size: 0.9em;' onclick='viewProfile(\"" . htmlspecialchars($row['user_id']) . "\")'>
+                                        See Profile
+                                    </button>
+                                  </td>";
+                            echo "</tr>";
+                            
+                        }
+                    } 
+                    $conn->close();
+                    ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Profile Modal -->
+<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="profileModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>Personal Information</h6>
+                <p>First Name</p>
+                <p>Middle Name</p>
+                <p>Last Name</p>
+                <p>Email</p>
+                <p>Current Address</p>
+                <p>Permanent Address</p>
+
+                <h6>Funding Management</h6>
+<div class="card my-3 p-3" style="background-color: #f7f3e9; border-radius: 8px; border: none;">
+    <h5 class="fw-bold">Account Overview</h5>
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <p class="mb-1" style="font-size: 0.9em; color: #999999;">AVAILABLE CREDIT</p>
+            <p class="fw-bold" style="color: #d3a569; font-size: 1.5em;">₱0</p>
+        </div>
+        <div>
+            <p class="mb-1" style="font-size: 0.9em; color: #999999;">OUTSTANDING LOANS</p>
+            <p class="fw-bold" style="color: #888888; font-size: 1.5em;">₱0</p>
+        </div>
+        <button class="btn" style="background-color: #d3a569; color: #ffffff; border-radius: 5px;">View Credit Transactions</button>
+    </div>
+</div>
+
+<div class="card p-3" style="background-color: #f4e4c3; border-radius: 8px; border: none;">
+    <h5 class="fw-bold">Lending Insights</h5>
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <p class="mb-1" style="font-size: 0.9em; color: #999999;">TOTAL AMOUNT LOANED</p>
+            <p class="fw-bold" style="color: #d3a569; font-size: 1.5em;">₱0</p>
+        </div>
+        <div>
+            <p class="mb-1" style="font-size: 0.9em; color: #999999;">LOANS MADE</p>
+            <p class="fw-bold" style="color: #000000; font-size: 1.5em;">0</p>
+        </div>
+        <button class="btn" style="background-color: #2f2f47; color: #ffffff; border-radius: 5px;">View Loans</button>
+    </div>
+</div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
 </div>
 
 
@@ -329,16 +430,20 @@ $result = $conn->query($sql);
         };
 
         $(document).ready(function() {
-        $('#applicantsTable').DataTable({
-            "paging": true,
+        $('#lendersTable').DataTable({
+            "paging": false,
             "searching": true,
-            "ordering": true,
-            "info": true,
-            "responsive": true,
-            
-
+            "info": false,
+            "ordering": false
         });
     });
+
+    function viewProfile(userId) {
+    document.getElementById('profileModalLabel').innerText = 'Lender ' + userId;
+    var profileModal = new bootstrap.Modal(document.getElementById('profileModal'));
+    profileModal.show();
+}
+
     </script>
 
 
