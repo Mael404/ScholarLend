@@ -20,7 +20,7 @@ $query = "SELECT `fname`, `mname`, `lname`, `birthdate`, `gender`, `cellphonenum
           `college`, `course`, `yearofstudy`, `graduationdate`, `monthly_allowance`, `source_of_allowance`, 
           `monthly_expenses`, `school_community`, `spending_pattern`, `monthly_savings`, `career_goals`, 
           `loan_amount`, `loan_purpose`, `loan_description`, `payment_mode`, `payment_frequency`, `due_date`, 
-          `account_details`, `total_amount`,`interest_earned`, `next_deadlines`,`days_to_next_deadline`, `cor1_path`, `cor2_path`, `cor3_path`, `cor4_path`, `current_address`, `permanent_address`
+          `account_details`, `total_amount`,`interest_earned`, `next_deadlines`,`days_to_next_deadline`, `cor1_path`, `cor2_path`, `cor3_path`, `cor4_path`, `current_address`, `permanent_address`, `gwa`
           FROM borrower_info WHERE transaction_id = $user_id";
 
 $result = $conn->query($query);

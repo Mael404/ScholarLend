@@ -54,6 +54,7 @@ $total_amount = (float) $conn->real_escape_string($_POST['total_amount']);
 $next_deadlines = $conn->real_escape_string($_POST['next_deadlines']);
 $current_address = $conn->real_escape_string($_POST['current_address']);
 $permanent_address = $conn->real_escape_string($_POST['permanent_address']);
+$gwa = $conn->real_escape_string($_POST['gwa']); // Retrieve GWA input
 $statuss = "Pending";
 
 if (!empty($next_deadlines)) {
@@ -78,7 +79,6 @@ $share_admin = floor($share_admin * 100) / 100; // Truncate to two decimal place
 
 // Optionally, format it for display (optional)
 $share_admin_formatted = number_format($share_admin, 2, '.', ''); // For display purposes
-
 
 // Handle file uploads
 $uploadDir = "uploads/";
@@ -123,7 +123,7 @@ if (!$errorOccurred) {
         loan_amount, loan_purpose, loan_description, payment_mode, payment_frequency, due_date, 
         next_deadlines, days_to_next_deadline, account_details, total_amount, interest_earned, 
         share_admin, status, cor1_path, cor2_path, cor3_path, cor4_path, current_address, 
-        permanent_address, outstanding_balance
+        permanent_address, outstanding_balance, gwa
     ) VALUES (
         '$transaction_id', '$user_id', '$fname', '$mname', '$lname', '$birthdate', '$gender', 
         '$cellphonenumber', '$email', '$school', '$college', '$course', '$yearofstudy', 
@@ -133,7 +133,7 @@ if (!$errorOccurred) {
         '$payment_frequency', '$due_date', '$next_deadlines', '$days_to_next_deadline', 
         '$account_details', '$total_amount', '$interest_earned', '$share_admin', '$statuss', 
         '$file1', '$file2', '$file3', '$file4', '$current_address', '$permanent_address', 
-        '$outstanding_balance'
+        '$outstanding_balance', '$gwa'
     )";
 
     if ($conn->query($sql) === TRUE) {

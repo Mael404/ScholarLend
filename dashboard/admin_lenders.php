@@ -180,20 +180,45 @@ $result = $conn->query($sql);
       padding: 1rem;
       border-radius: 0 0 10px 10px;
     }
-
+    .navbar {
+            background-color: #f9f7f3;
+            height: 8vh;
+            padding: 0.5rem 1rem;
+        }
+        .navbar-brand span {
+            font-weight: bold;
+            color: #c29c6d; /* Scholar color */
+        }
+        .navbar-brand .logo-text {
+            color: #2c2e45; /* Lend color */
+        }
+        .navbar-text {
+            color: #2c2e45;
+        }
     </style>
 </head>
 
 <body>
+<nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+        <a class="navbar-brand d-flex primary-text fs-1 fw-bold" href="#" style="font-family: 'Times New Roman', Times, serif; margin-left:60px;">
+            <span>Scholar</span><span class="logo-text">Lend</span>
+        </a>
+        <div class="d-none d-lg-block">
+            <span class="navbar-text" style="font-family: 'Times New Roman', Times, serif; font-weight:bolder; font-size:larger;">Administrator</span>
+        </div>
+    </div>
+</nav>
+
     <div class="d-flex" id="wrapper">
+        
         <!-- Sidebar -->
         <div class="bg-white" id="sidebar-wrapper">
-            <div class="sidebar-heading text-center py-4 primary-text fs-1 fw-bold border-bottom" style="font-family: 'Times New Roman', Times, serif;">
-                <i class=""></i>
-                <span style="color: #caac82;">Scholar</span><span style="color: black;">Lend</span>
-            </div>
+            
                   
-            <div class="user-info d-flex align-items-center my-3 text-center">
+            <div class="user-info d-flex align-items-center my-4 text-center">
+        
+
                 <img src="red.jpg" alt="User Profile Picture" class="img-fluid rounded-circle" style="width: 50px; height: 50px; margin-right: 10px;">
                 <div class="user-details">
                     <div class="username">
@@ -271,129 +296,128 @@ $result = $conn->query($sql);
         font-weight: bold;
     }
 </style>
-
-
 <?php
 // Database connection
-$conn = new mysqli("localhost", "username", "password", "scholarlend_db");
+$servername = "localhost";
+$username = "username";
+$password = "password";
+$dbname = "scholarlend_db";
 
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check for connection errors
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    die("Connection failed: " . htmlspecialchars($conn->connect_error));
 }
 
-// Fetch lenders' information
-$sql = "SELECT user_id FROM users_tb WHERE account_role = 'Lender'";
+// Fetch lenders' information with aggregated outstanding_balance from borrower_info
+$sql = "SELECT u.user_id, u.first_name, u.middle_name, u.last_name, u.email,
+        u.wallet_balance, u.outstanding_loans, u.total_amount_lent, u.loans_made,
+        IFNULL(SUM(b.outstanding_balance), 0) AS total_outstanding_balance
+        FROM users_tb u
+        LEFT JOIN borrower_info b ON u.user_id = b.lender_id
+        WHERE u.account_role = 'Lender'
+        GROUP BY u.user_id";
+
 $result = $conn->query($sql);
+
+// Check if the query executed properly
+if ($result === false) {
+    die("Error executing query: " . htmlspecialchars($conn->error));
+}
 ?>
 
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="card p-4 text-center" style="background-color:#f4f1ec;">
-                <h5 class="fw-bold" style="text-align: left; font-family:'Times New Roman', Times, serif; font-weight:bold; font-size: 2.0rem;">Lender Overview</h5>
-                <div class="d-flex justify-content-around mt-3">
-                    <div>
-                        <h2 class="fw-bold mb-0">20</h2>
-                        <small class="text-uppercase">Total Lenders</small>
-                    </div>
-                    <div>
-                        <h2 class="fw-bold mb-0">23</h2>
-                        <small class="text-uppercase">Total Number of Loans Funded</small>
-                    </div>
-                    <div>
-                        <h2 class="fw-bold mb-0">₱13000</h2>
-                        <small class="text-uppercase">Total Amount of Funded Loans</small>
-                    </div>
-                </div>
-            </div>
-        </div>
+<div class="row mt-5">
+    <div class="col-12">
+        <table id="lendersTable" class="table table-bordered table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col" class="text-center">User ID</th>
+                    <th scope="col" class="text-center">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        $user_id = htmlspecialchars($row['user_id']);
+                        $fname = htmlspecialchars($row['first_name']);
+                        $mname = htmlspecialchars($row['middle_name'] ?? '');
+                        $lname = htmlspecialchars($row['last_name']);
+                        $email = htmlspecialchars($row['email']);
+                       
+                        $available_credit = number_format((float)$row['wallet_balance'], 2);
+                        $outstanding_balance = number_format((float)$row['total_outstanding_balance'], 2);
+                        $total_loaned = number_format((float)$row['total_amount_lent'], 2);
+                        $loans_made = intval($row['loans_made']);
+
+                        echo "<tr>";
+                        echo "<td class='text-center'>{$user_id}</td>";
+                        echo "<td class='text-center'>
+                                <button type='button' class='btn btn-link text-primary' data-bs-toggle='modal' data-bs-target='#profileModal{$user_id}' style='font-size: 0.9em;'>
+                                    See Profile
+                                </button>
+                              </td>";
+                        echo "</tr>";
+
+                        // Profile Modal for each user
+                        echo "
+                        <div class='modal fade' id='profileModal{$user_id}' tabindex='-1' aria-labelledby='profileModalLabel{$user_id}' aria-hidden='true'>
+                            <div class='modal-dialog modal-lg'>
+                                <div class='modal-content'>
+                                    <div class='modal-header'>
+                                        <h5 class='modal-title' id='profileModalLabel{$user_id}'>User Profile: {$fname} {$lname}</h5>
+                                        <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+                                    </div>
+                                    <div class='modal-body'>
+                                        <h6>Personal Information</h6>
+                                        <p>First Name: {$fname}</p>
+                                        <p>Middle Name: {$mname}</p>
+                                        <p>Last Name: {$lname}</p>
+                                        <p>Email: {$email}</p>
+                                     
+
+                                        <h6>Funding Management</h6>
+                                        <div class='card my-3 p-3' style='background-color: #f7f3e9; border-radius: 8px; border: none;'>
+                                            <h5 class='fw-bold'>Account Overview</h5>
+                                            <div class='d-flex justify-content-between align-items-center'>
+                                                <div>
+                                                    <p class='mb-1' style='font-size: 0.9em; color: #999999;'>AVAILABLE CREDIT</p>
+                                                    <p class='fw-bold' style='color: #d3a569; font-size: 1.5em;'>₱{$available_credit}</p>
+                                                </div>
+                                                <div>
+                                                    <p class='mb-1' style='font-size: 0.9em; color: #999999;'>TOTAL OUTSTANDING BALANCE</p>
+                                                    <p class='fw-bold' style='color: #888888; font-size: 1.5em;'>₱{$outstanding_balance}</p>
+                                                </div>
+                                                <button class='btn' style='background-color: #d3a569; color: #ffffff; border-radius: 5px;'>View Credit Transactions</button>
+                                            </div>
+                                        </div>
+
+                                        <div class='card p-3' style='background-color: #f4e4c3; border-radius: 8px; border: none;'>
+                                            <h5 class='fw-bold'>Lending Insights</h5>
+                                            <div class='d-flex justify-content-between align-items-center'>
+                                                <div>
+                                                    <p class='mb-1' style='font-size: 0.9em; color: #999999;'>TOTAL AMOUNT LOANED</p>
+                                                    <p class='fw-bold' style='color: #d3a569; font-size: 1.5em;'>₱{$total_loaned}</p>
+                                                </div>
+                                                <div>
+                                                    <p class='mb-1' style='font-size: 0.9em; color: #999999;'>LOANS MADE</p>
+                                                    <p class='fw-bold' style='color: #000000; font-size: 1.5em;'>{$loans_made}</p>
+                                                </div>
+                                                <button class='btn' style='background-color: #2f2f47; color: #ffffff; border-radius: 5px;'>View Loans</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>";
+                    }
+                }
+                $conn->close();
+                ?>
+            </tbody>
+        </table>
     </div>
-
-    <!-- Lenders Table -->
-    <div class="row mt-5">
-        <div class="col-12">
-            <table id="lendersTable" class="table table-bordered table-striped">
-                <thead class="table-dark">
-                    <tr>
-                        <th scope="col" class="text-center">User ID</th>
-                        <th scope="col" class="text-center">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php
-                    if ($result->num_rows > 0) {
-                        while ($row = $result->fetch_assoc()) {
-                            echo "<tr>";
-                            echo "<td class='text-center'>" . htmlspecialchars($row['user_id']) . "</td>";
-                            echo "<td class='text-center'>
-                                    <button type='button' class='btn btn-link text-primary' style='font-size: 0.9em;' onclick='viewProfile(\"" . htmlspecialchars($row['user_id']) . "\")'>
-                                        See Profile
-                                    </button>
-                                  </td>";
-                            echo "</tr>";
-                            
-                        }
-                    } 
-                    $conn->close();
-                    ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Profile Modal -->
-<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="profileModalLabel"></h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <h6>Personal Information</h6>
-                <p>First Name</p>
-                <p>Middle Name</p>
-                <p>Last Name</p>
-                <p>Email</p>
-                <p>Current Address</p>
-                <p>Permanent Address</p>
-
-                <h6>Funding Management</h6>
-<div class="card my-3 p-3" style="background-color: #f7f3e9; border-radius: 8px; border: none;">
-    <h5 class="fw-bold">Account Overview</h5>
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <p class="mb-1" style="font-size: 0.9em; color: #999999;">AVAILABLE CREDIT</p>
-            <p class="fw-bold" style="color: #d3a569; font-size: 1.5em;">₱0</p>
-        </div>
-        <div>
-            <p class="mb-1" style="font-size: 0.9em; color: #999999;">OUTSTANDING LOANS</p>
-            <p class="fw-bold" style="color: #888888; font-size: 1.5em;">₱0</p>
-        </div>
-        <button class="btn" style="background-color: #d3a569; color: #ffffff; border-radius: 5px;">View Credit Transactions</button>
-    </div>
-</div>
-
-<div class="card p-3" style="background-color: #f4e4c3; border-radius: 8px; border: none;">
-    <h5 class="fw-bold">Lending Insights</h5>
-    <div class="d-flex justify-content-between align-items-center">
-        <div>
-            <p class="mb-1" style="font-size: 0.9em; color: #999999;">TOTAL AMOUNT LOANED</p>
-            <p class="fw-bold" style="color: #d3a569; font-size: 1.5em;">₱0</p>
-        </div>
-        <div>
-            <p class="mb-1" style="font-size: 0.9em; color: #999999;">LOANS MADE</p>
-            <p class="fw-bold" style="color: #000000; font-size: 1.5em;">0</p>
-        </div>
-        <button class="btn" style="background-color: #2f2f47; color: #ffffff; border-radius: 5px;">View Loans</button>
-    </div>
-</div>
-
-            </div>
-        </div>
-    </div>
-</div>
-
 </div>
 
 

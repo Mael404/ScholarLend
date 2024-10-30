@@ -548,6 +548,17 @@ $conn->close();
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <!-- General Weighted Average -->
+                                            <div class="row">
+                                                <div class="col-md-12 mb-3">
+                                                    <div class="form-floating">
+                                                        <input type="number" step="0.01" class="form-control form-control-sm" id="gwa" name="gwa" placeholder="Enter General Weighted Average" style="font-size: 0.9rem;" required>
+                                                        <label for="gwa">Enter General Weighted Average</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                 
                                     </div>
                                     <input type="button" name="next" class="next action-button" value="Next" />

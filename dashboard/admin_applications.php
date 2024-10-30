@@ -180,20 +180,42 @@ $result = $conn->query($sql);
       padding: 1rem;
       border-radius: 0 0 10px 10px;
     }
-
+    
+    .navbar {
+            background-color: #f9f7f3;
+            height: 8vh;
+            padding: 0.5rem 1rem;
+        }
+        .navbar-brand span {
+            font-weight: bold;
+            color: #c29c6d; /* Scholar color */
+        }
+        .navbar-brand .logo-text {
+            color: #2c2e45; /* Lend color */
+        }
+        .navbar-text {
+            color: #2c2e45;
+        }
     </style>
 </head>
 
 <body>
+<nav class="navbar navbar-expand-lg">
+    <div class="container-fluid">
+        <a class="navbar-brand d-flex primary-text fs-1 fw-bold" href="#" style="font-family: 'Times New Roman', Times, serif; margin-left:60px;">
+            <span>Scholar</span><span class="logo-text">Lend</span>
+        </a>
+        <div class="d-none d-lg-block">
+            <span class="navbar-text" style="font-family: 'Times New Roman', Times, serif; font-weight:bolder; font-size:larger;">Administrator</span>
+        </div>
+    </div>
+</nav>
     <div class="d-flex" id="wrapper">
         <!-- Sidebar -->
         <div class="bg-white" id="sidebar-wrapper">
-            <div class="sidebar-heading text-center py-4 primary-text fs-1 fw-bold border-bottom" style="font-family: 'Times New Roman', Times, serif;">
-                <i class=""></i>
-                <span style="color: #caac82;">Scholar</span><span style="color: black;">Lend</span>
-            </div>
+           
                   
-            <div class="user-info d-flex align-items-center my-3 text-center">
+            <div class="user-info d-flex align-items-center my-4 text-center">
                 <img src="red.jpg" alt="User Profile Picture" class="img-fluid rounded-circle" style="width: 50px; height: 50px; margin-right: 10px;">
                 <div class="user-details">
     <div class="username">
@@ -614,7 +636,7 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
 </script>
 
 
-<<script>
+<script>
 document.addEventListener('DOMContentLoaded', function () {
     var borrowerModal = document.getElementById('borrowerModal');
 
