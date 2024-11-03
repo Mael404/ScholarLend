@@ -233,7 +233,7 @@ $result_pending = $stmt_pending->get_result();
 $has_pending_application = $result_pending->num_rows > 0;
 
 // Query to check if the user has an approved application
-$sql_approved = "SELECT * FROM borrower_info WHERE user_id = ? AND status = 'approved'";
+$sql_approved = "SELECT * FROM borrower_info WHERE user_id = ? AND status = 'Approved'";
 $stmt_approved = $conn->prepare($sql_approved);
 $stmt_approved->bind_param("i", $user_id);
 $stmt_approved->execute();

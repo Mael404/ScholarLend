@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_POST['user_id'];
-$deadline_to_remove = $_POST['deadline'];
+$deadline_to_transfer = $_POST['deadline']; // Renamed for clarity
 $transaction_id = $_POST['transaction_id'];
 
 // Ensure transaction_id is in the session
@@ -93,7 +93,11 @@ if ($row) {
         $stmtOutstanding->bind_param('dis', $new_outstanding_balance, $user_id, $transaction_id);
         $stmtOutstanding->execute();
 
-        $conn->commit(); // Commit transaction
+        // Step 6: Transfer the deadline to payed_dates instead of deleting
+        $sql = "UPDATE borrower_info SET payed_dates = CONCAT_WS(',', payed_dates, ?) WHERE user_id = ? AND transaction_id = ?";
+        $stmtTransferDate = $conn->prepare($sql);
+        $stmtTransferDate->bind_param("sis", $deadline_to_transfer, $user_id, $transaction_id);
+        $stmtTransferDate->execute();
 
         // Remove deadline logic as before
         $sql = "SELECT next_deadlines FROM borrower_info WHERE user_id = ? AND transaction_id = ?";
@@ -108,7 +112,7 @@ if ($row) {
             $next_deadlines_array = array_map('trim', explode(',', $next_deadlines));
 
             // Remove the specified deadline
-            if (($key = array_search(trim($deadline_to_remove), $next_deadlines_array)) !== false) {
+            if (($key = array_search(trim($deadline_to_transfer), $next_deadlines_array)) !== false) {
                 unset($next_deadlines_array[$key]);
             }
 
@@ -118,6 +122,8 @@ if ($row) {
             $update_stmt->bind_param("sis", $new_deadlines, $user_id, $_SESSION['transaction_id']);
             $update_stmt->execute();
         }
+
+        $conn->commit(); // Commit transaction
 
         // Close statements and connection
         $stmt->close();

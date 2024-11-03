@@ -396,7 +396,7 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
                 // Status column with "Approved" changed to "Invested"
                 $status = isset($row['status']) ? htmlspecialchars($row['status']) : '';
                 if ($status === 'Approved') {
-                    $status = 'Invested';
+                    $status = 'Fund Transferred';
                 }
                 echo "<td class='text-center'>" . $status . "</td>";
 
