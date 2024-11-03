@@ -63,7 +63,46 @@ if (isset($_GET['transaction_id'], $_GET['loan_description'], $_GET['loan_amount
 
   <!-- Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
+   <style>
+     .gcash-title {
+      font-size: 24px;
+      color: #caaa82;
+      font-weight: bold;
+      text-align: left;
+    }
 
+    .instructions {
+      text-align: left;
+      margin-top: 10px;
+    }
+
+    .btn-complete {
+      background-color: #caaa82;
+      color: white;
+      font-weight: bold;
+    }
+
+    .btn-complete:hover {
+      background-color: #b08e6e;
+    }
+
+    .gcash-qr {
+      width: 100%;
+      max-width: 200px;
+      margin: auto;
+    }
+
+    .upload-section {
+      margin-top: 20px;
+    }
+
+    .back-link {
+      color: #caaa82;
+      font-weight: bold;
+      margin-top: 10px;
+      display: inline-block;
+    }
+   </style>
 </head>
 
 <body class="starter-page-page">
@@ -108,39 +147,76 @@ if (isset($_GET['transaction_id'], $_GET['loan_description'], $_GET['loan_amount
 
     <!-- Help Fund Section -->
   
-<div class="col-12 col-md-4">
+    <div class="col-12 col-md-4">
     <div class="help-fund card p-4" style="background-color: #fff; border-radius: 10px;">
         <h5>Help fund this loan</h5>
         
-        <!-- Start the form -->
-        <form id="lendForm" method="post" action="process_lend.php">
-
-            <div class="input-group mt-3">
-                <input type="text" class="form-control" value="<?php echo $loan_amount; ?>" readonly>
-                <!-- Hidden input fields for loan_amount and transaction_id -->
-                <input type="hidden" name="loan_amount" value="<?php echo $loan_amount; ?>">
-                <input type="hidden" name="transaction_id" value="<?php echo $transaction_id; ?>">
-                
-                <!-- Submit button for the form -->
-                <button type="submit" name="lendNow" class="btn" style="background-color: #dbbf94; color: #323246; border: none; margin-left: 10px;">Lend now</button>
-            </div>
-        </form>
+        <!-- Open Modal Button -->
+        <div class="input-group mt-3">
+            <input type="text" class="form-control" value="<?php echo $loan_amount; ?>" readonly>
+            <button type="button" class="btn" style="background-color: #dbbf94; color: #323246; border: none; margin-left: 10px;" data-bs-toggle="modal" data-bs-target="#gcashModal">
+                Lend now
+            </button>
+        </div>
         
         <button class="btn mt-3" style="background-color: #192a4d; color: white; width: 100%;">Invest funds</button>
 
         <!-- Borrower Profile and Loan Details -->
         <div class="d-flex justify-content-between align-items-center mt-4" style="color: #dbbf94;">
-            <!-- Trigger modal for Borrower Profile -->
             <span data-bs-toggle="modal" data-bs-target="#borrowerProfileModal" style="cursor: pointer;">
                 <i class="fas fa-user"></i> Borrower Profile
             </span>
-            <!-- Trigger modal for Loan Details -->
             <span data-bs-toggle="modal" data-bs-target="#loanDetailsModal" style="cursor: pointer;">
                 <i class="fas fa-bars"></i> Loan details
             </span>
         </div>
     </div>
 </div>
+
+<!-- Modal Structure with Form Inside -->
+<div class="modal fade" id="gcashModal" tabindex="-1" aria-labelledby="gcashModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title gcash-title" id="gcashModalLabel">Lend using GCash</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="lendForm" method="post" action="process_lend.php" enctype="multipart/form-data">
+        <div class="modal-body">
+          <div class="text-center">
+            <img src="https://businessmaker-academy.com/cms/wp-content/uploads/2022/04/Gcash-BMA-QRcode.jpg" alt="GCash QR Code" class="gcash-qr mb-3">
+          </div>
+          <div class="instructions">
+            <ol>
+              <li>Save QR Code.</li>
+              <li>Go to GCash app.</li>
+              <li>Pay using the QR Code.</li>
+              <li>Save receipt.</li>
+              <li>Upload a copy of the receipt.</li>
+            </ol>
+          </div>
+          <div class="upload-section">
+            <label for="receipt-upload" class="form-label fw-bold">Upload receipt here</label>
+            <div class="input-group">
+          
+            <input type="file" class="form-control" name="receipt-upload" id="receipt-upload" aria-label="Upload receipt" required>
+
+    
+            </div>
+          </div>
+          <!-- Hidden input fields for loan_amount and transaction_id -->
+          <input type="hidden" name="loan_amount" value="<?php echo $loan_amount; ?>">
+          <input type="hidden" name="transaction_id" value="<?php echo $transaction_id; ?>">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" name="lendNow" class="btn btn-complete">Complete Transaction</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <!-- Modal for Borrower Profile -->
 <div class="modal fade" id="borrowerProfileModal" tabindex="-1" aria-labelledby="borrowerProfileModalLabel" aria-hidden="true">
   <div class="modal-dialog">

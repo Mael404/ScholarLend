@@ -63,8 +63,8 @@ $result = $conn->query($sql);
 
     .list-group-item:hover {
         background-color: #caac82; /* Set background color on hover */
-        color: white; /* Set text color on hover */
-       
+        color: white; 
+     
     }
 
     .user-info {
@@ -194,8 +194,6 @@ $result = $conn->query($sql);
         .navbar-text {
             color: #2c2e45;
         }
-
-        
     </style>
 </head>
 
@@ -235,8 +233,6 @@ $result = $conn->query($sql);
                 </div>  
                             </div>
 
-          
-        
                             <div class="list-group list-group-flush my-3">
     <a href="admindashboard.php" class="list-group-item list-group-item-action">
         <i class="lnr lnr-home me-2" style="font-weight: bolder;"></i> Home
@@ -244,10 +240,10 @@ $result = $conn->query($sql);
     <a href="admin_applications.php" class="list-group-item ">
         <i class="lnr lnr-file-empty me-2"></i>Applications
     </a>
-    <a href="admin_lenders.php" class="list-group-item active">
+    <a href="admin_lenders.php" class="list-group-item">
         <i class="lnr lnr-briefcase me-2"></i>Lenders
     </a>
-    <a href="admin_borrowers.php" class="list-group-item">
+    <a href="admin_borrowers.php" class="list-group-item active">
         <i class="lnr lnr-users me-2"></i>Borrowers
     </a>
     <a href="admin_loans.php" class="list-group-item">
@@ -277,7 +273,7 @@ $result = $conn->query($sql);
   <nav class="navbar navbar-expand-lg navbar-light bg-transparent py-4 px-4">
     <div class="d-flex align-items-center">
       <i class="fas fa-align-left primary-text fs-4 me-3" id="menu-toggle"></i>
-      <h2 class="fs-2 m-0" style="font-family: 'Times New Roman', Times, serif;">Lenders</h2>
+      <h2 class="fs-2 m-0" style="font-family: 'Times New Roman', Times, serif;">Borrowers</h2>
     </div>
 
     
@@ -300,30 +296,32 @@ $result = $conn->query($sql);
 </style>
 <?php
 // Database connection
-$servername = "localhost";
-$username = "username";
-$password = "password";
-$dbname = "scholarlend_db";
+include 'condb.php';
 
-$conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check for connection errors
-if ($conn->connect_error) {
-    die("Connection failed: " . htmlspecialchars($conn->connect_error));
-}
-
-// Fetch lenders' information with aggregated outstanding_balance from borrower_info
-$sql = "SELECT u.user_id, u.first_name, u.middle_name, u.last_name, u.email,
-        u.wallet_balance, u.outstanding_loans, u.total_amount_lent, u.loans_made,
-        IFNULL(SUM(b.outstanding_balance), 0) AS total_outstanding_balance
-        FROM users_tb u
-        LEFT JOIN borrower_info b ON u.user_id = b.lender_id
-        WHERE u.account_role = 'Lender'
-        GROUP BY u.user_id";
+$sql = "
+SELECT 
+    u.user_id,
+    u.first_name,
+    u.middle_name,
+    u.last_name,
+    u.email,
+    u.wallet_balance,
+    COALESCE(SUM(CASE WHEN b.status != 'pending' THEN b.outstanding_balance ELSE 0 END), 0) AS total_outstanding_balance,
+    COALESCE(SUM(CASE WHEN b.status != 'pending' THEN b.loan_amount ELSE 0 END), 0) AS total_amount_lent,
+    COALESCE(COUNT(CASE WHEN b.status != 'pending' THEN b.user_id END), 0) AS loans_made
+FROM 
+    users_tb u
+LEFT JOIN 
+    borrower_info b ON u.user_id = b.user_id
+WHERE 
+    u.account_role = 'Borrower'
+GROUP BY 
+    u.user_id
+";
 
 $result = $conn->query($sql);
 
-// Check if the query executed properly
 if ($result === false) {
     die("Error executing query: " . htmlspecialchars($conn->error));
 }
@@ -336,7 +334,7 @@ if ($result === false) {
                 <div class="d-flex justify-content-around mt-3">
                     <div>
                         <h2 class="fw-bold mb-0">20</h2>
-                        <small class="text-uppercase">Total Lenders</small>
+                        <small class="text-uppercase">Total Borrowers</small>
                     </div>
                     <div>
                         <h2 class="fw-bold mb-0">23</h2>
@@ -351,7 +349,7 @@ if ($result === false) {
         </div>
     </div>
 <div class="row mt-5">
-    <div class="col-12">
+<div class="table-responsive">
         <table id="lendersTable" class="table table-bordered table-striped">
             <thead class="table-dark">
                 <tr>
@@ -442,7 +440,6 @@ if ($result === false) {
         </table>
     </div>
 </div>
-
 
 
 

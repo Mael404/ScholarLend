@@ -116,7 +116,7 @@ include 'display_user_wallet.php';
             <br>
         
             <div class="list-group list-group-flush my-3">
-    <a href="lender.php" class="list-group-item list-group-item-action ">
+    <a href="borrower_applicationform.php" class="list-group-item list-group-item-action ">
         <i class="fas fa-tachometer-alt me-2"></i>Dashboard
     </a>
     <a href="#" class="list-group-item">
@@ -201,24 +201,31 @@ if ($result = $query->fetch(PDO::FETCH_ASSOC)) {
     $available_to_lend = $result['wallet_balance'];
 }
 
-// Query 2: Get total amount lent and loans made from users_tb
+// Query 2: Calculate total amount lent from borrower_info
 $total_amount_lent = 0;
-$loans_made = 0;
-$query = $pdo->prepare("SELECT total_amount_lent, loans_made FROM users_tb WHERE user_id = ?");
+$query = $pdo->prepare("SELECT SUM(loan_amount) AS total_lent FROM borrower_info WHERE user_id = ?");
 $query->execute([$current_user_id]);
 if ($result = $query->fetch(PDO::FETCH_ASSOC)) {
-    $total_amount_lent = $result['total_amount_lent'];
-    $loans_made = $result['loans_made'];
+    $total_amount_lent = $result['total_lent'];
 }
 
-// Query 3: Calculate outstanding loans from borrower_info
+// Query 3: Count loans made from borrower_info
+$loans_made = 0;
+$query = $pdo->prepare("SELECT COUNT(*) AS loan_count FROM borrower_info WHERE user_id = ?");
+$query->execute([$current_user_id]);
+if ($result = $query->fetch(PDO::FETCH_ASSOC)) {
+    $loans_made = $result['loan_count'];
+}
+
+// Query 4: Calculate outstanding loans from borrower_info
 $outstanding_loans = 0;
-$query = $pdo->prepare("SELECT SUM(outstanding_balance) AS total_outstanding FROM borrower_info WHERE lender_id = ?");
+$query = $pdo->prepare("SELECT SUM(outstanding_balance) AS total_outstanding FROM borrower_info WHERE user_id = ?");
 $query->execute([$current_user_id]);
 if ($result = $query->fetch(PDO::FETCH_ASSOC)) {
     $outstanding_loans = $result['total_outstanding'];
 }
 ?>
+
 
 <div class="container-fluid px-4">
     <!-- Account Overview -->

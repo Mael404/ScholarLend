@@ -103,7 +103,7 @@ if (isset($_SESSION['insufficient_balance'])) {
             
           
             <div class="user-info d-flex align-items-center my-3 text-center">
-                <img src="red.jpg" alt="User Profile Picture" class="img-fluid rounded-circle" style="width: 50px; height: 50px; margin-right: 10px;">
+            <i class="fas fa-user-circle" style="font-size: 50px; margin-right: 10px;"></i>
                 <div class="user-details">
     <div class="username">
         <?php 
@@ -130,7 +130,7 @@ if (isset($_SESSION['insufficient_balance'])) {
     <a href="#" class="list-group-item">
         <i class="fas fa-envelope me-2"></i>Messages
     </a>
-    <a href="#" class="list-group-item">
+    <a href="borrower_addcredit.php" class="list-group-item">
         <i class="fas fa-plus-circle me-2"></i>Add Credit
     </a>
     <a href="#" class="list-group-item">
@@ -828,7 +828,7 @@ $conn->close();
         <!-- Account Details -->
         <div class="form-floating mb-3">
             <input type="text" class="form-control" name="account_details" id="accountDetails" placeholder="Enter Bank Account Details" required>
-            <label for="accountDetails">Account Details</label>
+            <label for="accountDetails">Gcash Account Details</label>
         </div>
 
         <!-- Submit Button -->

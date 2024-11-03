@@ -31,6 +31,8 @@ $result = $conn->query($sql);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdn.linearicons.com/free/1.0.0/icon-font.min.css">
+
     
     <link rel="stylesheet" href="styles.css" />
     <title>ScholarLend - Admin</title>
@@ -63,9 +65,7 @@ $result = $conn->query($sql);
 
     .list-group-item:hover {
         background-color: #caac82; /* Set background color on hover */
-        color: white; /* Set text color on hover */
-        padding: 14px 18px; /* Adjust padding for hover effect */
-        transform: scale(1.05); /* Scale up */
+        color: white; 
     }
 
     .user-info {
@@ -196,6 +196,19 @@ $result = $conn->query($sql);
         .navbar-text {
             color: #2c2e45;
         }
+
+        .uniform-button {
+    width: 150px; /* Adjust this value to fit your layout */
+    font-size: 0.9em; /* Keep the same font size for all buttons */
+    padding: 0.4rem 1rem; /* Consistent padding */
+}
+.active-card {
+    background-color: #cdad7d; /* Brown color */
+    color: white;
+  }
+
+  
+
     </style>
 </head>
 
@@ -242,6 +255,7 @@ $result = $conn->query($sql);
 
         <!-- Page Content -->
         <div id="page-content-wrapper">
+
   <nav class="navbar navbar-expand-lg navbar-light bg-transparent py-4 px-4">
     <div class="d-flex align-items-center">
       <i class="fas fa-align-left primary-text fs-4 me-3" id="menu-toggle"></i>
@@ -295,7 +309,7 @@ $result_pending = $conn->query($sql_pending);
 $pending_applicants = $result_pending->fetch_assoc()['pending_count'];
 
 // Count approved applicants
-$sql_approved = "SELECT COUNT(*) AS approved_count FROM borrower_info WHERE status = 'Posted'";
+$sql_approved = "SELECT COUNT(*) AS approved_count FROM borrower_info WHERE status = 'Approved'";
 $result_approved = $conn->query($sql_approved);
 $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
 
@@ -303,7 +317,7 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
 ?>
 
 <!-- Total Applicants Card -->
-<div class="col-md-4">
+<div id="totalApplicantsCard" class="col-md-4">
   <div class="card text-center rounded">
     <div class="card-body">
       <div class="d-flex align-items-center justify-content-center">
@@ -316,7 +330,7 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
 </div>
 
 <!-- Pending Applicants Card -->
-<div class="col-md-4">
+<div id="pendingApplicantsCard" class="col-md-4">
   <div class="card text-center rounded">
     <div class="card-body">
       <div class="d-flex align-items-center justify-content-center">
@@ -329,7 +343,7 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
 </div>
 
 <!-- Approved Applicants Card -->
-<div class="col-md-4">
+<div id="approvedApplicantsCard" class="col-md-4">
   <div class="card text-center rounded">
     <div class="card-body">
       <div class="d-flex align-items-center justify-content-center">
@@ -341,7 +355,8 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
   </div>
 </div>
 
-</div>
+
+
    
      <!-- Data Table Section -->
      <div class="mt-4">
@@ -366,7 +381,6 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
                 // Created On (Application Date) column
                 echo "<td class='text-center'>" . (isset($row['created_at']) ? date("F j, Y", strtotime($row['created_at'])) : '') . "</td>";
 
-
                 // Application ID (Transaction ID) column
                 echo "<td class='text-center'>" . htmlspecialchars($row['transaction_id']) . "</td>";
 
@@ -379,22 +393,57 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
                 $fullName = ucwords(strtolower($fullName));
                 echo "<td class='text-center'>" . htmlspecialchars($fullName) . "</td>";
 
-                // Status column
-                echo "<td class='text-center'>" . (isset($row['status']) ? htmlspecialchars($row['status']) : '') . "</td>";
+                // Status column with "Approved" changed to "Invested"
+                $status = isset($row['status']) ? htmlspecialchars($row['status']) : '';
+                if ($status === 'Approved') {
+                    $status = 'Invested';
+                }
+                echo "<td class='text-center'>" . $status . "</td>";
 
-                // Action column
+                // Action column with conditional buttons
                 echo "<td class='text-center'>
                     <button type='button' class='btn btn-link text-primary' style='font-size: 0.9em;' data-bs-toggle='modal' data-bs-target='#borrowerModal' data-id='" . htmlspecialchars($row['transaction_id']) . "'>
                         <i class='fas fa-eye'></i>
-                    </button>
-                    <button type='button' class='btn btn-outline-success mx-1' style='font-size: 0.9em; padding: 0.2rem 0.4rem;' onclick='checkApplicant(" . htmlspecialchars($row['transaction_id']) . ")'>
-                        <i class='fas fa-check'></i>
-                    </button>
-                    <button type='button' class='btn btn-outline-danger' style='font-size: 0.9em; padding: 0.2rem 0.4rem;' onclick='deleteApplicant(" . htmlspecialchars($row['transaction_id']) . ")'>
-                        <i class='fas fa-trash'></i>
-                    </button>
-                  </td>";
+                    </button>";
 
+                // Display Confirm button if status is "Pending"
+                if ($status === 'Pending') {
+                    echo "
+                    <button type='button' class='btn btn-outline-success mx-1 uniform-button' onclick='checkApplicant(" . htmlspecialchars($row['transaction_id']) . ")'>
+                        <i class='fas fa-check'></i> Confirm
+                    </button>";
+                }
+                
+                // Display Transfer Funds button if status is "Invested"
+                elseif ($status === 'Invested') {
+                    echo "
+                    <button type='button' class='btn btn-outline-primary mx-1 uniform-button' onclick='transferFunds(" . htmlspecialchars($row['transaction_id']) . ")'>
+                        <i class='fas fa-exchange-alt'></i> Transfer Funds
+                    </button>";
+                }
+                
+                // Display disabled button if status is "Completed" or "Posted"
+                elseif ($status === 'Completed') {
+                    echo "
+                    <button type='button' class='btn btn-secondary mx-1 uniform-button' disabled>
+                        <i class='fas fa-check'></i> Loan Settled 
+                    </button>";
+                }  
+                elseif ($status === 'Fund Transferred') {
+                    echo "
+                    <button type='button' class='btn btn-secondary mx-1 uniform-button' disabled>
+                        <i class='fas fa-check'></i> Funded
+                    </button>";
+                } 
+                elseif ($status === 'Posted') {
+                    echo "
+                    <button type='button' class='btn btn-secondary mx-1 uniform-button' disabled>
+                        <i class='fas fa-check'></i> Approved
+                    </button>";
+                }    
+                
+
+                echo "</td>";
                 echo "</tr>";
             }
         } 
@@ -402,11 +451,6 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
         ?>
     </tbody>
 </table>
-
-
-
-
-
 
 
         </div>
@@ -632,11 +676,69 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
         xhr.send('id=' + borrowerId + '&status=Posted');
     }
 }
+function transferFunds(borrowerId) {
+    if (confirm('Are you sure you want to Transfer Funds to this borrower?')) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'transfer_funds.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                alert('Funds transferred successfully!');
+                location.reload(); // Refresh the page to reflect changes
+            }
+        };
+        xhr.send('id=' + borrowerId);
+    }
+}
 
 </script>
 
 
 <script>
+document.addEventListener("DOMContentLoaded", function () {
+  const totalCard = document.querySelector("#totalApplicantsCard .card");
+  const pendingCard = document.querySelector("#pendingApplicantsCard .card");
+  const approvedCard = document.querySelector("#approvedApplicantsCard .card");
+  const cards = [totalCard, pendingCard, approvedCard]; // Array of all card elements
+
+  totalCard.addEventListener("click", function () {
+    setActiveCard(totalCard);
+    filterTable("all");
+  });
+
+  pendingCard.addEventListener("click", function () {
+    setActiveCard(pendingCard);
+    filterTable("Pending");
+  });
+
+  approvedCard.addEventListener("click", function () {
+    setActiveCard(approvedCard);
+    filterTable("Invested");
+  });
+
+  function setActiveCard(selectedCard) {
+    // Remove active class from all cards
+    cards.forEach(card => card.classList.remove("active-card"));
+    // Add active class to the selected card
+    selectedCard.classList.add("active-card");
+  }
+
+  function filterTable(status) {
+    const rows = document.querySelectorAll("#applicantsTable tbody tr");
+
+    rows.forEach(row => {
+      const statusCell = row.querySelector("td:nth-child(4)").innerText.trim();
+
+      if (status === "all" || statusCell === status) {
+        row.style.display = "";
+      } else {
+        row.style.display = "none";
+      }
+    });
+  }
+});
+
+
 document.addEventListener('DOMContentLoaded', function () {
     var borrowerModal = document.getElementById('borrowerModal');
 
