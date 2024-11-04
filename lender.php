@@ -48,8 +48,7 @@ include 'display_user_wallet.php';
     .list-group-item:hover {
         background-color: #dbbf94; /* Set background color on hover */
         color: white; /* Set text color on hover */
-        padding: 14px 18px; /* Adjust padding for hover effect */
-        transform: scale(1.05); /* Scale up */
+      
     }
 
     .user-info {
@@ -93,9 +92,9 @@ include 'display_user_wallet.php';
                 <span style="color: #dbbf94;">Scholar</span><span style="color: black;">Lend</span>
             </div>
             
-          
+          <br>
             <div class="user-info d-flex align-items-center my-3 text-center">
-                <img src="red.jpg" alt="User Profile Picture" class="img-fluid rounded-circle" style="width: 50px; height: 50px; margin-right: 10px;">
+            <i class="fas fa-user-circle" style="font-size: 50px; margin-right: 10px; color:#dbbf94;"></i>
                 <div class="user-details">
     <div class="username">
         <?php 
@@ -116,18 +115,13 @@ include 'display_user_wallet.php';
             <br>
         
             <div class="list-group list-group-flush my-3">
-    <a href="lender.php" class="list-group-item list-group-item-action active">
+    <a href="lender.php" class="list-group-item list-group-item-action active ">
         <i class="fas fa-tachometer-alt me-2"></i>Dashboard
     </a>
     <a href="#" class="list-group-item">
         <i class="fas fa-envelope me-2"></i>Messages
     </a>
-    <a href="lender_addcredit.php" class="list-group-item">
-        <i class="fas fa-plus-circle me-2"></i>Add Credit
-    </a>
-    <a href="#" class="list-group-item">
-        <i class="fas fa-minus-circle me-2"></i>Withdraw Credit
-    </a>
+   
     <a href="#" class="list-group-item">
         <i class="fas fa-exchange-alt me-2"></i>Transactions
     </a>
@@ -137,7 +131,7 @@ include 'display_user_wallet.php';
     <a href="#" class="list-group-item">
         <i class="fas fa-address-book me-2"></i>Contact Us
     </a>
-    <a href="#" class="list-group-item list-group-item-action text-danger fw-bold">
+    <a href="index.html" class="list-group-item list-group-item-action text-danger fw-bold">
         <i class="fas fa-power-off me-2"></i>Logout
     </a>
 </div>
@@ -158,15 +152,11 @@ include 'display_user_wallet.php';
             <h2 class="fs-2 m-0" style="font-family: 'Times New Roman', Times, serif; font-weight: bold;">
            
             </h2>
+
+            
         </div>
 
-       
-
-        <!-- Wallet Section (Positioned Where User Dropdown Was) -->
-        <a class="nav-link wallet-link second-text fw-bold ms-auto" href="#">
-    <i class="fas fa-wallet me-2"></i>Balance: 
-    <span class="wallet-balance">PHP <?php echo number_format($wallet_balance, 2); ?></span>
-</a>
+           
 
     </div>
 </nav>
@@ -185,31 +175,145 @@ include 'display_user_wallet.php';
 </style>
 
 
-            <div class="container-fluid px-4">
-                <div class="row justify-content-center">
-                    
+<?php
+// Connect to the database
+$pdo = new PDO("mysql:host=localhost;dbname=scholarlend_db", "username", "password");
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-                <div class="col-12 mx-auto">
-    <br>
-    <div class="p-3" style="background-color: #ffffff; border: 4px solid #f0f0f0; border-radius: 8px; text-align: center; width: 100%; height: auto;">
-        <label class="fs-5" style="color: black; margin-bottom: 10px; display: block; text-align:left; font-weight: bold; padding-left: 30px;">You have not invested in any loan yet.</label>
-        <div class="d-flex justify-content-start align-items-center" style="padding-left: 30px;">
-            <button class="btn" style="background-color: #dbbf94; color: white; width: 200px; font-weight: 660;" > <!-- Customize width here -->
-                Find a loan
-                <i class="fas fa-chevron-right" style="margin-left: 8px;"></i>
-            </button>
+
+$current_user_id = $_SESSION['user_id']; // Assuming `user_id` is stored in the session upon login
+
+// Query 1: Get available to lend amount from users_tb
+$available_to_lend = 0;
+$query = $pdo->prepare("SELECT wallet_balance FROM users_tb WHERE user_id = ?");
+$query->execute([$current_user_id]);
+if ($result = $query->fetch(PDO::FETCH_ASSOC)) {
+    $available_to_lend = $result['wallet_balance'];
+}
+
+// Query 2: Get total amount lent and loans made from users_tb
+$total_amount_lent = 0;
+$loans_made = 0;
+$query = $pdo->prepare("SELECT total_amount_lent, loans_made FROM users_tb WHERE user_id = ?");
+$query->execute([$current_user_id]);
+if ($result = $query->fetch(PDO::FETCH_ASSOC)) {
+    $total_amount_lent = $result['total_amount_lent'];
+    $loans_made = $result['loans_made'];
+}
+
+// Query 3: Calculate outstanding loans from borrower_info
+$outstanding_loans = 0;
+$query = $pdo->prepare("SELECT SUM(outstanding_balance) AS total_outstanding FROM borrower_info WHERE lender_id = ?");
+$query->execute([$current_user_id]);
+if ($result = $query->fetch(PDO::FETCH_ASSOC)) {
+    $outstanding_loans = $result['total_outstanding'];
+}
+?>
+
+<div class="container-fluid px-4 mt-5">
+    <!-- Lending Insights -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-12">
+            <div class="card p-4" style="background-color: #f0e2cc; border-radius: 10px;">
+                <h5 class="card-title" style="font-family: serif; font-size: 1.75rem; color: #333;">Your lending insights</h5>
+                <div class="d-flex justify-content-between align-items-center" style="background-color: #e5c596; padding: 20px; border-radius: 8px;">
+                    <div style="text-align: center;">
+                        <h4 style="font-size: 2rem; color: #1b1b1b;">₱<?php echo number_format($total_amount_lent, 2); ?></h4>
+                        <span style="color: #555;">TOTAL AMOUNT LENT</span>
+                    </div>
+                    <div style="text-align: center;">
+                        <h4 style="font-size: 2rem; color: #1b1b1b;"><?php echo $loans_made; ?></h4>
+                        <span style="color: #555;">LOANS MADE</span>
+                    </div>
+                    <div>
+                        <button class="btn" style="background-color: #1b1b1b; color: #fff; border-radius: 5px;" data-bs-toggle="modal" data-bs-target="#loansModal">View loans</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php
+
+$user_id = $_SESSION['user_id'];
+
+// Database connection (replace with your own credentials)
+$conn = new mysqli("localhost", "username", "password", "scholarlend_db");
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Query to check and retrieve loans made by the logged-in user
+$sql = "SELECT created_at, transaction_id, loan_amount, status 
+        FROM borrower_info 
+        WHERE lender_id = ?";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+$loans = [];
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $loans[] = $row;
+    }
+}
+
+$stmt->close();
+$conn->close();
+?>
+
+<!-- Loans Modal -->
+<div class="modal fade" id="loansModal" tabindex="-1" aria-labelledby="loansModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loansModalLabel">Loans Made</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <thead style="background-color: #f4f1ec; text-align:center;">
+                        <tr>
+                            <th>Date</th>
+                            <th>Loan ID</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (!empty($loans)): ?>
+                            <?php foreach ($loans as $loan): ?>
+                                <tr style="text-align: center;">
+                                    <td><?php echo date("m/d/Y", strtotime($loan['created_at'])); ?></td>
+                                    <td><?php echo htmlspecialchars($loan['transaction_id']); ?></td>
+                                    <td>₱<?php echo number_format($loan['loan_amount'], 2); ?></td>
+                                    <td>
+    <?php 
+    echo ($loan['status'] == 'Invested' || $loan['status'] == 'Fund Transferred') ? 'Ongoing' : htmlspecialchars($loan['status']); 
+    ?>
+</td>
+
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="4" class="text-center">No loans found</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
 
 
 
-
-
-        </div>
-            
-        </div>
-            
             
 
 
@@ -226,16 +330,15 @@ include 'display_user_wallet.php';
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"></script>
 
-    
-<script>  
-
+    <script>
         var el = document.getElementById("wrapper");
         var toggleButton = document.getElementById("menu-toggle");
 
         toggleButton.onclick = function () {
             el.classList.toggle("toggled");
         };
-        </script>
+    </script>
+
 </body>
 
 </html>

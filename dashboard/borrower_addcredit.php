@@ -228,56 +228,110 @@ if ($result = $query->fetch(PDO::FETCH_ASSOC)) {
 
 
 <div class="container-fluid px-4">
-    <!-- Account Overview -->
-    <div class="row justify-content-center mb-4">
-        <div class="col-12">
-            <div class="card p-3" style="background-color: #f4f1ec;">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 class="card-title" style="font-family: 'Times New Roman', Times, serif; font-size:xx-large;">Account Overview</h5>
-                        <div class="d-flex">
-                            <div class="mr-4">
-                                <span class="text-muted">AVAILABLE TO LEND</span>
-                                <h4>₱<?php echo number_format($available_to_lend, 2); ?></h4>
-                            </div>
-                            <div style="margin-left: 350px;">
-                                <span class="text-muted">OUTSTANDING LOANS</span>
-                                <h4 class="text-muted">₱<?php echo number_format($outstanding_loans, 2); ?></h4>
-                            </div>
-                        </div>
-                    </div>
-                    <div>
-                        <button class="btn btn-warning">Invest funds</button>
-                    </div>
+   
+   <!-- Lending Insights -->
+<div class="row justify-content-center mb-4">
+    <div class="col-12">
+        <div class="card p-3" style="background-color: #f0e2cc; border-radius: 10px; border: none;">
+            <h5 class="card-title" style="font-family: serif; font-size: 1.75rem; color: #333;">Your lending insights</h5>
+            <div class="d-flex justify-content-between align-items-center" style="background-color: #e5c596; padding: 20px; border-radius: 8px;">
+                <div style="text-align: center;">
+                    <span style="font-size: 0.9em; color: #555;">TOTAL AMOUNT LENT</span>
+                    <h4 style="color: #1b1b1b; font-size: 2rem;">₱<?php echo number_format($total_amount_lent, 2); ?></h4>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Lending Insights -->
-    <div class="row justify-content-center mb-4">
-        <div class="col-12">
-            <div class="card p-3" style="background-color: #e8d1ae;">
-                <h5 class="card-title" style="font-family: 'Times New Roman', Times, serif; font-size:xx-large;">Your lending insights</h5>
-                <div class="d-flex justify-content-between align-items-center" style="background-color: #e8d1ae;">
-                    <div>
-                        <span class="text-muted">TOTAL AMOUNT LENT</span>
-                        <h4>₱<?php echo number_format($total_amount_lent, 2); ?></h4>
-                    </div>
-                    <div>
-                        <span class="text-muted">LOANS MADE</span>
-                        <h4><?php echo $loans_made; ?></h4>
-                    </div>
-                    <div>
-                        <button class="btn btn-dark">View loans</button>
-                    </div>
+                <div style="text-align: center;">
+                    <span style="font-size: 0.9em; color: #555;">LOANS MADE</span>
+                    <h4 style="color: #1b1b1b; font-size: 2rem;"><?php echo $loans_made; ?></h4>
+                </div>
+                <div>
+                    <button class="btn" style="background-color: #1b1b1b; color: #ffffff; border-radius: 5px; " data-bs-toggle="modal" data-bs-target="#loansModal">View loans</button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+</div>
+
             
+
+<?php
+
+$user_id = $_SESSION['user_id'];
+
+// Database connection (replace with your own credentials)
+$conn = new mysqli("localhost", "username", "password", "scholarlend_db");
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Query to check and retrieve loans made by the logged-in user
+$sql = "SELECT created_at, transaction_id, loan_amount, status 
+        FROM borrower_info 
+        WHERE user_id = ?";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+$loans = [];
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $loans[] = $row;
+    }
+}
+
+$stmt->close();
+$conn->close();
+?>
+
+<!-- Loans Modal -->
+<div class="modal fade" id="loansModal" tabindex="-1" aria-labelledby="loansModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loansModalLabel">Loans Made</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <thead style="background-color: #f4f1ec; text-align:center;">
+                        <tr>
+                            <th>Date</th>
+                            <th>Loan ID</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (!empty($loans)): ?>
+                            <?php foreach ($loans as $loan): ?>
+                                <tr style="text-align: center;">
+                                    <td><?php echo date("m/d/Y", strtotime($loan['created_at'])); ?></td>
+                                    <td><?php echo htmlspecialchars($loan['transaction_id']); ?></td>
+                                    <td>₱<?php echo number_format($loan['loan_amount'], 2); ?></td>
+                                    <td>
+    <?php 
+    echo ($loan['status'] == 'Invested' || $loan['status'] == 'Approved') ? 'Ongoing' : htmlspecialchars($loan['status']); 
+    ?>
+</td>
+
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="4" class="text-center">No loans found</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
 
                 

@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'display_user_wallet.php';
+
 
 
 ?>
@@ -190,11 +190,7 @@ include 'display_user_wallet.php';
       
             
 
-            <li class="nav-item d-flex align-items-center mx-3">
-              <span style="font-size: 1.2rem; color: #323246; background-color: #dbbf94; border-radius: 10px; padding: 7px 17px; text-align: center; font-weight: bold;">
-              PHP <?php echo number_format($wallet_balance, 2); ?>
-              </span>
-            </li>
+          
             
       
             <li class="nav-item d-flex align-items-center mx-3">

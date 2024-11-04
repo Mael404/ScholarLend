@@ -171,10 +171,7 @@ if (isset($_SESSION['insufficient_balance'])) {
        
 
         <!-- Wallet Section (Positioned Where User Dropdown Was) -->
-        <a class="nav-link wallet-link second-text fw-bold ms-auto" href="#">
-    <i class="fas fa-wallet me-2"></i>Balance: 
-    <span class="wallet-balance">PHP <?php echo number_format($wallet_balance, 2); ?></span>
-</a>
+        
 
     </div>
 </nav>
@@ -266,6 +263,7 @@ if ($posted_or_approved_application) {
     }
 }
 
+
 // Close the statements
 $stmt_pending->close();
 $stmt_approved->close();
@@ -273,7 +271,7 @@ $stmt_posted->close();
 
 // If the user has a pending application, show the message
 if ($has_pending_application) {
-    echo '<p style="background: linear-gradient(135deg, #dbbf94, #ccac82); padding: 20px; border-radius: 9px; color: white; font-size: 22px; text-align: center; width: 80%; margin: 20px auto; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); border: 1px solid #b08a63;">Your application is pending.</p>';
+    echo '<p style="background: linear-gradient(135deg, #dbbf94, #ccac82);font-family: Times New Roman, Times, serif; padding: 20px; border-radius: 6px; color: white; font-size: 22px; text-align: center; width: 80%; margin: 20px auto; border: 1px solid;">Your application is pending.</p>';
 } elseif ($posted_or_approved_application) {
     // If there is a posted or approved application, show the details
     $due_date = $posted_or_approved_application['due_date'];
@@ -383,8 +381,6 @@ if ($has_pending_application) {
 // Close the database connection
 $conn->close();
 ?>
-
-
 
                             <form id="msform" action="borrower_apform_data.php" method="post" enctype="multipart/form-data">
                                                      

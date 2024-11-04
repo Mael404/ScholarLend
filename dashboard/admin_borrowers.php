@@ -235,7 +235,7 @@ $result = $conn->query($sql);
 
                             <div class="list-group list-group-flush my-3">
     <a href="admindashboard.php" class="list-group-item list-group-item-action">
-        <i class="lnr lnr-home me-2" style="font-weight: bolder;"></i> Home
+        <i class="lnr lnr-home me-2"></i> Home
     </a>
     <a href="admin_applications.php" class="list-group-item ">
         <i class="lnr lnr-file-empty me-2"></i>Applications

@@ -239,7 +239,7 @@ $result = $conn->query($sql);
         
                             <div class="list-group list-group-flush my-3">
     <a href="admindashboard.php" class="list-group-item list-group-item-action">
-        <i class="lnr lnr-home me-2" style="font-weight: bolder;"></i> Home
+        <i class="lnr lnr-home me-2"></i> Home
     </a>
     <a href="admin_applications.php" class="list-group-item ">
         <i class="lnr lnr-file-empty me-2"></i>Applications
@@ -401,35 +401,25 @@ if ($result === false) {
                                      
 
                                         <h6>Funding Management</h6>
-                                        <div class='card my-3 p-3' style='background-color: #f7f3e9; border-radius: 8px; border: none;'>
-                                            <h5 class='fw-bold'>Account Overview</h5>
-                                            <div class='d-flex justify-content-between align-items-center'>
-                                                <div>
-                                                    <p class='mb-1' style='font-size: 0.9em; color: #999999;'>AVAILABLE CREDIT</p>
-                                                    <p class='fw-bold' style='color: #d3a569; font-size: 1.5em;'>₱{$available_credit}</p>
-                                                </div>
-                                                <div>
-                                                    <p class='mb-1' style='font-size: 0.9em; color: #999999;'>TOTAL OUTSTANDING BALANCE</p>
-                                                    <p class='fw-bold' style='color: #888888; font-size: 1.5em;'>₱{$outstanding_balance}</p>
-                                                </div>
-                                                <button class='btn' style='background-color: #d3a569; color: #ffffff; border-radius: 5px;'>View Credit Transactions</button>
-                                            </div>
-                                        </div>
+                                      
 
-                                        <div class='card p-3' style='background-color: #f4e4c3; border-radius: 8px; border: none;'>
-                                            <h5 class='fw-bold'>Lending Insights</h5>
-                                            <div class='d-flex justify-content-between align-items-center'>
-                                                <div>
-                                                    <p class='mb-1' style='font-size: 0.9em; color: #999999;'>TOTAL AMOUNT LOANED</p>
-                                                    <p class='fw-bold' style='color: #d3a569; font-size: 1.5em;'>₱{$total_loaned}</p>
-                                                </div>
-                                                <div>
-                                                    <p class='mb-1' style='font-size: 0.9em; color: #999999;'>LOANS MADE</p>
-                                                    <p class='fw-bold' style='color: #000000; font-size: 1.5em;'>{$loans_made}</p>
-                                                </div>
-                                                <button class='btn' style='background-color: #2f2f47; color: #ffffff; border-radius: 5px;'>View Loans</button>
-                                            </div>
-                                        </div>
+                                        <div class='card p-3' style='background-color: #f0e2cc; border-radius: 10px; border: none;'>
+    <h5 style='font-family: serif; font-size: 1.75rem; color: #333;'>Your lending insights</h5>
+    <div class='d-flex justify-content-between align-items-center' style='background-color: #e5c596; padding: 20px; border-radius: 8px;'>
+        <div style='text-align: center;'>
+            <p class='mb-1' style='font-size: 0.9em; color: #555;'>TOTAL AMOUNT LOANED</p>
+            <p class='fw-bold' style='color: #1b1b1b; font-size: 2rem;'>₱{$total_loaned}</p>
+        </div>
+        <div style='text-align: center;'>
+            <p class='mb-1' style='font-size: 0.9em; color: #555;'>LOANS MADE</p>
+            <p class='fw-bold' style='color: #1b1b1b; font-size: 2rem;'>{$loans_made}</p>
+        </div>
+        <button class='btn' style='background-color: #1b1b1b; color: #ffffff; border-radius: 5px;'  data-bs-toggle='modal' data-bs-target='#loansModal'>View Loans</button>
+        
+    </div>
+</div>
+
+
                                     </div>
                                 </div>
                             </div>
@@ -444,7 +434,83 @@ if ($result === false) {
 </div>
 
 
+<?php
 
+$user_id;
+
+// Database connection (replace with your own credentials)
+$conn = new mysqli("localhost", "username", "password", "scholarlend_db");
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Query to check and retrieve loans made by the logged-in user
+$sql = "SELECT created_at, transaction_id, loan_amount, status 
+        FROM borrower_info 
+        WHERE lender_id = ?";
+
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+$loans = [];
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $loans[] = $row;
+    }
+}
+
+$stmt->close();
+$conn->close();
+?>
+
+<!-- Loans Modal -->
+<div class="modal fade" id="loansModal" tabindex="-1" aria-labelledby="loansModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loansModalLabel">Loans Made</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <thead style="background-color: #f4f1ec; text-align:center;">
+                        <tr>
+                            <th>Date</th>
+                            <th>Loan ID</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if (!empty($loans)): ?>
+                            <?php foreach ($loans as $loan): ?>
+                                <tr style="text-align: center;">
+                                    <td><?php echo date("m/d/Y", strtotime($loan['created_at'])); ?></td>
+                                    <td><?php echo htmlspecialchars($loan['transaction_id']); ?></td>
+                                    <td>₱<?php echo number_format($loan['loan_amount'], 2); ?></td>
+                                    <td>
+    <?php 
+    echo ($loan['status'] == 'Invested' || $loan['status'] == 'Fund Transferred') ? 'Ongoing' : htmlspecialchars($loan['status']); 
+    ?>
+</td>
+
+                                </tr>
+                            <?php endforeach; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="4" class="text-center">No loans found</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Bootstrap JS 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script> -->
