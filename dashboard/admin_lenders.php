@@ -414,7 +414,7 @@ if ($result === false) {
             <p class='mb-1' style='font-size: 0.9em; color: #555;'>LOANS MADE</p>
             <p class='fw-bold' style='color: #1b1b1b; font-size: 2rem;'>{$loans_made}</p>
         </div>
-        <button class='btn' style='background-color: #1b1b1b; color: #ffffff; border-radius: 5px;'  data-bs-toggle='modal' data-bs-target='#loansModal'>View Loans</button>
+          <button class='btn' style='background-color: #1b1b1b; color: #ffffff; border-radius: 5px;' data-bs-toggle='modal' data-bs-target='#loansModal' data-userid='{$user_id}'>View Loans</button>
         
     </div>
 </div>
@@ -434,42 +434,9 @@ if ($result === false) {
 </div>
 
 
-<?php
-
-$user_id;
-
-// Database connection (replace with your own credentials)
-$conn = new mysqli("localhost", "username", "password", "scholarlend_db");
-
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// Query to check and retrieve loans made by the logged-in user
-$sql = "SELECT created_at, transaction_id, loan_amount, status 
-        FROM borrower_info 
-        WHERE lender_id = ?";
-
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $user_id);
-$stmt->execute();
-$result = $stmt->get_result();
-
-$loans = [];
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $loans[] = $row;
-    }
-}
-
-$stmt->close();
-$conn->close();
-?>
-
 <!-- Loans Modal -->
 <div class="modal fade" id="loansModal" tabindex="-1" aria-labelledby="loansModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+<div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="loansModalLabel">Loans Made</h5>
@@ -485,32 +452,15 @@ $conn->close();
                             <th>Status</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <?php if (!empty($loans)): ?>
-                            <?php foreach ($loans as $loan): ?>
-                                <tr style="text-align: center;">
-                                    <td><?php echo date("m/d/Y", strtotime($loan['created_at'])); ?></td>
-                                    <td><?php echo htmlspecialchars($loan['transaction_id']); ?></td>
-                                    <td>₱<?php echo number_format($loan['loan_amount'], 2); ?></td>
-                                    <td>
-    <?php 
-    echo ($loan['status'] == 'Invested' || $loan['status'] == 'Fund Transferred') ? 'Ongoing' : htmlspecialchars($loan['status']); 
-    ?>
-</td>
-
-                                </tr>
-                            <?php endforeach; ?>
-                        <?php else: ?>
-                            <tr>
-                                <td colspan="4" class="text-center">No loans found</td>
-                            </tr>
-                        <?php endif; ?>
+                    <tbody id="loanTableBody">
+                        <!-- Loan data will be populated here by JavaScript -->
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 </div>
+
 
 <!-- Bootstrap JS 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script> -->
@@ -531,6 +481,39 @@ $conn->close();
 </script>
 
 
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Attach event listener to all buttons that open the loans modal
+    const loanButtons = document.querySelectorAll('[data-bs-target="#loansModal"]');
+    
+    loanButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const userId = this.getAttribute('data-userid');
+            
+            // Load loans specific to this user when the button is clicked
+            loadLoans(userId);
+        });
+    });
+});
+
+// Function to load loans data via AJAX
+function loadLoans(userId) {
+    console.log("Loading loans for user ID: " + userId);
+
+    $.ajax({
+        url: 'viewloanlender.php', // Your server-side script to fetch loans
+        type: 'GET',
+        data: { user_id: userId },
+        success: function(response) {
+            // Populate the loans table in the modal with response data
+            document.getElementById('loanTableBody').innerHTML = response;
+        },
+        error: function() {
+            alert('Error loading loans');
+        }
+    });
+}
+</script>
 
 
 

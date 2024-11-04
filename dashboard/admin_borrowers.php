@@ -399,20 +399,7 @@ if ($result === false) {
                                      
 
                                         <h6>Funding Management</h6>
-                                        <div class='card my-3 p-3' style='background-color: #f7f3e9; border-radius: 8px; border: none;'>
-                                            <h5 class='fw-bold'>Account Overview</h5>
-                                            <div class='d-flex justify-content-between align-items-center'>
-                                                <div>
-                                                    <p class='mb-1' style='font-size: 0.9em; color: #999999;'>AVAILABLE CREDIT</p>
-                                                    <p class='fw-bold' style='color: #d3a569; font-size: 1.5em;'>₱{$available_credit}</p>
-                                                </div>
-                                                <div>
-                                                    <p class='mb-1' style='font-size: 0.9em; color: #999999;'>TOTAL OUTSTANDING BALANCE</p>
-                                                    <p class='fw-bold' style='color: #888888; font-size: 1.5em;'>₱{$outstanding_balance}</p>
-                                                </div>
-                                                <button class='btn' style='background-color: #d3a569; color: #ffffff; border-radius: 5px;'>View Credit Transactions</button>
-                                            </div>
-                                        </div>
+                                       
 
                                         <div class='card p-3' style='background-color: #f4e4c3; border-radius: 8px; border: none;'>
                                             <h5 class='fw-bold'>Lending Insights</h5>
@@ -425,9 +412,46 @@ if ($result === false) {
                                                     <p class='mb-1' style='font-size: 0.9em; color: #999999;'>LOANS MADE</p>
                                                     <p class='fw-bold' style='color: #000000; font-size: 1.5em;'>{$loans_made}</p>
                                                 </div>
-                                                <button class='btn' style='background-color: #2f2f47; color: #ffffff; border-radius: 5px;'>View Loans</button>
+                                                     <button class='btn' style='background-color: #1b1b1b; color: #ffffff; border-radius: 5px;' data-bs-toggle='modal' data-bs-target='#loansModal' data-userid='{$user_id}'>View Loans</button>
+
                                             </div>
                                         </div>
+                                        
+                                 <div class='card p-3 mt-3' style='background-color: #eeead6; border-radius: 8px; border: none;'>
+    <h5 class='fw-bold'>Credit Transactions</h5>
+
+    <!-- Transaction Card Start -->
+    <div class='p-3 mb-3 d-flex justify-content-between align-items-center' style='background-color: #eeead6; border-radius: 8px;'>
+        <div>
+            <p class='mb-1' style='font-size: 0.9em; color: #999999;'>DATE</p>
+            <p class='fw-bold'>11/30/24</p>
+        </div>
+        <div>
+            <p class='mb-1' style='font-size: 0.9em; color: #999999;'>TRANSACTION</p>
+            <p class='fw-bold'>First payment made</p>
+        </div>
+        <div>
+            <p class='mb-1' style='font-size: 0.9em; color: #999999;'>AMOUNT</p>
+            <p class='fw-bold' style='color: #d3a569;'>₱986.67</p>
+        </div>
+        <div>
+            <p class='mb-1' style='font-size: 0.9em; color: #999999;'>STATUS</p>
+            <p class='fw-bold' style='color: #28a745;'>Verified</p>
+        </div>
+        <div>
+            <button class='btn btn-link text-primary' style='font-size: 0.9em;'>Transfer to Lender</button>
+        </div>
+    </div>
+    <!-- Transaction Card End -->
+
+    <!-- Repeat the Transaction Card block for additional transactions -->
+</div>
+
+
+
+
+
+                                        
                                     </div>
                                 </div>
                             </div>
@@ -438,6 +462,34 @@ if ($result === false) {
                 ?>
             </tbody>
         </table>
+    </div>
+</div>
+
+
+<!-- Loans Modal -->
+<div class="modal fade" id="loansModal" tabindex="-1" aria-labelledby="loansModalLabel" aria-hidden="true">
+<div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="loansModalLabel">Loans Made</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-bordered">
+                    <thead style="background-color: #f4f1ec; text-align:center;">
+                        <tr>
+                            <th>Date</th>
+                            <th>Loan ID</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="loanTableBody">
+                        <!-- Loan data will be populated here by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -462,6 +514,40 @@ if ($result === false) {
 </script>
 
 
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Attach event listener to all buttons that open the loans modal
+    const loanButtons = document.querySelectorAll('[data-bs-target="#loansModal"]');
+    
+    loanButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const userId = this.getAttribute('data-userid');
+            
+            // Load loans specific to this user when the button is clicked
+            loadLoans(userId);
+        });
+    });
+});
+
+// Function to load loans data via AJAX
+function loadLoans(userId) {
+    console.log("Loading loans for user ID: " + userId);
+
+    $.ajax({
+        url: 'viewloanborrower.php', // Your server-side script to fetch loans
+        type: 'GET',
+        data: { user_id: userId },
+        success: function(response) {
+            // Populate the loans table in the modal with response data
+            document.getElementById('loanTableBody').innerHTML = response;
+        },
+        error: function() {
+            alert('Error loading loans');
+        }
+    });
+}
+</script>
 
 
 
