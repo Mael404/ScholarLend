@@ -529,11 +529,21 @@ $conn->close();
                                         <div class="row">
                                             <div class="col-md-12 mb-3">
                                                 <div class="form-floating">
-                                                    <input type="text" class="form-control form-control-sm" id="yearofstudy" name="yearofstudy" placeholder="Year of Study" style="font-size: 0.9rem;" required>
+                                                <select class="form-select form-control-sm" id="yearofstudy" name="yearofstudy" required>
+
+                                                            <option value="" disabled selected>Select Year of Study</option>
+                                                            <option value="4th year">4th year</option>
+                                                            <option value="3rd year">3rd year</option>
+                                                            <option value="2nd year">2nd year</option>
+                                                            <option value="1st year">1st year</option>
+                                                            </select>
+                                                   
                                                     <label for="yearofstudy">Year of Study</label>
                                                 </div>
                                             </div>
                                         </div>
+
+                                      
                                 
                                         <!-- Expected Graduation Date -->
                                         <div class="row">
@@ -549,13 +559,23 @@ $conn->close();
                                             <div class="row">
                                                 <div class="col-md-12 mb-3">
                                                     <div class="form-floating">
-                                                        <input type="number" step="0.01" class="form-control form-control-sm" id="gwa" name="gwa" placeholder="Enter General Weighted Average" style="font-size: 0.9rem;" required>
+                                                    <select class="form-select form-control-sm" id="gwa" name="gwa" required>
+
+                                                        <option value="" disabled selected>Select General Weighted Average</option>
+                                                        <option value="1.4 - 1.0 (95-100)">1.4 - 1.0 (95-100)</option>
+                                                        <option value="1.7 - 1.5 (92-94)">1.7 - 1.5 (92-94)</option>
+                                                        <option value="2.5 - 1.8 (84-91)">2.5 - 1.8 (84-91)</option>
+                                                        <option value="2.8 - 2.6 (78-83)">2.8 - 2.6 (78-83)</option>
+                                                        <option value="3.0 - 2.9 (75-77)">3.0 - 2.9 (75-77)</option>
+                                                        <option value="4.0 - 3.1 (75 Below)">4.0 - 3.1 (75 Below)</option>
+                                                        <option value="5.0 (Failure)">5.0 (Failure)</option>
+                                                        </select>
                                                         <label for="gwa">Enter General Weighted Average</label>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                
+                                          
                                     </div>
                                     <input type="button" name="next" class="next action-button" value="Next" />
                                 </fieldset>
@@ -578,13 +598,16 @@ $conn->close();
                                  
                                                     <select class="form-select" id="monthly-allowance" name="monthly-allowance" required>
 
-                                                        <option value="" disabled selected>Select Monthly Allowance</option>
-                                                        <option value="1000">Below $1000</option>
-                                                        <option value="3000">$1000 - $3000</option>
-                                                        <option value="5000">$3000 - $5000</option>
-                                                        <option value="10000">Above $5000</option>
+                                                        <option value="" disabled selected>Select Monthly Income</option>
+                                                        <option value="5,000 and Below">5,000 and Below</option>
+                                                        <option value="5,001 - 20,000">5,001 - 20,000</option>
+                                                        <option value="20,001 - 40,000">20,001 - 40,000</option>
+                                                        <option value="40,001 - 60,000">40,001 - 60,000</option>
+                                                        <option value="60,001 - 80,000">60,001 - 80,000</option>
+                                                        <option value="80,001 - 100,000">80,001 - 100,000</option>
+                                                        <option value="100,001 and Above">100,001 and Above</option>
                                                     </select>
-                                                    <label for="monthly-allowance">Monthly Allowance</label>
+                                                    <label for="monthly-allowance">Monthly Income</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -594,13 +617,14 @@ $conn->close();
                                             <div class="col-md-12">
                                                 <div class="form-floating">
                                                     <select class="form-select" id="source-of-allowance" name="source-of-allowance" required>
-                                                        <option value="None" disabled selected>Select Source of Allowance</option>
-                                                        <option value="family">Family</option>
-                                                        <option value="scholarship">Scholarship</option>
-                                                        <option value="parttime">Part-time Job</option>
-                                                        <option value="others">Others</option>
+                                                        <option value="None" disabled selected>Select Source of Income</option>
+                                                        <option value="Own Business">Own Business</option>
+                                                        <option value="Parental Support">Parental Support</option>
+                                                        <option value="Part-time Job">Part-time Job</option>
+                                                        <option value="Scholarships">Scholarships</option>
+                                                        <option value="Educational Assistance">Educational Assistance</option>
                                                     </select>
-                                                    <label for="source-of-allowance">Source of Allowance</label>
+                                                    <label for="source-of-allowance">Source of Income</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -635,11 +659,11 @@ $conn->close();
     <div class="col-md-12">
         <div class="form-floating">
             <select class="form-select" id="school_community" name="school_community" required>
-                <option value="" disabled selected>Are you a member of any school community or organization?</option>
+                <option value="" disabled selected>Select Affiliated Organization</option>
                 <option value="yes">Yes</option>
                 <option value="no">No</option>
             </select>
-            <label for="school_community">School Community/Organization Membership</label>
+            <label for="school_community">Affiliated Organization</label>
         </div>
     </div>
 </div>
@@ -651,9 +675,9 @@ $conn->close();
                                                 <div class="form-floating">
                                                     <select class="form-select" id="spending-pattern" name="spending-pattern" required>
                                                         <option value="" disabled selected>Select Spending Pattern</option>
-                                                        <option value="frugal">Frugal</option>
-                                                        <option value="moderate">Moderate</option>
-                                                        <option value="extravagant">Extravagant</option>
+                                                        <option value="Regular Expenses">Regular Expenses</option>
+                                                        <option value="Discretionary Spending">Discretionary Spending</option>
+                                                       
                                                     </select>
                                                     <label for="spending-pattern">Select Spending Pattern</label>
                                                 </div>
@@ -666,12 +690,13 @@ $conn->close();
                                                 <div class="form-floating">
                                                     <select class="form-select" id="monthly-savings" name="monthly-savings" required>
                                                         <option value="" disabled selected>Select How Much You Save in a Month</option>
-                                                        <option value="0">None</option>
-                                                        <option value="500">Below $500</option>
-                                                        <option value="1000">$500 - $1000</option>
-                                                        <option value="1000">Above $1000</option>
+                                                        <option value="1000 and above">1000 and above</option>
+                                                        <option value="800-999">800-999</option>
+                                                        <option value="600-799">600-799</option>
+                                                        <option value="400-599">400-599</option>
+                                                        <option value="Below 400">Below 400</option>
                                                     </select>
-                                                    <label for="monthly-savings">Monthly Savings</label>
+                                                    <label for="monthly-savings">Savings Behaviour</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -703,24 +728,33 @@ $conn->close();
                                         </div>
                                         
                                         <div class="row">
-            <div class="col-md-12 mb-3">
-                <div class="form-floating">
-                    <select class="form-control form-control-sm" id="loanAmount" name="loan_amount" required>
-                        <option value="" disabled selected>Select Loan Amount</option>
-                        <option value="500"><?= '₱' ?>500</option>
-                        <option value="1000"><?= '₱' ?>1000</option>
-                        <option value="2000"><?= '₱' ?>2000</option>
-                    </select>
-                    <label for="loanAmount">Loan Amount</label>
-                </div>
-            </div>
-        </div>
+                                            <div class="col-md-12 mb-3">
+                                                <div class="form-floating">
+                                                    <select class="form-control form-control-sm" id="loanAmount" name="loan_amount" required>
+                                                        <option value="" disabled selected>Select Loan Amount</option>
+                                                        <option value="500"><?= '₱' ?>500</option>
+                                                        <option value="1000"><?= '₱' ?>1000</option>
+                                                        <option value="2000"><?= '₱' ?>2000</option>
+                                                        <option value="3000"><?= '₱' ?>3000</option>
+                                                        <option value="4000"><?= '₱' ?>4000</option>
+                                                        <option value="5000"><?= '₱' ?>5000</option>
+                                                    </select>
+                                                    <label for="loanAmount">Loan Amount</label>
+                                                </div>
+                                            </div>
+                                        </div>
 
                             
                                         <div class="row">
                                             <div class="col-md-12 mb-3">
                                                 <div class="form-floating">
-                                                    <input type="text" class="form-control form-control-sm" id="loanPurpose" name="loan_purpose" placeholder="Loan Purpose" required>
+                                                <select class="form-control form-control-sm" id="loanPurpose" name="loan_purpose" required>
+                                                <option value="" disabled selected>Select Loan Purpose</option>
+                                                        <option value="Educational">Educational</option>
+                                                        <option value="Personal">Personal</option>
+                                                        <option value="General">General</option>
+                                                
+                                                    </select>
                                                     <label for="loanPurpose">Loan Purpose</label>
                                                 </div>
                                             </div>

@@ -463,15 +463,99 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
         <div class="modal-content">
             <div class="modal-body">
                 <div class="mb-3">
-                    <h5 class="modal-title fw-bold">Application <span id="modal-application-id">082202</span></h5>
-                    <div class="alert alert-success py-2 px-3 mt-2 d-flex justify-content-between" style="background-color: #4CAF50; color: white;">
+                    <h5 class="modal-title fw-bold">Application <span id="modal-application-id"></span></h5>
+                   
+                   <!-- Alert with link to open the modal -->
+                   <div class="alert alert-success py-2 px-3 mt-2 d-flex justify-content-between" style="background-color: #4CAF50; color: white;">
     <span>Credit Scoring: Green zone</span>
-    <a href="#" class="text-white" style="text-decoration: none;">
-        View Credit Scoring <i class="fas fa-angle-right"></i>
-    </a>
+    <a href="#" class="text-white" id="viewCreditScoring" style="text-decoration: none;">
+    View Credit Scoring <i class="fas fa-angle-right"></i>
+</a>
+
 </div>
 
+<div id="creditScoringTable" style="display: none; margin-top: 20px;">
+<table class="table table-bordered mb-0" style="width: 100%; border-collapse: collapse;">
+    <thead>
+        <tr style="background-color: #f3e8d6;">
+            <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">Category</th>
+            <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">Sub-category</th>
+            <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">Data Collected</th>
+            <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">Weight</th>
+            <th style="padding: 8px; border: 1px solid #ddd; text-align: center;">Score</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td rowspan="2" style="padding: 8px; border: 1px solid #ddd; vertical-align: middle;">Educational Background</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">Year of Study</td>
+            <td id="modal-yearofstudy_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">7</td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">7</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd;">GWA</td>
+            <td id="modal-gwa_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">8</td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">8</td>
+        </tr>
+        <tr>
+            <td rowspan="2" style="padding: 8px; border: 1px solid #ddd; vertical-align: middle;">Financial Information</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">Monthly Allowance</td>
+            <td id="modal-monthly-allowance_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">20</td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">20</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd;">Source of Allowance</td>
+            <td id="modal-source-of-allowance_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">20</td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">20</td>
+        </tr>
+        <tr>
+            <td rowspan="3" style="padding: 8px; border: 1px solid #ddd; vertical-align: middle;">Alternative Data Points</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">Affiliated Organization</td>
+            <td id="modal-affiliated-organization_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">20</td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">20</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd;">Spending Pattern</td>
+            <td id="modal-spending-pattern_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">10</td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">10</td>
+        </tr>
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd;">Saving Behavior</td>
+            <td id="modal-savings-behavior_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">10</td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">10</td>
+        </tr>
+        <tr>
+    <td rowspan="2" style="padding: 8px; border: 1px solid #ddd; vertical-align: middle;">Loan Purpose and Repayment Plan</td>
+    <td style="padding: 8px; border: 1px solid #ddd;">Loan Purpose</td>
+    <td id="modal-loan-purpose_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
+    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">10</td>
+    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">10</td>
+</tr>
 
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd;">Loan Amount</td>
+            <td id="modal-loan-amount_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">10</td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">10</td>
+        </tr>
+        <tr style="background-color: #f3e8d6;">
+            <td colspan="3" style="padding: 8px; border: 1px solid #ddd; text-align: right;"><strong>TOTAL</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><strong>100</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><strong>100</strong></td>
+        </tr>
+    </tbody>
+</table>
+
+
+
+</div>
 
 
                 </div>
@@ -814,6 +898,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('modal-cor2').src = data.cor2_path || '#';
                 document.getElementById('modal-cor3').src = data.cor3_path || '#';
                 document.getElementById('modal-cor4').src = data.cor4_path || '#';
+
+                // Populate educational information for credit scoring table
+document.getElementById('modal-yearofstudy_credit').textContent = data.yearofstudy;
+document.getElementById('modal-gwa_credit').textContent = data.gwa;
+document.getElementById('modal-monthly-allowance_credit').textContent = '₱' + data.monthly_allowance;
+document.getElementById('modal-source-of-allowance_credit').textContent = data.source_of_allowance;
+document.getElementById('modal-affiliated-organization_credit').textContent = data.school_community;
+document.getElementById('modal-spending-pattern_credit').textContent = data.spending_pattern;
+document.getElementById('modal-savings-behavior_credit').textContent = data.monthly_savings;
+
+// For the loan purpose leave it blank for now
+document.getElementById('modal-loan-amount_credit').textContent = '₱' + data.loan_amount;
+// Populate loan purpose
+document.getElementById('modal-loan-purpose_credit').textContent = data.loan_purpose || 'N/A'; // Default to 'N/A' if not available
+
+
             }
         };
         xhr.send();
@@ -827,6 +927,9 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 <script>
+    // Variable to store the transaction ID
+    let currentTransactionId;
+
     // Event listener for when the modal is shown
     var borrowerModal = document.getElementById('borrowerModal');
     borrowerModal.addEventListener('show.bs.modal', function (event) {
@@ -834,14 +937,33 @@ document.addEventListener('DOMContentLoaded', function () {
         var button = event.relatedTarget; // Button that triggered the modal
 
         // Extract info from data-* attributes
-        var transactionId = button.getAttribute('data-id');
+        currentTransactionId = button.getAttribute('data-id'); // Store the transactionId
 
         // Update the modal's content
         var modalTitle = borrowerModal.querySelector('.modal-title #modal-application-id');
-        modalTitle.textContent = transactionId;
+        modalTitle.textContent = currentTransactionId;
 
         // Optional: Fetch more data based on transactionId here if needed
         // For example, you could make an AJAX request to get additional details
+    });
+
+    // Event listener for the "View Credit Scoring" link
+    $(document).ready(function() {
+        $('#viewCreditScoring').on('click', function(e) {
+          
+                document.getElementById('viewCreditScoring').addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent default anchor click behavior
+        const table = document.getElementById('creditScoringTable');
+        table.style.display = table.style.display === 'none' ? 'block' : 'none'; // Toggle visibility
+    });
+
+            // Log the current transaction ID
+            console.log("Credit Scoring ID:", currentTransactionId);
+            
+            // Here you can add logic to populate the credit scoring table
+            // For example, make an AJAX call to fetch data and populate the table
+            $('#creditScoringTable').show(); // Show the table
+        });
     });
 </script>
 

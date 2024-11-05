@@ -40,8 +40,8 @@ include 'display_user_wallet.php';
 .list-group-item.active {
     background-color: #dbbf94; /* Set the background color for active item */
     color: rgb(255, 255, 255); /* Set the text color for active item */
-    font-weight: bold; /* Make the text bold for active item */
-    border-radius: 8px; /* Keep the rounded corners */
+    font-weight: bold; 
+    border-radius: 8px; 
     border: none; /* Remove any border if necessary */
 }
 
