@@ -491,67 +491,67 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
             <td style="padding: 8px; border: 1px solid #ddd;">Year of Study</td>
             <td id="modal-yearofstudy_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">7</td>
-            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">7</td>
+            <td id="yearsofstudyScore" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
         </tr>
         <tr>
             <td style="padding: 8px; border: 1px solid #ddd;">GWA</td>
             <td id="modal-gwa_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">8</td>
-            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">8</td>
+            <td id="gwaScore" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
         </tr>
         <tr>
             <td rowspan="2" style="padding: 8px; border: 1px solid #ddd; vertical-align: middle;">Financial Information</td>
             <td style="padding: 8px; border: 1px solid #ddd;">Monthly Allowance</td>
             <td id="modal-monthly-allowance_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">20</td>
-            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">20</td>
+            <td id="monthlyAllowanceScore" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
         </tr>
         <tr>
             <td style="padding: 8px; border: 1px solid #ddd;">Source of Allowance</td>
             <td id="modal-source-of-allowance_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">20</td>
-            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">20</td>
+            <td id="sourceOfAllowanceScore" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
         </tr>
         <tr>
             <td rowspan="3" style="padding: 8px; border: 1px solid #ddd; vertical-align: middle;">Alternative Data Points</td>
             <td style="padding: 8px; border: 1px solid #ddd;">Affiliated Organization</td>
             <td id="modal-affiliated-organization_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">20</td>
-            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">20</td>
+            <td id="affiliatedOrganizationScore" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
         </tr>
         <tr>
             <td style="padding: 8px; border: 1px solid #ddd;">Spending Pattern</td>
             <td id="modal-spending-pattern_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">10</td>
-            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">10</td>
+            <td id="spendingPatternScore" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
         </tr>
         <tr>
             <td style="padding: 8px; border: 1px solid #ddd;">Saving Behavior</td>
             <td id="modal-savings-behavior_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">10</td>
-            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">10</td>
+            <td id="savingsBehaviorScore" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
         </tr>
         <tr>
-    <td rowspan="2" style="padding: 8px; border: 1px solid #ddd; vertical-align: middle;">Loan Purpose and Repayment Plan</td>
-    <td style="padding: 8px; border: 1px solid #ddd;">Loan Purpose</td>
-    <td id="modal-loan-purpose_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
-    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">10</td>
-    <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">10</td>
-</tr>
-
+            <td rowspan="2" style="padding: 8px; border: 1px solid #ddd; vertical-align: middle;">Loan Purpose and Repayment Plan</td>
+            <td style="padding: 8px; border: 1px solid #ddd;">Loan Purpose</td>
+            <td id="modal-loan-purpose_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">10</td>
+            <td id="loanPurposeScore" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
+        </tr>
         <tr>
             <td style="padding: 8px; border: 1px solid #ddd;">Loan Amount</td>
             <td id="modal-loan-amount_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">10</td>
-            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">10</td>
+            <td id="loanAmountScore" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
         </tr>
         <tr style="background-color: #f3e8d6;">
             <td colspan="3" style="padding: 8px; border: 1px solid #ddd; text-align: right;"><strong>TOTAL</strong></td>
-            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><strong>100</strong></td>
-            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;"><strong>100</strong></td>
+            <td id="modal-credit-score" style="padding: 8px; border: 1px solid #ddd; text-align: center;"><strong>100</strong></td>
+            <td id="modal-credit-category" style="padding: 8px; border: 1px solid #ddd; text-align: center;"><strong>100</strong></td>
         </tr>
     </tbody>
 </table>
+
 
 
 
@@ -912,6 +912,20 @@ document.getElementById('modal-savings-behavior_credit').textContent = data.mont
 document.getElementById('modal-loan-amount_credit').textContent = '₱' + data.loan_amount;
 // Populate loan purpose
 document.getElementById('modal-loan-purpose_credit').textContent = data.loan_purpose || 'N/A'; // Default to 'N/A' if not available
+
+document.getElementById('modal-credit-score').textContent = data.credit_score;
+document.getElementById('modal-credit-category').textContent = data.credit_category;
+
+// Example of how to set scores
+document.getElementById('yearsofstudyScore').textContent = data.yearsofstudy_score; // from PHP data
+document.getElementById('gwaScore').textContent = data.gwa_score;
+document.getElementById('monthlyAllowanceScore').textContent = data.monthly_allowance_score;
+document.getElementById('sourceOfAllowanceScore').textContent = data.source_of_allowance_score;
+document.getElementById('affiliatedOrganizationScore').textContent = data.school_community_score;
+document.getElementById('spendingPatternScore').textContent = data.spending_pattern_score;
+document.getElementById('savingsBehaviorScore').textContent = data.monthly_savings_score;
+document.getElementById('loanPurposeScore').textContent = data.loan_purpose_score;
+document.getElementById('loanAmountScore').textContent = data.loan_amount_score;
 
 
             }

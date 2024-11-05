@@ -38,6 +38,149 @@ if ($result->num_rows > 0) {
     // Add the count to the response
     $row['next_deadlines_count'] = $count_deadlines;
 
+    // Initialize credit score and scores for each category
+    $credit_score = 0;
+    $yearsofstudy_score = 0;
+    $gwa_score = 0;
+    $school_community_score = 0;
+    $spending_pattern_score = 0;
+    $monthly_savings_score = 0;
+    $loan_purpose_score = 0;
+    $loan_amount_score = 0;
+    $monthly_allowance_score = 0;
+    $source_of_allowance_score = 0;
+
+    // Calculate the credit score based on year of study
+    $yearsofstudy = $row['yearofstudy'];
+    switch ($yearsofstudy) {
+        case '4th year': $yearsofstudy_score = 7; break;
+        case '3rd year': $yearsofstudy_score = 6; break;
+        case '2nd year': $yearsofstudy_score = 5; break;
+        case '1st year': $yearsofstudy_score = 4; break;
+    }
+    $credit_score += $yearsofstudy_score;
+
+    // Calculate the score based on gwa
+    $gwa = (float)$row['gwa'];
+    if ($gwa >= 1.0 && $gwa <= 1.4) {
+        $gwa_score = 8;
+    } elseif ($gwa >= 1.5 && $gwa <= 1.7) {
+        $gwa_score = 7;
+    } elseif ($gwa >= 1.8 && $gwa <= 2.5) {
+        $gwa_score = 6;
+    } elseif ($gwa >= 2.6 && $gwa <= 2.8) {
+        $gwa_score = 5;
+    } elseif ($gwa >= 2.9 && $gwa <= 3.0) {
+        $gwa_score = 4;
+    } elseif ($gwa >= 3.1 && $gwa <= 4.0) {
+        $gwa_score = 3;
+    } else {
+        $gwa_score = 2;
+    }
+    $credit_score += $gwa_score;
+
+    // Calculate the score based on school community
+    $school_community = strtolower($row['school_community']);
+    $school_community_score = ($school_community === 'yes') ? 5 : 4;
+    $credit_score += $school_community_score;
+
+    // Calculate the score based on spending pattern
+    $spending_pattern = strtolower($row['spending_pattern']);
+    $spending_pattern_score = ($spending_pattern === 'regular expenses') ? 10 : 8;
+    $credit_score += $spending_pattern_score;
+
+    // Calculate the score based on monthly savings
+    $monthly_savings = (int)$row['monthly_savings'];
+    if ($monthly_savings >= 1000) {
+        $monthly_savings_score = 10;
+    } elseif ($monthly_savings >= 800) {
+        $monthly_savings_score = 9;
+    } elseif ($monthly_savings >= 600) {
+        $monthly_savings_score = 8;
+    } elseif ($monthly_savings >= 400) {
+        $monthly_savings_score = 7;
+    } else {
+        $monthly_savings_score = 6;
+    }
+    $credit_score += $monthly_savings_score;
+
+    // Calculate the score based on loan purpose
+    $loan_purpose = strtolower($row['loan_purpose']);
+    $loan_purpose_score = ($loan_purpose === 'educational' || $loan_purpose === 'personal') ? 10 : 8;
+    $credit_score += $loan_purpose_score;
+
+    // Calculate the score based on loan amount
+    $loan_amount = (int)$row['loan_amount'];
+    if ($loan_amount == 500 || $loan_amount == 1000) {
+        $loan_amount_score = 10;
+    } elseif ($loan_amount == 2000) {
+        $loan_amount_score = 9;
+    } elseif ($loan_amount == 3000) {
+        $loan_amount_score = 8;
+    } elseif ($loan_amount == 4000) {
+        $loan_amount_score = 7;
+    } else {
+        $loan_amount_score = 6;
+    }
+    $credit_score += $loan_amount_score;
+
+    // Calculate the score based on monthly allowance
+    $monthly_allowance = (int)$row['monthly_allowance'];
+    if ($monthly_allowance <= 5000) {
+        $monthly_allowance_score = 20;
+    } elseif ($monthly_allowance <= 20000) {
+        $monthly_allowance_score = 19;
+    } elseif ($monthly_allowance <= 40000) {
+        $monthly_allowance_score = 18;
+    } elseif ($monthly_allowance <= 60000) {
+        $monthly_allowance_score = 17;
+    } elseif ($monthly_allowance <= 80000) {
+        $monthly_allowance_score = 16;
+    } elseif ($monthly_allowance <= 100000) {
+        $monthly_allowance_score = 15;
+    } else {
+        $monthly_allowance_score = 14;
+    }
+    $credit_score += $monthly_allowance_score;
+
+    // Calculate the score based on source of allowance
+    $source_of_allowance = strtolower($row['source_of_allowance']);
+    if ($source_of_allowance === 'own business' || $source_of_allowance === 'parental support') {
+        $source_of_allowance_score = 20;
+    } elseif ($source_of_allowance === 'part-time job' || $source_of_allowance === 'scholarships') {
+        $source_of_allowance_score = 19;
+    } else {
+        $source_of_allowance_score = 18;
+    }
+    $credit_score += $source_of_allowance_score;
+
+    // Determine credit score category
+    $credit_category = '';
+    if ($credit_score >= 90) {
+        $credit_category = 'Excellent';
+    } elseif ($credit_score >= 80) {
+        $credit_category = 'Very Good';
+    } elseif ($credit_score >= 70) {
+        $credit_category = 'Good';
+    } elseif ($credit_score >= 51) {
+        $credit_category = 'Fair';
+    } else {
+        $credit_category = 'Poor';
+    }
+
+    // Add the scores and credit score category to the response
+    $row['credit_score'] = $credit_score;
+    $row['credit_category'] = $credit_category;
+    $row['yearsofstudy_score'] = $yearsofstudy_score;
+    $row['gwa_score'] = $gwa_score;
+    $row['school_community_score'] = $school_community_score;
+    $row['spending_pattern_score'] = $spending_pattern_score;
+    $row['monthly_savings_score'] = $monthly_savings_score;
+    $row['loan_purpose_score'] = $loan_purpose_score;
+    $row['loan_amount_score'] = $loan_amount_score;
+    $row['monthly_allowance_score'] = $monthly_allowance_score;
+    $row['source_of_allowance_score'] = $source_of_allowance_score;
+
     echo json_encode($row); // Return the row as a JSON object
     
 } else {
