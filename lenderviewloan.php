@@ -125,7 +125,25 @@ if (isset($_GET['transaction_id'], $_GET['loan_description'], $_GET['loan_amount
     <i class="fas fa-user" style="font-size: 40px; color: #333;"></i>
 </div>
         <div class="ms-3">
-            <h5><?php echo $fname; ?></h5>
+        <?php
+// Define the function in this file directly
+function maskName($name) {
+    $length = strlen($name);
+    if ($length <= 2) {
+        return $name; // Don't mask if the name is too short
+    }
+    $first = $name[0];
+    $last = $name[$length - 1];
+    $middle = substr($name, 1, $length - 2);
+
+    // Mask the middle characters, keeping the first and last character
+    $maskedMiddle = str_repeat('*', strlen($middle));
+    return $first . $maskedMiddle . $last;
+}
+?>
+
+<h5><?php echo htmlspecialchars(maskName($fname)); ?></h5>
+
             <p class="text-muted mb-0">Junior</p>
         </div>
     </div>
