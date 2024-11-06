@@ -7,7 +7,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_POST['user_id'];
-$deadline_to_transfer = $_POST['deadline']; // Renamed for clarity
+$deadline_to_transfer = $_POST['deadline'];
 $transaction_id = $_POST['transaction_id'];
 
 // Ensure transaction_id is in the session
@@ -63,71 +63,66 @@ if ($row) {
         $updateBorrower = "UPDATE users_tb SET wallet_balance = wallet_balance - ? WHERE user_id = ?";
         $stmtBorrower = $conn->prepare($updateBorrower);
         $stmtBorrower->bind_param('di', $loan_amount, $user_id);
-        $stmtBorrower->execute();
+        if (!$stmtBorrower->execute()) {
+            $conn->rollback();
+            die("Error updating borrower balance: " . $stmtBorrower->error);
+        }
 
-        // Calculate the precise outstanding balance (subtract total_amount and add share_admin)
-        $new_outstanding_balance = bcadd(bcsub((string) $current_outstanding_balance, (string) $loan_amount, 2), (string) $share_admin, 2);
+        // Calculate the precise outstanding balance
+        $new_outstanding_balance = bcadd(bcsub((string)$current_outstanding_balance, (string)$loan_amount, 2), (string)$share_admin, 2);
 
         // Update lender balance (minus the admin's share)
-        $amount_for_lender = bcsub((string) $loan_amount, (string) $share_admin, 2);
+        $amount_for_lender = bcsub((string)$loan_amount, (string)$share_admin, 2);
         $updateLender = "UPDATE users_tb SET wallet_balance = wallet_balance + ? WHERE user_id = ?";
         $stmtLender = $conn->prepare($updateLender);
         $stmtLender->bind_param('di', $amount_for_lender, $lender_id);
-        $stmtLender->execute();
+        if (!$stmtLender->execute()) {
+            $conn->rollback();
+            die("Error updating lender balance: " . $stmtLender->error);
+        }
 
         // Step 3: Deduct admin share from lender's wallet and add to admin
         $updateLenderForAdmin = "UPDATE users_tb SET wallet_balance = wallet_balance - ? WHERE user_id = ?";
         $stmtLenderForAdmin = $conn->prepare($updateLenderForAdmin);
         $stmtLenderForAdmin->bind_param('di', $share_admin, $lender_id);
-        $stmtLenderForAdmin->execute();
+        if (!$stmtLenderForAdmin->execute()) {
+            $conn->rollback();
+            die("Error deducting admin share from lender: " . $stmtLenderForAdmin->error);
+        }
 
         // Step 4: Transfer admin share to the admin
         $adminQuery = "UPDATE users_tb SET wallet_balance = wallet_balance + ? WHERE account_role = 'Admin'";
         $stmtAdmin = $conn->prepare($adminQuery);
         $stmtAdmin->bind_param('d', $share_admin);
-        $stmtAdmin->execute();
+        if (!$stmtAdmin->execute()) {
+            $conn->rollback();
+            die("Error updating admin balance: " . $stmtAdmin->error);
+        }
 
         // Step 5: Update outstanding balance in borrower_info
         $updateOutstandingBalance = "UPDATE borrower_info SET outstanding_balance = ? WHERE user_id = ? AND transaction_id = ?";
         $stmtOutstanding = $conn->prepare($updateOutstandingBalance);
         $stmtOutstanding->bind_param('dis', $new_outstanding_balance, $user_id, $transaction_id);
-        $stmtOutstanding->execute();
-
-        // Step 6: Transfer the deadline to payed_dates instead of deleting
-        $sql = "UPDATE borrower_info SET payed_dates = CONCAT_WS(',', payed_dates, ?) WHERE user_id = ? AND transaction_id = ?";
-        $stmtTransferDate = $conn->prepare($sql);
-        $stmtTransferDate->bind_param("sis", $deadline_to_transfer, $user_id, $transaction_id);
-        $stmtTransferDate->execute();
-
-        // Remove deadline logic as before
-        $sql = "SELECT next_deadlines FROM borrower_info WHERE user_id = ? AND transaction_id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("is", $user_id, $_SESSION['transaction_id']);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $row = $result->fetch_assoc();
-
-        if ($row) {
-            $next_deadlines = $row['next_deadlines'];
-            $next_deadlines_array = array_map('trim', explode(',', $next_deadlines));
-
-            // Remove the specified deadline
-            if (($key = array_search(trim($deadline_to_transfer), $next_deadlines_array)) !== false) {
-                unset($next_deadlines_array[$key]);
-            }
-
-            $new_deadlines = implode(', ', array_values($next_deadlines_array));
-            $update_sql = "UPDATE borrower_info SET next_deadlines = ? WHERE user_id = ? AND transaction_id = ?";
-            $update_stmt = $conn->prepare($update_sql);
-            $update_stmt->bind_param("sis", $new_deadlines, $user_id, $_SESSION['transaction_id']);
-            $update_stmt->execute();
+        if (!$stmtOutstanding->execute()) {
+            $conn->rollback();
+            die("Error updating outstanding balance: " . $stmtOutstanding->error);
         }
 
-        $conn->commit(); // Commit transaction
+      // Step 6: Insert deadline into loan_deadlines table
+$insertDeadline = "INSERT INTO loan_deadlines (transaction_id, amount, deadline, created_at, user_id) VALUES (?, ?, ?, NOW(), ?)";
+$stmtDeadline = $conn->prepare($insertDeadline);
+$stmtDeadline->bind_param("sisi", $transaction_id, $loan_amount, $deadline_to_transfer, $user_id);
+if (!$stmtDeadline->execute()) {
+    $conn->rollback();
+    die("Error inserting deadline: " . $stmtDeadline->error);
+}
+
+
+        // Commit transaction
+        $conn->commit();
 
         // Close statements and connection
         $stmt->close();
-        $update_stmt->close();
         $conn->close();
 
         // Redirect back to borrower_applicationform.php
