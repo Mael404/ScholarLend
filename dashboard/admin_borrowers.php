@@ -360,6 +360,7 @@ if ($result === false) {
         </thead>
         <tbody>
             <?php
+            // Assuming you already have a database connection established as $conn
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     $user_id = htmlspecialchars($row['user_id']);
@@ -378,6 +379,7 @@ if ($result === false) {
                         $deadline_date = $deadline_row['deadline']; // Date from loan_deadlines
                         $status = $deadline_row['status']; // Status from loan_deadlines
                         $transaction_amount = number_format((float)$deadline_row['amount'], 2); // Correct column: 'amount'
+                        $transaction_id = $deadline_row['transaction_id']; // Make sure this is the correct field
 
                         // Prepare the transaction details for Pending status
                         $transaction_date = $deadline_date; // Use the deadline date as transaction date
@@ -389,6 +391,7 @@ if ($result === false) {
                         $transaction_type = null;
                         $transaction_amount = null;
                         $transaction_status = null;
+                        $transaction_id = ''; // Empty transaction_id if not found
                     }
 
                     echo "<tr>";
@@ -453,7 +456,10 @@ if ($result === false) {
                                                     <p class='fw-bold' style='color: #28a745;'>{$transaction_status}</p>
                                                 </div>
                                                 <div>
-                                                    <button class='btn btn-link text-primary' style='font-size: 0.9em;'>Transfer to Lender</button>
+                                                    <!-- Pass the transaction_id to the button -->
+                                                    <button class='btn btn-link text-primary transfer-to-lender' 
+                                                            data-transaction-id='{$transaction_id}' 
+                                                            style='font-size: 0.9em;'>Transfer to Lender</button>
                                                 </div>
                                             </div>";
                                         }
@@ -470,6 +476,65 @@ if ($result === false) {
         </tbody>
     </table>
 </div>
+
+<script>
+// Add event listener for 'Transfer to Lender' button
+document.querySelectorAll('.transfer-to-lender').forEach(button => {
+    button.addEventListener('click', function() {
+        // Get the transaction_id from the data attribute
+        const transactionId = this.getAttribute('data-transaction-id');
+        
+        if (transactionId) {
+            // Log the transaction ID
+            console.log('Transaction ID:', transactionId);
+
+            // Send AJAX request to get lender_id
+            fetch('check_lender.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `transaction_id=${transactionId}`,
+            })
+            .then(response => response.json())
+            .then(data => {
+                // If lender_id is found, send the message
+                if (data.lender_id) {
+                    const lenderId = data.lender_id;
+                    console.log('Lender ID:', lenderId);
+
+                    // Send message to lender
+                    fetch('sendMessage.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `lender_id=${lenderId}&transaction_id=${transactionId}`, // Added transaction_id here
+                    })
+                    .then(response => response.json())
+                    .then(messageData => {
+                        if (messageData.success) {
+                            console.log('Message sent successfully:', messageData.success);
+                        } else if (messageData.error) {
+                            console.log('Error sending message:', messageData.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.log('Error during AJAX request to send message:', error);
+                    });
+                } else if (data.error) {
+                    console.log('Error:', data.error);
+                }
+            })
+            .catch(error => {
+                console.log('Error during AJAX request:', error);
+            });
+        } else {
+            console.log('No transaction ID found');
+        }
+    });
+});
+</script>
 
 
 

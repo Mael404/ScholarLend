@@ -50,7 +50,7 @@ $result = $stmt->get_result();
 $row = $result->fetch_assoc();
 
 if ($row) {
-    $lender_id = $row['lender_id'];
+    $lender_id = $row['lender_id']; // Fetch lender_id
     $loan_amount = $row['total_amount'];
     $share_admin = $row['share_admin'];
     $current_outstanding_balance = $row['outstanding_balance'];
@@ -108,15 +108,14 @@ if ($row) {
             die("Error updating outstanding balance: " . $stmtOutstanding->error);
         }
 
-      // Step 6: Insert deadline into loan_deadlines table
-$insertDeadline = "INSERT INTO loan_deadlines (transaction_id, amount, deadline, created_at, user_id) VALUES (?, ?, ?, NOW(), ?)";
-$stmtDeadline = $conn->prepare($insertDeadline);
-$stmtDeadline->bind_param("sisi", $transaction_id, $loan_amount, $deadline_to_transfer, $user_id);
-if (!$stmtDeadline->execute()) {
-    $conn->rollback();
-    die("Error inserting deadline: " . $stmtDeadline->error);
-}
-
+        // Step 6: Insert deadline into loan_deadlines table
+        $insertDeadline = "INSERT INTO loan_deadlines (transaction_id, amount, deadline, created_at, user_id, lender_id) VALUES (?, ?, ?, NOW(), ?, ?)";
+        $stmtDeadline = $conn->prepare($insertDeadline);
+        $stmtDeadline->bind_param("sisis", $transaction_id, $loan_amount, $deadline_to_transfer, $user_id, $lender_id);
+        if (!$stmtDeadline->execute()) {
+            $conn->rollback();
+            die("Error inserting deadline: " . $stmtDeadline->error);
+        }
 
         // Commit transaction
         $conn->commit();
