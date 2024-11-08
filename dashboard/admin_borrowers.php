@@ -351,130 +351,131 @@ if ($result === false) {
 <div class="row mt-5">
 
 <div class="table-responsive">
-    <table id="lendersTable" class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th scope="col" class="text-center">User ID</th>
-                <th scope="col" class="text-center">Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php
-            // Assuming you already have a database connection established as $conn
-            if ($result->num_rows > 0) {
-                while ($row = $result->fetch_assoc()) {
-                    $user_id = htmlspecialchars($row['user_id']);
-                    $fname = htmlspecialchars($row['first_name']);
-                    $lname = htmlspecialchars($row['last_name']);
-                    $email = htmlspecialchars($row['email']);
-                    $total_loaned = number_format((float)$row['total_amount_lent'], 2);
-                    $loans_made = intval($row['loans_made']);
+<table id="lendersTable" class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th scope="col" class="text-center">User ID</th>
+            <th scope="col" class="text-center">Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php
+        // Assuming you already have a database connection established as $conn
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                $user_id = htmlspecialchars($row['user_id']);
+                $fname = htmlspecialchars($row['first_name']);
+                $lname = htmlspecialchars($row['last_name']);
+                $email = htmlspecialchars($row['email']);
+                $total_loaned = number_format((float)$row['total_amount_lent'], 2);
+                $loans_made = intval($row['loans_made']);
 
-                    // Query the loan_deadlines table to check if user_id exists with Pending status
-                    $sql = "SELECT * FROM loan_deadlines WHERE user_id = '$user_id' AND status = 'Pending' LIMIT 1";
-                    $result_deadline = $conn->query($sql);
+                // Query the loan_deadlines table to check if user_id exists with Pending status
+                $sql = "SELECT * FROM loan_deadlines WHERE user_id = '$user_id' AND status = 'Pending' LIMIT 1";
+                $result_deadline = $conn->query($sql);
 
-                    if ($result_deadline->num_rows > 0) {
-                        $deadline_row = $result_deadline->fetch_assoc();
-                        $deadline_date = $deadline_row['deadline']; // Date from loan_deadlines
-                        $status = $deadline_row['status']; // Status from loan_deadlines
-                        $transaction_amount = number_format((float)$deadline_row['amount'], 2); // Correct column: 'amount'
-                        $transaction_id = $deadline_row['transaction_id']; // Make sure this is the correct field
+                if ($result_deadline->num_rows > 0) {
+                    $deadline_row = $result_deadline->fetch_assoc();
+                    $deadline_date = $deadline_row['deadline']; // Date from loan_deadlines
+                    $status = $deadline_row['status']; // Status from loan_deadlines
+                    $transaction_amount = number_format((float)$deadline_row['amount'], 2); // Correct column: 'amount'
+                    $transaction_id = $deadline_row['transaction_id']; // Make sure this is the correct field
 
-                        // Prepare the transaction details for Pending status
-                        $transaction_date = $deadline_date; // Use the deadline date as transaction date
-                        $transaction_type = 'Payment'; // Default transaction type
-                        $transaction_status = $status; // Status from loan_deadlines table
-                    } else {
-                        // If no Pending loan deadlines, set default values or skip
-                        $transaction_date = null;
-                        $transaction_type = null;
-                        $transaction_amount = null;
-                        $transaction_status = null;
-                        $transaction_id = ''; // Empty transaction_id if not found
-                    }
+                    // Prepare the transaction details for Pending status
+                    $transaction_date = $deadline_date; // Use the deadline date as transaction date
+                    $transaction_type = 'Payment'; // Default transaction type
+                    $transaction_status = $status; // Status from loan_deadlines table
+                } else {
+                    // If no Pending loan deadlines, set default values or skip
+                    $transaction_date = null;
+                    $transaction_type = null;
+                    $transaction_amount = null;
+                    $transaction_status = null;
+                    $transaction_id = ''; // Empty transaction_id if not found
+                }
 
-                    echo "<tr>";
-                    echo "<td class='text-center'>{$user_id}</td>";
-                    echo "<td class='text-center'>
-                            <button type='button' class='btn btn-link text-primary' data-bs-toggle='modal' data-bs-target='#profileModal{$user_id}' style='font-size: 0.9em;'>See Profile</button>
-                          </td>";
-                    echo "</tr>";
+                echo "<tr>";
+                echo "<td class='text-center'>{$user_id}</td>";
+                echo "<td class='text-center'>
+                        <button type='button' class='btn btn-link text-primary' data-bs-toggle='modal' data-bs-target='#profileModal{$user_id}' style='font-size: 0.9em;'>See Profile</button>
+                      </td>";
+                echo "</tr>";
 
-                    // Profile Modal for each user
-                    echo "
-                    <div class='modal fade' id='profileModal{$user_id}' tabindex='-1' aria-labelledby='profileModalLabel{$user_id}' aria-hidden='true'>
-                        <div class='modal-dialog modal-lg'>
-                            <div class='modal-content'>
-                                <div class='modal-header'>
-                                    <h5 class='modal-title' id='profileModalLabel{$user_id}'>User Profile: {$fname} {$lname}</h5>
-                                    <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
-                                </div>
-                                <div class='modal-body'>
-                                    <h6>Personal Information</h6>
-                                    <p>First Name: {$fname}</p>
-                                    <p>Last Name: {$lname}</p>
-                                    <p>Email: {$email}</p>
+                // Profile Modal for each user
+                echo "
+                <div class='modal fade' id='profileModal{$user_id}' tabindex='-1' aria-labelledby='profileModalLabel{$user_id}' aria-hidden='true'>
+                    <div class='modal-dialog modal-lg'>
+                        <div class='modal-content'>
+                            <div class='modal-header'>
+                                <h5 class='modal-title' id='profileModalLabel{$user_id}'>User Profile: {$fname} {$lname}</h5>
+                                <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Close'></button>
+                            </div>
+                            <div class='modal-body'>
+                                <h6>Personal Information</h6>
+                                <p>First Name: {$fname}</p>
+                                <p>Last Name: {$lname}</p>
+                                <p>Email: {$email}</p>
 
-                                    <h6>Funding Management</h6>
-                                    <div class='card p-3' style='background-color: #f4e4c3; border-radius: 8px; border: none;'>
-                                        <h5 class='fw-bold'>Lending Insights</h5>
-                                        <div class='d-flex justify-content-between align-items-center'>
-                                            <div>
-                                                <p class='mb-1' style='font-size: 0.9em; color: #999999;'>TOTAL AMOUNT LOANED</p>
-                                                <p class='fw-bold' style='color: #d3a569; font-size: 1.5em;'>₱{$total_loaned}</p>
-                                            </div>
-                                            <div>
-                                                <p class='mb-1' style='font-size: 0.9em; color: #999999;'>LOANS MADE</p>
-                                                <p class='fw-bold' style='color: #000000; font-size: 1.5em;'>{$loans_made}</p>
-                                            </div>
-                                            <button class='btn' style='background-color: #1b1b1b; color: #ffffff; border-radius: 5px;' data-bs-toggle='modal' data-bs-target='#loansModal' data-userid='{$user_id}'>View Loans</button>
+                                <h6>Funding Management</h6>
+                                <div class='card p-3' style='background-color: #f4e4c3; border-radius: 8px; border: none;'>
+                                    <h5 class='fw-bold'>Lending Insights</h5>
+                                    <div class='d-flex justify-content-between align-items-center'>
+                                        <div>
+                                            <p class='mb-1' style='font-size: 0.9em; color: #999999;'>TOTAL AMOUNT LOANED</p>
+                                            <p class='fw-bold' style='color: #d3a569; font-size: 1.5em;'>₱{$total_loaned}</p>
                                         </div>
+                                        <div>
+                                            <p class='mb-1' style='font-size: 0.9em; color: #999999;'>LOANS MADE</p>
+                                            <p class='fw-bold' style='color: #000000; font-size: 1.5em;'>{$loans_made}</p>
+                                        </div>
+                                        <button class='btn' style='background-color: #1b1b1b; color: #ffffff; border-radius: 5px;' data-bs-toggle='modal' data-bs-target='#loansModal' data-userid='{$user_id}'>View Loans</button>
                                     </div>
-
-                                    <div class='card p-3 mt-3' style='background-color: #eeead6; border-radius: 8px; border: none;'>
-                                        <h5 class='fw-bold'>Credit Transactions</h5>";
-
-                                        // If there is a pending loan deadline, populate the transaction card
-                                        if ($transaction_date && $transaction_type && $transaction_amount && $transaction_status) {
-                                            echo "
-                                            <div class='p-3 mb-3 d-flex justify-content-between align-items-center' style='background-color: #eeead6; border-radius: 8px;'>
-                                                <div>
-                                                    <p class='mb-1' style='font-size: 0.9em; color: #999999;'>DATE</p>
-                                                    <p class='fw-bold'>{$transaction_date}</p>
-                                                </div>
-                                                <div>
-                                                    <p class='mb-1' style='font-size: 0.9em; color: #999999;'>TRANSACTION</p>
-                                                    <p class='fw-bold'>{$transaction_type}</p>
-                                                </div>
-                                                <div>
-                                                    <p class='mb-1' style='font-size: 0.9em; color: #999999;'>AMOUNT</p>
-                                                    <p class='fw-bold' style='color: #d3a569;'>₱{$transaction_amount}</p>
-                                                </div>
-                                                <div>
-                                                    <p class='mb-1' style='font-size: 0.9em; color: #999999;'>STATUS</p>
-                                                    <p class='fw-bold' style='color: #28a745;'>{$transaction_status}</p>
-                                                </div>
-                                                <div>
-                                                    <!-- Pass the transaction_id to the button -->
-                                                    <button class='btn btn-link text-primary transfer-to-lender' 
-                                                            data-transaction-id='{$transaction_id}' 
-                                                            style='font-size: 0.9em;'>Transfer to Lender</button>
-                                                </div>
-                                            </div>";
-                                        }
-                                        
-                                    echo "</div>
                                 </div>
+
+                                <div class='card p-3 mt-3' style='background-color: #eeead6; border-radius: 8px; border: none;'>
+                                    <h5 class='fw-bold'>Credit Transactions</h5>";
+
+                                    // If there is a pending loan deadline, populate the transaction card
+                                    if ($transaction_date && $transaction_type && $transaction_amount && $transaction_status) {
+                                        echo "
+                                        <div class='p-3 mb-3 d-flex justify-content-between align-items-center' style='background-color: #eeead6; border-radius: 8px;'>
+                                            <div>
+                                                <p class='mb-1' style='font-size: 0.9em; color: #999999;'>DATE</p>
+                                                <p class='fw-bold'>{$transaction_date}</p>
+                                            </div>
+                                            <div>
+                                                <p class='mb-1' style='font-size: 0.9em; color: #999999;'>TRANSACTION</p>
+                                                <p class='fw-bold'>{$transaction_type}</p>
+                                            </div>
+                                            <div>
+                                                <p class='mb-1' style='font-size: 0.9em; color: #999999;'>AMOUNT</p>
+                                                <p class='fw-bold' style='color: #d3a569;'>₱{$transaction_amount}</p>
+                                            </div>
+                                            <div>
+                                                <p class='mb-1' style='font-size: 0.9em; color: #999999;'>STATUS</p>
+                                                <p class='fw-bold' style='color: #28a745;'>{$transaction_status}</p>
+                                            </div>
+                                            <div>
+                                                <!-- Pass the transaction_id to the button -->
+                                                <button class='btn btn-link text-primary transfer-to-lender' 
+                                                        data-transaction-id='{$transaction_id}' 
+                                                        style='font-size: 0.9em;'>Transfer to Lender</button>
+                                            </div>
+                                        </div>";
+                                    }
+                                    
+                                echo "</div>
                             </div>
                         </div>
-                    </div>";
-                }
+                    </div>
+                </div>";
             }
-            $conn->close();
-            ?>
-        </tbody>
-    </table>
+        }
+        $conn->close();
+        ?>
+    </tbody>
+</table>
+
 </div>
 
 <script>
