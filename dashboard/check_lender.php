@@ -1,44 +1,41 @@
 <?php
-$servername = "localhost"; // Replace with your server name
-$username = "root"; // Replace with your database username
-$password = ""; // Replace with your database password
+header('Content-Type: application/json');
+
+$servername = "localhost";
+$username = "root";
+$password = "";
 $dbname = "scholarlend_db";
 
-// Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    echo json_encode(['error' => 'Database connection failed']);
+    exit();
 }
 
-// Get the raw POST data from the request
 if (isset($_POST['transaction_id'])) {
     $transaction_id = $_POST['transaction_id'];
     
-    // Query the borrower_info table for the lender_id based on transaction_id
     $sql = "SELECT lender_id FROM borrower_info WHERE transaction_id = ?";
-    
-    // Prepare statement
     if ($stmt = $conn->prepare($sql)) {
-        $stmt->bind_param("s", $transaction_id); // Bind the transaction_id to the query
+        $stmt->bind_param("s", $transaction_id);
         $stmt->execute();
-        $stmt->bind_result($lender_id); // Bind result to $lender_id
+        $stmt->bind_result($lender_id);
         
-        // Fetch the result
         if ($stmt->fetch()) {
-            echo json_encode(['lender_id' => $lender_id]); // Return the lender_id as JSON
+            echo json_encode(['lender_id' => $lender_id]);
         } else {
-            echo json_encode(['error' => 'Transaction ID not found']); // Handle case where transaction_id is not found
+            echo json_encode(['error' => 'Transaction ID not found']);
         }
         
         $stmt->close();
     } else {
-        echo json_encode(['error' => 'Failed to prepare the query']); // Handle query preparation failure
+        echo json_encode(['error' => 'Failed to prepare the query']);
     }
 } else {
-    echo json_encode(['error' => 'Transaction ID is missing']); // Handle missing transaction_id
+    echo json_encode(['error' => 'Transaction ID is missing']);
 }
 
 $conn->close();
+exit();
 ?>

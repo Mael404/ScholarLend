@@ -458,8 +458,8 @@ if ($result === false) {
                                             <div>
                                                 <!-- Pass the transaction_id to the button -->
                                                 <button class='btn btn-link text-primary transfer-to-lender' 
-                                                        data-transaction-id='{$transaction_id}' 
-                                                        style='font-size: 0.9em;'>Transfer to Lender</button>
+        data-transaction-id='{$transaction_id}' 
+        style='font-size: 0.9em;'>Transfer to Lender</button>
                                             </div>
                                         </div>";
                                     }
@@ -475,68 +475,97 @@ if ($result === false) {
         ?>
     </tbody>
 </table>
+<!-- Confirmation Modal -->
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmTransferModal" tabindex="-1" aria-labelledby="confirmTransferModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmTransferModalLabel">Confirm Transfer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to transfer funds to the lender?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmTransferBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 </div>
 
 <script>
-// Add event listener for 'Transfer to Lender' button
+/// Add event listener for 'Transfer to Lender' button to open the modal
 document.querySelectorAll('.transfer-to-lender').forEach(button => {
     button.addEventListener('click', function() {
-        // Get the transaction_id from the data attribute
         const transactionId = this.getAttribute('data-transaction-id');
-        
         if (transactionId) {
-            // Log the transaction ID
-            console.log('Transaction ID:', transactionId);
+            document.getElementById('confirmTransferBtn').setAttribute('data-transaction-id', transactionId);
+            new bootstrap.Modal(document.getElementById('confirmTransferModal')).show();
+        } else {
+            console.log('Transaction ID not found for button.');
+        }
+    });
+});
 
-            // Send AJAX request to get lender_id
-            fetch('check_lender.php', {
+// Add event listener for 'Confirm' button in the modal
+document.getElementById('confirmTransferBtn').addEventListener('click', function() {
+    const transactionId = this.getAttribute('data-transaction-id');
+    
+    if (!transactionId) {
+        console.log('No transaction ID found.');
+        return;
+    }
+    
+    // Send AJAX request to check lender and send message
+    fetch('check_lender.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `transaction_id=${transactionId}`,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.lender_id) {
+            const lenderId = data.lender_id;
+            console.log('Lender ID found:', lenderId);
+
+            // Send message to lender
+            return fetch('sendMessage.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: `transaction_id=${transactionId}`,
-            })
-            .then(response => response.json())
-            .then(data => {
-                // If lender_id is found, send the message
-                if (data.lender_id) {
-                    const lenderId = data.lender_id;
-                    console.log('Lender ID:', lenderId);
-
-                    // Send message to lender
-                    fetch('sendMessage.php', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded',
-                        },
-                        body: `lender_id=${lenderId}&transaction_id=${transactionId}`, // Added transaction_id here
-                    })
-                    .then(response => response.json())
-                    .then(messageData => {
-                        if (messageData.success) {
-                            console.log('Message sent successfully:', messageData.success);
-                        } else if (messageData.error) {
-                            console.log('Error sending message:', messageData.error);
-                        }
-                    })
-                    .catch(error => {
-                        console.log('Error during AJAX request to send message:', error);
-                    });
-                } else if (data.error) {
-                    console.log('Error:', data.error);
-                }
-            })
-            .catch(error => {
-                console.log('Error during AJAX request:', error);
+                body: `lender_id=${lenderId}&transaction_id=${transactionId}`,
             });
         } else {
-            console.log('No transaction ID found');
+            console.log('Lender ID not found or error:', data.error);
+            throw new Error('Lender ID not found');
         }
+    })
+    .then(response => response.json())
+    .then(messageData => {
+        if (messageData.success) {
+            console.log('Message sent successfully:', messageData.success);
+            window.location.href = 'admin_borrowers.php';
+        } else {
+            console.log('Error sending message:', messageData.error);
+        }
+    })
+    .catch(error => {
+        console.log('Error during AJAX request:', error);
     });
-});
-</script>
 
+    // Hide the modal after confirming the transfer
+    bootstrap.Modal.getInstance(document.getElementById('confirmTransferModal')).hide();
+});
+
+</script>
 
 
 
