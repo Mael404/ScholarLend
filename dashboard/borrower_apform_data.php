@@ -49,7 +49,21 @@ $payment_frequency = $conn->real_escape_string($_POST['frequency']);
 $due_date = $conn->real_escape_string($_POST['due_date']);
 $account_details = $conn->real_escape_string($_POST['account_details']);
 $total_amount = (float) $conn->real_escape_string($_POST['total_amount']);
-$next_deadlines = $conn->real_escape_string($_POST['next_deadlines']);
+$next_deadlines_raw = $conn->real_escape_string($_POST['next_deadlines']);
+
+// Extract dates in "Mon dd, yyyy" format
+preg_match_all('/\b\w{3} \d{1,2}, \d{4}\b/', $next_deadlines_raw, $matches);
+$dates = $matches[0];
+
+// Convert each date to "mm/dd/yyyy" format
+$formatted_dates = array_map(function($date) {
+    return date("m/d/Y", strtotime($date));
+}, $dates);
+
+// Store formatted dates into the variable
+$next_deadlines = implode(", ", $formatted_dates);
+
+
 $current_address = $conn->real_escape_string($_POST['current_address']);
 $permanent_address = $conn->real_escape_string($_POST['permanent_address']);
 $gwa = $conn->real_escape_string($_POST['gwa']);
@@ -134,7 +148,7 @@ if (!$errorOccurred) {
     )";
 
     if ($conn->query($sql) === TRUE) {
-        echo "New record created successfully with Transaction ID: $transaction_id";
+        header("Location: thanku.php");
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }

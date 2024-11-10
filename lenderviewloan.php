@@ -169,10 +169,10 @@ function maskName($name) {
     <div class="help-fund card p-4" style="background-color: #fff; border-radius: 10px;">
         <h5>Help fund this loan</h5>
         
-        <!-- Open Modal Button -->
+        <!-- Open Confirmation Box Button -->
         <div class="input-group mt-3">
             <input type="text" class="form-control" value="<?php echo $loan_amount; ?>" readonly>
-            <button type="button" class="btn" style="background-color: #dbbf94; color: #323246; border: none; margin-left: 10px;" data-bs-toggle="modal" data-bs-target="#gcashModal">
+            <button type="button" class="btn" style="background-color: #dbbf94; color: #323246; border: none; margin-left: 10px;" onclick="showConfirmationBox()">
                 Lend now
             </button>
         </div>
@@ -191,49 +191,38 @@ function maskName($name) {
     </div>
 </div>
 
-<!-- Modal Structure with Form Inside -->
-<div class="modal fade" id="gcashModal" tabindex="-1" aria-labelledby="gcashModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title gcash-title" id="gcashModalLabel">Lend using GCash</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <form id="lendForm" method="post" action="process_lend.php" enctype="multipart/form-data">
-        <div class="modal-body">
-          <div class="text-center">
-            <img src="https://businessmaker-academy.com/cms/wp-content/uploads/2022/04/Gcash-BMA-QRcode.jpg" alt="GCash QR Code" class="gcash-qr mb-3">
-          </div>
-          <div class="instructions">
-            <ol>
-              <li>Save QR Code.</li>
-              <li>Go to GCash app.</li>
-              <li>Pay using the QR Code.</li>
-              <li>Save receipt.</li>
-              <li>Upload a copy of the receipt.</li>
-            </ol>
-          </div>
-          <div class="upload-section">
-            <label for="receipt-upload" class="form-label fw-bold">Upload receipt here</label>
-            <div class="input-group">
-          
-            <input type="file" class="form-control" name="receipt-upload" id="receipt-upload" aria-label="Upload receipt" required>
-
-    
+<!-- Custom Confirmation Dialog with Larger Size -->
+<div id="confirmationBox" style="display: none; background-color: rgba(0, 0, 0, 0.5); position: fixed; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: center; z-index: 9999;">
+    <div style="background-color: white; padding: 40px; border-radius: 10px; width: 500px; text-align: center;">
+        <h5 style="font-size: 24px; font-weight: bold; color: #131e3d;">Confirm Payment</h5>
+        <p style="font-size: 18px; color: #333; margin: 10px 0;">Are you sure you want to proceed with the payment?</p>
+        <!-- GCash QR Code Image -->
+        <img src="https://businessmaker-academy.com/cms/wp-content/uploads/2022/04/Gcash-BMA-QRcode.jpg" alt="GCash QR Code" class="gcash-qr mb-3" style="max-width: 65%; height: auto; border-radius: 10px; max-height: 350px;">
+        
+        <!-- Form inside the confirmation box -->
+        <form id="lendForm" method="post" action="process_lend.php" enctype="multipart/form-data">
+            <!-- Hidden input fields for loan_amount and transaction_id -->
+            <input type="hidden" name="loan_amount" value="<?php echo $loan_amount; ?>">
+            <input type="hidden" name="transaction_id" value="<?php echo $transaction_id; ?>">
+            
+            <div>
+                <button type="submit" id="confirmBtn" name="lendNow" style="background-color: #131e3d; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 16px; margin: 10px;">Confirm</button>
+                <button type="button" onclick="hideConfirmationBox()" style="background-color: #cdad7d; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 16px; margin: 10px;">Cancel</button>
             </div>
-          </div>
-          <!-- Hidden input fields for loan_amount and transaction_id -->
-          <input type="hidden" name="loan_amount" value="<?php echo $loan_amount; ?>">
-          <input type="hidden" name="transaction_id" value="<?php echo $transaction_id; ?>">
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="submit" name="lendNow" class="btn btn-complete">Complete Transaction</button>
-        </div>
-      </form>
+        </form>
     </div>
-  </div>
 </div>
+
+<!-- JavaScript to handle the custom confirmation box -->
+<script>
+    function showConfirmationBox() {
+        document.getElementById("confirmationBox").style.display = "flex";
+    }
+
+    function hideConfirmationBox() {
+        document.getElementById("confirmationBox").style.display = "none";
+    }
+</script>
 
 <!-- Modal for Borrower Profile -->
 <div class="modal fade" id="borrowerProfileModal" tabindex="-1" aria-labelledby="borrowerProfileModalLabel" aria-hidden="true">

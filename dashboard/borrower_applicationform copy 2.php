@@ -130,7 +130,12 @@ if (isset($_SESSION['insufficient_balance'])) {
     <a href="#" class="list-group-item">
         <i class="fas fa-envelope me-2"></i>Messages
     </a>
-   
+    <a href="borrower_addcredit.php" class="list-group-item">
+        <i class="fas fa-plus-circle me-2"></i>Add Credit
+    </a>
+    <a href="#" class="list-group-item">
+        <i class="fas fa-minus-circle me-2"></i>Withdraw Credit
+    </a>
     <a href="#" class="list-group-item">
         <i class="fas fa-exchange-alt me-2"></i>Transactions
     </a>
@@ -191,7 +196,6 @@ if (isset($_SESSION['insufficient_balance'])) {
                         <div class="card px-0 pt-0 pb-0 mt-3 mb-3">
                        
                         <?php
-
 // Ensure user is logged in
 if (!isset($_SESSION['user_id'])) {
     die("User not logged in.");
@@ -219,6 +223,8 @@ $stmt_pending = $conn->prepare($sql_pending);
 $stmt_pending->bind_param("i", $user_id);
 $stmt_pending->execute();
 $result_pending = $stmt_pending->get_result();
+
+// Check if the query returned any rows
 $has_pending_application = $result_pending->num_rows > 0;
 
 // Query to check if the user has an approved application
@@ -260,210 +266,119 @@ if ($posted_or_approved_application) {
     }
 }
 
-// Additional check for loan_deadlines table to display pending payment message
-$sql_deadlines = "SELECT * FROM loan_deadlines WHERE user_id = ? AND status = 'Pending'";
-$stmt_deadlines = $conn->prepare($sql_deadlines);
-$stmt_deadlines->bind_param("i", $user_id);
-$stmt_deadlines->execute();
-$result_deadlines = $stmt_deadlines->get_result();
-$has_pending_payment = $result_deadlines->num_rows > 0;
-
-// Close statements
+// Close the statements
 $stmt_pending->close();
 $stmt_approved->close();
 $stmt_posted->close();
 $stmt_invested->close();
-$stmt_deadlines->close();
 
-// If the user has a pending payment, show the message
-if ($has_pending_payment) {
-    echo "<p>Your payment is being processed</p>";
-}
-elseif ($has_pending_application) {
-    $pending_application = $result_pending->fetch_assoc();
-    $total_amount = $pending_application['total_amount'];
-    $next_deadlines = $pending_application['next_deadlines'];
-    $next_deadlines_array = array_map('trim', explode(',', $next_deadlines));
-    $first_deadline = !empty($next_deadlines_array) ? $next_deadlines_array[0] : 'No deadlines available';
-    
-  
-echo '<p style="background: linear-gradient(135deg, #dbbf94, #ccac82); padding: 15px; border-radius: 4px; color: #333333; font-size: 20px; text-align: left; width: 100%; margin: 10px auto; border: 1px solid #b29c84;"><strong>PENDING:</strong> Your application is now being processed.</p>';
-
-// Display the application summary
-echo '<div style="background-color: #f4f1ec; border-radius: 9px; padding: 20px; margin: 10px auto; color: #333; font-family: Arial, sans-serif; width: 100%;">';
-
-echo '<h2 style="font-family: Georgia, serif; font-weight: bold; color: #131e3d; font-size: 28px; margin-bottom: 15px; text-align:left;">Your Loans</h2>';
-
-echo '<div style="display: flex; justify-content: space-between; align-items: center; padding: 25px 0;">';
-// Amount section
-echo '<div style="text-align: left;">';
-echo '<p style="font-size: 18px; color: #131e3d; font-weight: 200; margin: 0;">AMOUNT</p>';
-echo '<p style="font-size: 40px; color: #cdad7d; font-weight: bold; margin: 5px 0;">₱' . number_format($total_amount, 2) . '</p>';
-echo '</div>';
-
-// First payment section
-echo '<div style="text-align: center;">';
-echo '<p style="font-size: 18px; color: #131e3d; font-weight: 200; margin: 0;">FIRST PAYMENT IS DUE ON</p>';
-echo '<p style="font-size: 28px; color: #a6a6a6; font-weight: bold; margin: 5px 0;">' . date('M. j, Y', strtotime($first_deadline)) . '</p>';
-echo '</div>';
-
-// Pay Now button (disabled for pending applications)
-echo '<div style="text-align: right;">';
-echo '<button type="button" disabled style="background-color: #ccc; color: white; padding: 12px 25px; border: none; border-radius: 5px; margin-top: 10px; font-size: 18px; cursor: not-allowed;">Pay Now</button>';
-echo '</div>';
-
-echo '</div>';
-echo '<div style="text-align: center; margin-top: 0px;">';
-        echo '<button style="background-color: #dbbf94; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold;">VIEW DETAILED REPAYMENT SCHEDULE</button>';
-        echo '</div>';
-echo '</div>';
-
-
-    
+// If the user has a pending application, show the message
+if ($has_pending_application) {
+    echo '<p style="background: linear-gradient(135deg, #dbbf94, #ccac82);font-family: Times New Roman, Times, serif; padding: 20px; border-radius: 6px; color: white; font-size: 22px; text-align: center; width: 80%; margin: 20px auto; border: 1px solid;">Your application is pending.</p>';
 } elseif ($has_invested_application) {
-    $invested_application = $result_invested->fetch_assoc();
-    $total_amount = $posted_or_approved_application['total_amount']; // Retrieve or default to 0 if not set
-    $next_deadlines = $invested_application['next_deadlines'] ?? '';
-    
-    // Extract the first deadline if available
-    $next_deadlines_array = array_map('trim', explode(',', $next_deadlines));
-    $first_deadline = !empty($next_deadlines_array) ? $next_deadlines_array[0] : 'No deadlines available';
-
-    echo '<p style="background: linear-gradient(135deg, #dbbf94, #ccac82); padding: 15px; border-radius: 4px; color: #333333; font-size: 20px; text-align: left; width: 100%; margin: 10px auto; border: 1px solid #b29c84;"><strong>PENDING:</strong> Your application has been fully funded and is awaiting the final transfer of funds by the administrator</p>';
-
-// Display the application summary
-echo '<div style="background-color: #f4f1ec; border-radius: 9px; padding: 20px; margin: 10px auto; color: #333; font-family: Arial, sans-serif; width: 100%;">';
-
-echo '<h2 style="font-family: Georgia, serif; font-weight: bold; color: #131e3d; font-size: 28px; margin-bottom: 15px; text-align:left;">Your Loans</h2>';
-
-echo '<div style="display: flex; justify-content: space-between; align-items: center; padding: 25px 0;">';
-// Amount section
-echo '<div style="text-align: left;">';
-echo '<p style="font-size: 18px; color: #131e3d; font-weight: 200; margin: 0;">AMOUNT</p>';
-echo '<p style="font-size: 40px; color: #cdad7d; font-weight: bold; margin: 5px 0;">₱' . number_format($total_amount, 2) . '</p>';
-echo '</div>';
-
-// First payment section
-echo '<div style="text-align: center;">';
-echo '<p style="font-size: 18px; color: #131e3d; font-weight: 200; margin: 0;">FIRST PAYMENT IS DUE ON</p>';
-echo '<p style="font-size: 28px; color: #a6a6a6; font-weight: bold; margin: 5px 0;">' . date('M. j, Y', strtotime($first_deadline)) . '</p>';
-echo '</div>';
-
-// Pay Now button (disabled for pending applications)
-echo '<div style="text-align: right;">';
-echo '<button type="button" disabled style="background-color: #ccc; color: white; padding: 12px 25px; border: none; border-radius: 5px; margin-top: 10px; font-size: 18px; cursor: not-allowed;">Pay Now</button>';
-echo '</div>';
-
-echo '</div>';
-echo '<div style="text-align: center; margin-top: 0px;">';
-        echo '<button style="background-color: #dbbf94; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold;">VIEW DETAILED REPAYMENT SCHEDULE</button>';
-        echo '</div>';
-echo '</div>';
-} elseif ($posted_or_approved_application) {
+    // Message for "invested" status
+    echo '<p style="background: linear-gradient(135deg, #dbbf94, #ccac82); font-family: Times New Roman, Times, serif; padding: 20px; border-radius: 6px; color: white; font-size: 22px; text-align: center; width: 80%; margin: 20px auto; border: 1px solid;">Your application has been fully funded and is awaiting the final transfer of funds by the administrator.</p>';
+}elseif ($posted_or_approved_application) {
+    // If there is a posted or approved application, show the details
     $due_date = $posted_or_approved_application['due_date'];
-    $next_deadlines = $posted_or_approved_application['next_deadlines'];
+    $next_deadlines = $posted_or_approved_application['next_deadlines']; // Get the raw value
     $total_amount = $posted_or_approved_application['total_amount'];
+
+    // Convert the comma-separated string to an array
     $next_deadlines_array = array_map('trim', explode(',', $next_deadlines));
+
+    // Display the first deadline
     $first_deadline = !empty($next_deadlines_array) ? $next_deadlines_array[0] : 'No deadlines available';
 
     if ($has_posted_application) {
-      
-
-        echo '<p style="background: linear-gradient(135deg, #dbbf94, #ccac82); padding: 15px; border-radius: 4px; color: #333333; font-size: 20px; text-align: left; width: 100%; margin: 10px auto; border: 1px solid #b29c84;"><strong>PENDING:</strong> Your application has been successfully posted. Please wait for a lender to review and fund your request.</p>';
+        // If the application status is "Posted", show the message and summary
+        echo '<p style="background:#dbbf94; padding: 10px; border-radius: 9px; color: white; font-size: 22px; text-align: center; width: 90%; margin: 20px auto;">';
+        echo 'Your application has been successfully posted. Please wait for a lender to review and fund your request.';
+        echo '</p>';
 
         // Display the application summary
-        echo '<div style="background-color: #f4f1ec; border-radius: 9px; padding: 20px; margin: 10px auto; color: #333; font-family: Arial, sans-serif; width: 100%;">';
-        
-        echo '<h2 style="font-family: Georgia, serif; font-weight: bold; color: #131e3d; font-size: 28px; margin-bottom: 15px; text-align:left;">Your Loans</h2>';
-        
-        echo '<div style="display: flex; justify-content: space-between; align-items: center; padding: 25px 0;">';
-        // Amount section
-        echo '<div style="text-align: left;">';
-        echo '<p style="font-size: 18px; color: #131e3d; font-weight: 200; margin: 0;">AMOUNT</p>';
-        echo '<p style="font-size: 40px; color: #cdad7d; font-weight: bold; margin: 5px 0;">₱' . number_format($total_amount, 2) . '</p>';
-        echo '</div>';
-        
-        // First payment section
-        echo '<div style="text-align: center;">';
-        echo '<p style="font-size: 18px; color: #131e3d; font-weight: 200; margin: 0;">FIRST PAYMENT IS DUE ON</p>';
-        echo '<p style="font-size: 28px; color: #a6a6a6; font-weight: bold; margin: 5px 0;">' . date('M. j, Y', strtotime($first_deadline)) . '</p>';
-        echo '</div>';
-        
-        // Pay Now button (disabled for pending applications)
-        echo '<div style="text-align: right;">';
-        echo '<button type="button" disabled style="background-color: #ccc; color: white; padding: 12px 25px; border: none; border-radius: 5px; margin-top: 10px; font-size: 18px; cursor: not-allowed;">Pay Now</button>';
-        echo '</div>';
-        
-        echo '</div>';
-        echo '<div style="text-align: center; margin-top: 0px;">';
-                echo '<button style="background-color: #dbbf94; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold;">VIEW DETAILED REPAYMENT SCHEDULE</button>';
-                echo '</div>';
-        echo '</div>';
-        
-    } else {
-       
         echo '<div style="background-color: #f4f1ec; border-radius: 9px; padding: 15px; margin: 10px auto; color: #333; font-family: Arial, sans-serif; width: 90%;">';
+
         echo '<h2 style="font-family: Georgia, serif; font-weight: bold; color: #131e3d; margin-bottom: 10px; text-align:left;">Your Loans</h2>';
-        // Flex container with three columns
+
         echo '<div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0;">';
-        
-        // First column (Amount)
+        // Amount section
         echo '<div style="text-align: left;">';
         echo '<p style="font-size: 15px; color: #131e3d; font-weight: 200; margin: 0;">AMOUNT</p>';
         echo '<p style="font-size: 36px; color: #cdad7d; font-weight: bold; margin: 5px 0;">₱' . number_format($total_amount, 2) . '</p>';
+
         echo '</div>';
-        
-        // Second column (Due Date)
+
+        // First payment section
         echo '<div style="text-align: center;">';
         echo '<p style="font-size: 15px; color: #131e3d; font-weight: 200; margin: 0;">FIRST PAYMENT IS DUE ON</p>';
-        echo '<p style="font-size: 24px; color: #a6a6a6; font-weight: bold; margin: 5px 0;">' . date('M. j, Y', strtotime($first_deadline)) . '</p>';
+        echo '<p style="font-size: 24px; color: #a6a6a6; font-weight: bold; margin: 5px 0;">' . date('M. j, Y', strtotime($first_deadline)) . '</p>'; // Format the date
         echo '</div>';
-        
-        // Third column (Button and Form)
+
+        // Pay Now button
         echo '<div style="text-align: right;">';
-        echo '<form id="payForm" action="remove_deadline.php" method="POST" style="display: inline;">';
-        echo '<input type="hidden" name="user_id" value="' . $user_id . '">';
-        echo '<input type="hidden" name="deadline" value="' . htmlspecialchars($first_deadline) . '">';
-        echo '<input type="hidden" name="transaction_id" value="' . $_SESSION['transaction_id'] . '">';
-        echo '<button type="button" onclick="showConfirmationBox()" style="background-color: #131e3d; color: white; padding: 10px 20px; border: none; border-radius: 5px; margin-top: 10px; cursor: pointer;">Pay Now</button>';
+        echo '<form action="remove_deadline.php" method="POST" style="display: inline;">'; 
+        echo '<input type="hidden" name="user_id" value="' . $user_id . '">'; 
+        echo '<input type="hidden" name="deadline" value="' . htmlspecialchars($first_deadline) . '">'; 
+        echo '<input type="hidden" name="transaction_id" value="' . $_SESSION['transaction_id'] . '">'; // Include transaction_id here
+        echo '<button type="submit" disabled style="background-color: #ccc; color: white; padding: 10px 20px; border: none; border-radius: 5px; margin-top: 10px; cursor: not-allowed;">Pay Now</button>';
         echo '</form>';
-        echo '</div>'; // End of right-aligned div
-        
-        echo '</div>'; // End of flex container
-        echo '</div>'; // End of main container
-        
-        // Custom Confirmation Dialog with Larger Size
-        echo '
-        <div id="confirmationBox" style="display: none; background-color: rgba(0, 0, 0, 0.5); position: fixed; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: center; z-index: 9999;">
-            <div style="background-color: white; padding: 40px; border-radius: 10px; width: 500px; text-align: center;">
-                <h5 style="font-size: 24px; font-weight: bold; color: #131e3d;">Confirm Payment</h5>
-                <p style="font-size: 18px; color: #333; margin: 10px 0;">Are you sure you want to proceed with the payment?</p>
-                <!-- GCash QR Code Image -->
-                <img src="https://businessmaker-academy.com/cms/wp-content/uploads/2022/04/Gcash-BMA-QRcode.jpg" alt="GCash QR Code" class="gcash-qr mb-3" style="max-width: 100%; height: auto; border-radius: 10px; max-height: 300px;">
-                <div>
-                    <button id="confirmBtn" style="background-color: #131e3d; color: white; padding: 15px 30px; border: none; border-radius: 5px; font-size: 16px; margin: 10px;">Confirm</button>
-                    <button onclick="hideConfirmationBox()" style="background-color: #cdad7d; color: white; padding: 15px 30px; border: none; border-radius: 5px; font-size: 16px; margin: 10px;">Cancel</button>
-                </div>
-            </div>
-        </div>';
-        
-        // JavaScript to handle the custom confirmation box
-        echo '
-        <script>
-            function showConfirmationBox() {
-                document.getElementById("confirmationBox").style.display = "flex";
-            }
-        
-            function hideConfirmationBox() {
-                document.getElementById("confirmationBox").style.display = "none";
-            }
-        
-            // Fix for form submission
-            document.getElementById("confirmBtn").addEventListener("click", function() {
-                document.getElementById("payForm").submit(); // Submit the form when "Confirm" is clicked
-            });
-        </script>';
-        
+        echo '</div>';
+
+        echo '</div>';
+
+        // View Detailed Repayment Schedule button
+        echo '<div style="text-align: center; margin-top: 0px;">';
+        echo '<button style="background-color: #dbbf94; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold;">VIEW DETAILED REPAYMENT SCHEDULE</button>';
+        echo '</div>';
+
+        echo '</div>'; // Close application summary div
+
+    } else {
+        // Display the application summary if not posted
+        echo '<div style="background-color: #f4f1ec; border-radius: 9px; padding: 15px; margin: 10px auto; color: #333; font-family: Arial, sans-serif; width: 90%;">';
+
+        echo '<h2 style="font-family: Georgia, serif; font-weight: bold; color: #131e3d; margin-bottom: 10px; text-align:left;">Your Loans</h2>';
+
+        echo '<div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0;">';
+
+        // Amount section
+        echo '<div style="text-align: left;">';
+        echo '<p style="font-size: 15px; color: #131e3d; font-weight: 200; margin: 0;">AMOUNT</p>';
+        echo '<p style="font-size: 36px; color: #cdad7d; font-weight: bold; margin: 5px 0;">₱' . number_format($total_amount, 2) . '</p>';
+
+        echo '</div>';
+
+        // First payment section
+        echo '<div style="text-align: center;">';
+        echo '<p style="font-size: 15px; color: #131e3d; font-weight: 200; margin: 0;">FIRST PAYMENT IS DUE ON</p>';
+        // Check if the first_deadline is empty
+        if (!empty($first_deadline)) {
+            echo '<p style="font-size: 24px; color: #a6a6a6; font-weight: bold; margin: 5px 0;">' . date('M. j, Y', strtotime($first_deadline)) . '</p>'; // Format the date
+        } else {
+            echo '<p style="font-size: 24px; color: #a6a6a6; font-weight: bold; margin: 5px 0;">&nbsp;</p>'; // Display empty space if no date
+        }
+        echo '</div>';
+
+        // Pay Now button
+        echo '<div style="text-align: right;">';
+        echo '<form action="remove_deadline.php" method="POST" style="display: inline;">'; 
+        echo '<input type="hidden" name="user_id" value="' . $user_id . '">'; 
+        echo '<input type="hidden" name="deadline" value="' . htmlspecialchars($first_deadline) . '">'; 
+        echo '<input type="hidden" name="transaction_id" value="' . $_SESSION['transaction_id'] . '">'; // Include transaction_id here
+        echo '<button type="submit" style="background-color: #131e3d; color: white; padding: 10px 20px; border: none; border-radius: 5px; margin-top: 10px; cursor: pointer;">Pay Now</button>';
+        echo '</form>';
+        echo '</div>';
+
+        echo '</div>'; // Close flex container
+
+        // View Detailed Repayment Schedule button
+        echo '<div style="text-align: center; margin-top: 0px;">';
+        echo '<button style="background-color: #dbbf94; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold;">VIEW DETAILED REPAYMENT SCHEDULE</button>';
+        echo '</div>';
+
+        echo '</div>'; // Close main container
+
     }
 } else {
     // Handle case when there are no applications
@@ -689,7 +604,7 @@ $conn->close();
                                  
                                                     <select class="form-select" id="monthly-allowance" name="monthly-allowance" required>
 
-                                                        <option value="" disabled selected>Select Monthly Allowance</option>
+                                                        <option value="" disabled selected>Select Monthly Income</option>
                                                         <option value="5,000 and Below">5,000 and Below</option>
                                                         <option value="5,001 - 20,000">5,001 - 20,000</option>
                                                         <option value="20,001 - 40,000">20,001 - 40,000</option>
@@ -698,7 +613,7 @@ $conn->close();
                                                         <option value="80,001 - 100,000">80,001 - 100,000</option>
                                                         <option value="100,001 and Above">100,001 and Above</option>
                                                     </select>
-                                                    <label for="monthly-allowance">Monthly Allowance</label>
+                                                    <label for="monthly-allowance">Monthly Income</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -708,14 +623,14 @@ $conn->close();
                                             <div class="col-md-12">
                                                 <div class="form-floating">
                                                     <select class="form-select" id="source-of-allowance" name="source-of-allowance" required>
-                                                        <option value="None" disabled selected>Select Source of Allowance</option>
+                                                        <option value="None" disabled selected>Select Source of Income</option>
                                                         <option value="Own Business">Own Business</option>
                                                         <option value="Parental Support">Parental Support</option>
                                                         <option value="Part-time Job">Part-time Job</option>
                                                         <option value="Scholarships">Scholarships</option>
                                                         <option value="Educational Assistance">Educational Assistance</option>
                                                     </select>
-                                                    <label for="source-of-allowance">Source of Allowance</label>
+                                                    <label for="source-of-allowance">Source of Income</label>
                                                 </div>
                                             </div>
                                         </div>
@@ -726,11 +641,10 @@ $conn->close();
                                                 <div class="form-floating">
                                                     <select class="form-select" id="monthly-expenses" name="monthly-expenses" required>
                                                         <option value="" disabled selected>Select Monthly Expenses</option>
-                                                        <option value="1000">Below 1000</option>
-                                                        <option value="2000">2000</option>
-                                                        <option value="3000">3000</option>
-                                                        <option value="4000">4000</option>
-                                                        <option value="5000">Above 5000</option>
+                                                        <option value="1000">Below $1000</option>
+                                                        <option value="3000">$1000 - $3000</option>
+                                                        <option value="5000">$3000 - $5000</option>
+                                                        <option value="8000">Above $5000</option>
                                                     </select>
                                                     <label for="monthly-expenses">Monthly Expenses</label>
                                                 </div>
@@ -842,8 +756,10 @@ $conn->close();
                                                 <div class="form-floating">
                                                 <select class="form-control form-control-sm" id="loanPurpose" name="loan_purpose" required>
                                                 <option value="" disabled selected>Select Loan Purpose</option>
-                                                        <option value="Directly Attributable to Studying">Directly Attributable to Studying</option>
-                                                        <option value="Overhead to Studying">Overhead to Studying</option>                                               
+                                                        <option value="Educational">Educational</option>
+                                                        <option value="Personal">Personal</option>
+                                                        <option value="General">General</option>
+                                                
                                                     </select>
                                                     <label for="loanPurpose">Loan Purpose</label>
                                                 </div>
@@ -1006,7 +922,7 @@ $conn->close();
 <div class="modal fade" id="summaryModal" tabindex="-1" aria-labelledby="summaryModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-md">
         <div class="modal-content shadow-lg rounded-3">
-            <div class="modal-header text-white py-3 rounded-top" style="background-color: #131e3d;">
+            <div class="modal-header bg-primary text-white py-3 rounded-top">
                 <h5 class="modal-title fw-bold" id="summaryModalLabel">Payment Summary</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -1023,24 +939,21 @@ $conn->close();
                     <span class="fw-semibold text-secondary">Selected Due Date:</span>
                     <span id="modalDueDate" class="text-dark"></span>
                 </div>
-                <div class="d-flex flex-column align-items-start border-bottom py-2">
-    <span class="fw-semibold text-secondary">Next Deadlines:</span>
-    <br>
-    <div id="modalNextDeadlines" class="w-100"></div>
-</div>
-
+                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                    <span class="fw-semibold text-secondary">Next Deadlines:</span>
+                    <span id="modalNextDeadlines" class="text-dark"></span>
+                </div>
                 <div class="d-flex justify-content-between align-items-center border-bottom py-2">
                     <span class="fw-semibold text-secondary">Account Details:</span>
                     <span id="modalAccountDetails" class="text-dark"></span>
                 </div>
-                <div class="d-flex justify-content-between align-items-center pt-3 d-none">
-    <span class="fw-semibold text-secondary">Total Amount to be Paid:</span>
-    <span id="modalTotalAmount" class="text-primary fw-bold"></span>
-</div>
-
+                <div class="d-flex justify-content-between align-items-center pt-3">
+                    <span class="fw-semibold text-secondary">Total Amount to be Paid:</span>
+                    <span id="modalTotalAmount" class="text-primary fw-bold"></span>
+                </div>
             </div>
             <div class="modal-footer py-3">
-                <button type="button" class="btn btn-success btn-sm px-4" onclick="submitForm()" style="background-color: #dbbf94; border-color:#dbbf94;">Confirm</button>
+                <button type="button" class="btn btn-success btn-sm px-4" onclick="submitForm()">Confirm</button>
                 <button type="button" class="btn btn-secondary btn-sm px-4" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
@@ -1069,75 +982,56 @@ $conn->close();
     </div>
 </div>
 
+
 <script>
-// Example function to calculate due dates and populate table
+// Example function to calculate due dates
 function calculateDueDates() {
     const frequency = document.getElementById('modalFrequency').innerText;
     const dueDateString = document.getElementById('modalDueDate').innerText;
-
+    
     const dueDate = new Date(dueDateString);
-    let today = new Date();
-
+    let today = new Date(); // Create a date object for today
+    
+    // Advance both the start and end dates
     if (frequency === 'Daily') {
-        today.setDate(today.getDate() + 1);
-        dueDate.setDate(dueDate.getDate() + 1);
+        today.setDate(today.getDate() + 1); // Advance start date by 1 day
+        dueDate.setDate(dueDate.getDate() + 1); // Advance end date by 1 day
     } else if (frequency === 'Weekly') {
-        today.setDate(today.getDate() + 7);
-        dueDate.setDate(dueDate.getDate() + 7);
+        today.setDate(today.getDate() + 7); // Advance start date by 1 week
+        dueDate.setDate(dueDate.getDate() + 7); // Advance end date by 1 week
     } else if (frequency === 'Monthly') {
-        today.setMonth(today.getMonth() + 1);
-        dueDate.setMonth(dueDate.getMonth() + 1);
+        today.setMonth(today.getMonth() + 1); // Advance start date by 1 month
+        dueDate.setMonth(dueDate.getMonth() + 1); // Advance end date by 1 month
     }
 
     let nextDeadlines = [];
+
+    // Calculate next due dates based on frequency
     if (frequency === 'Daily') {
         while (today <= dueDate) {
-            nextDeadlines.push(new Date(today));
-            today.setDate(today.getDate() + 1);
+            nextDeadlines.push(today.toLocaleDateString()); // Add today's date
+            today.setDate(today.getDate() + 1); // Move to the next day
         }
     } else if (frequency === 'Weekly') {
         while (today <= dueDate) {
-            nextDeadlines.push(new Date(today));
-            today.setDate(today.getDate() + 7);
+            nextDeadlines.push(today.toLocaleDateString()); // Add today's date
+            today.setDate(today.getDate() + 7); // Move to the next week
         }
     } else if (frequency === 'Monthly') {
         while (today <= dueDate) {
-            nextDeadlines.push(new Date(today));
-            today.setMonth(today.getMonth() + 1);
+            nextDeadlines.push(today.toLocaleDateString()); // Add today's date
+            today.setMonth(today.getMonth() + 1); // Move to the next month
         }
     }
 
-    // Create table structure for deadlines
-    const options = { year: 'numeric', month: 'short', day: 'numeric' };
-    let tableHTML = `
-        <table class="table table-bordered">
-            <thead class="bg-dark text-white">
-                <tr>
-                    <th>Amount Due</th>
-                    <th>Due Date</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-
-    const installmentAmount = (parseFloat(document.getElementById('modalTotalAmount').innerText)).toFixed(2);
-    nextDeadlines.forEach(date => {
-        tableHTML += `
-            <tr>
-                <td>${installmentAmount}</td>
-                <td>${date.toLocaleDateString('en-US', options)}</td>
-            </tr>
-        `;
-    });
-
-    tableHTML += `</tbody></table>`;
-    document.getElementById('modalNextDeadlines').innerHTML = tableHTML;
+    // Update the modal with the calculated deadlines
+    document.getElementById('modalNextDeadlines').innerText = nextDeadlines.join(', ');
 }
 
 // Call the function when the modal is shown
 document.getElementById('summaryModal').addEventListener('show.bs.modal', calculateDueDates);
-</script>
 
+</script>
 
 
 
@@ -1375,9 +1269,7 @@ document.getElementById('summaryModal').addEventListener('show.bs.modal', calcul
     // Set the values in the modal
     document.getElementById('modalPaymentMode').textContent = paymentModeValue; // Display Payment Mode
     document.getElementById('modalFrequency').textContent = frequencyValue; // Display Frequency
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-document.getElementById('modalDueDate').textContent = selectedDueDate.toLocaleDateString('en-US', options);
-
+    document.getElementById('modalDueDate').textContent = selectedDueDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
     document.getElementById('modalAccountDetails').textContent = accountDetails; // Display Account Details
     document.getElementById('modalTotalAmount').textContent = totalAmountToBePaid.toFixed(2); // Show 2 decimal places
 

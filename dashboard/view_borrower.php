@@ -106,7 +106,7 @@ if ($result->num_rows > 0) {
 
     // Calculate the score based on loan purpose
     $loan_purpose = strtolower($row['loan_purpose']);
-    $loan_purpose_score = ($loan_purpose === 'educational' || $loan_purpose === 'personal') ? 10 : 8;
+    $loan_purpose_score = ($loan_purpose === 'Directly Attributable to Studying' || $loan_purpose === 'Overhead to Studying') ? 10 : 8;
     $credit_score += $loan_purpose_score;
 
     // Calculate the score based on loan amount

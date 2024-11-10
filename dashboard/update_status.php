@@ -1,7 +1,7 @@
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Get borrower ID and new status from POST request
-    $id = $_POST['id'];
+    // Get transaction ID and new status from POST request
+    $transaction_id = $_POST['id'];
     $status = $_POST['status'];
 
     // Database connection
@@ -12,24 +12,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         die("Connection failed: " . $conn->connect_error);
     }
 
-    // Update query to change status to Approved
-    $sql = "UPDATE borrower_info SET status = ? WHERE transaction_id = ?";
+    // Verify if the transaction ID exists in the borrower_info table and get user_id
+    $checkSql = "SELECT user_id FROM borrower_info WHERE transaction_id = ?";
+    if ($checkStmt = $conn->prepare($checkSql)) {
+        $checkStmt->bind_param('i', $transaction_id); // 'i' means integer
+        $checkStmt->execute();
+        $checkStmt->store_result();
 
-    // Prepare and bind parameters
-    if ($stmt = $conn->prepare($sql)) {
-        $stmt->bind_param('si', $status, $id); // 'si' means string, integer
-        $stmt->execute();
+        // Check if a matching record was found
+        if ($checkStmt->num_rows > 0) {
+            $checkStmt->bind_result($user_id);
+            $checkStmt->fetch();
 
-        // Check if update was successful
-        if ($stmt->affected_rows > 0) {
-            echo "Status updated successfully";
+            // Update the status in the borrower_info table
+            $updateSql = "UPDATE borrower_info SET status = ? WHERE transaction_id = ?";
+            if ($updateStmt = $conn->prepare($updateSql)) {
+                $updateStmt->bind_param('si', $status, $transaction_id);
+                $updateStmt->execute();
+
+                if ($updateStmt->affected_rows > 0) {
+                    echo "Status updated successfully";
+
+                    // Insert a new message into the messages table with the retrieved user_id
+                    $message = "Your loan application is approved";
+                    $messageStatus = "unread";
+
+                    $msgSql = "INSERT INTO messages (borrower_id, message, status) VALUES (?, ?, ?)";
+                    if ($msgStmt = $conn->prepare($msgSql)) {
+                        $msgStmt->bind_param('iss', $user_id, $message, $messageStatus); // 'iss' means integer, string, string
+                        $msgStmt->execute();
+
+                        if ($msgStmt->affected_rows > 0) {
+                            echo " and message inserted successfully";
+                        } else {
+                            echo " but error inserting message";
+                        }
+
+                        $msgStmt->close();
+                    } else {
+                        echo " but error preparing message statement: " . $conn->error;
+                    }
+
+                } else {
+                    echo "Error updating status or no changes made";
+                }
+
+                $updateStmt->close();
+            } else {
+                echo "Error preparing update statement: " . $conn->error;
+            }
         } else {
-            echo "Error updating status or no changes made";
+            echo "Transaction ID not found in borrower_info table";
         }
 
-        $stmt->close();
+        $checkStmt->close();
     } else {
-        echo "Error preparing statement: " . $conn->error;
+        echo "Error preparing check statement: " . $conn->error;
     }
 
     $conn->close();

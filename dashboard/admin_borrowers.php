@@ -426,7 +426,7 @@ if ($result === false) {
                                         </div>
                                         <div>
                                             <p class='mb-1' style='font-size: 0.9em; color: #999999;'>LOANS MADE</p>
-                                            <p class='fw-bold' style='color: #000000; font-size: 1.5em;'>{$loans_made}</p>
+                                            <p class='fw-bold' style='color: #000000; font-size: 1.5em; text-align:center;'>{$loans_made}</p>
                                         </div>
                                         <button class='btn' style='background-color: #1b1b1b; color: #ffffff; border-radius: 5px;' data-bs-toggle='modal' data-bs-target='#loansModal' data-userid='{$user_id}'>View Loans</button>
                                     </div>

@@ -214,25 +214,31 @@ if ($result = $query->fetch(PDO::FETCH_ASSOC)) {
     <!-- Lending Insights -->
     <div class="row justify-content-center mb-4">
         <div class="col-12">
-            <div class="card p-4" style="background-color: #f0e2cc; border-radius: 10px;">
-                <h5 class="card-title" style="font-family: serif; font-size: 1.75rem; color: #333;">Your lending insights</h5>
-                <div class="d-flex justify-content-between align-items-center" style="background-color: #e5c596; padding: 20px; border-radius: 8px;">
+            <div class="card p-5" style="background-color: #f0e2cc; border-radius: 12px;">
+                <h5 class="card-title" style="font-family: serif; font-size: 2.5rem; color: #333;">Your lending insights</h5>
+                <div class="d-flex justify-content-between align-items-center" style="background-color: #e5c596; padding: 30px; border-radius: 10px;">
                     <div style="text-align: center;">
-                        <h4 style="font-size: 2rem; color: #1b1b1b;">₱<?php echo number_format($total_amount_lent, 2); ?></h4>
-                        <span style="color: #555;">TOTAL AMOUNT LENT</span>
+                        <h4 style="font-size: 2.5rem; color: #1b1b1b;">₱<?php echo number_format($total_amount_lent, 2); ?></h4>
+                        <span style="font-size: 1.25rem; color: #555;">TOTAL AMOUNT LENT</span>
                     </div>
                     <div style="text-align: center;">
-                        <h4 style="font-size: 2rem; color: #1b1b1b;"><?php echo $loans_made; ?></h4>
-                        <span style="color: #555;">LOANS MADE</span>
+                        <h4 style="font-size: 2.5rem; color: #1b1b1b;"><?php echo $loans_made; ?></h4>
+                        <span style="font-size: 1.25rem; color: #555;">LOANS MADE</span>
                     </div>
                     <div>
-                        <button class="btn" style="background-color: #1b1b1b; color: #fff; border-radius: 5px;" data-bs-toggle="modal" data-bs-target="#loansModal">View loans</button>
+                        <button class="btn" style="background-color: #1b1b1b; color: #fff; font-size: 1.25rem; padding: 10px 20px; border-radius: 8px;" data-bs-toggle="modal" data-bs-target="#loansModal">View loans</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <!-- View More Loans Button Outside the Design -->
+    <div class="text-center mt-4">
+        <a href="lenderdashboard.php" class="btn" style="background-color: #1b1b1b; color: #fff; font-size: 1.25rem; padding: 10px 20px; border-radius: 8px;">View more loans</a>
+    </div>
 </div>
+
+
 
 <?php
 
