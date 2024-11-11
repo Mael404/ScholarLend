@@ -500,7 +500,7 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
             <td id="gwaScore" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
         </tr>
         <tr>
-            <td rowspan="2" style="padding: 8px; border: 1px solid #ddd; vertical-align: middle;">Financial Information</td>
+            <td rowspan="3" style="padding: 8px; border: 1px solid #ddd; vertical-align: middle;">Financial Information</td>
             <td style="padding: 8px; border: 1px solid #ddd;">Monthly Allowance</td>
             <td id="modal-monthly-allowance_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">20</td>
@@ -509,14 +509,21 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
         <tr>
             <td style="padding: 8px; border: 1px solid #ddd;">Source of Allowance</td>
             <td id="modal-source-of-allowance_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
-            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">20</td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">10</td>
             <td id="sourceOfAllowanceScore" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
+        </tr>
+        <!-- Added Expenses Sub-category under Financial Information -->
+        <tr>
+            <td style="padding: 8px; border: 1px solid #ddd;">Expenses</td>
+            <td id="modal-expenses_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">20</td>
+            <td id="expensesScore" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
         </tr>
         <tr>
             <td rowspan="3" style="padding: 8px; border: 1px solid #ddd; vertical-align: middle;">Alternative Data Points</td>
             <td style="padding: 8px; border: 1px solid #ddd;">Affiliated Organization</td>
             <td id="modal-affiliated-organization_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
-            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">20</td>
+            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">5</td>
             <td id="affiliatedOrganizationScore" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
         </tr>
         <tr>
@@ -551,6 +558,8 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
         </tr>
     </tbody>
 </table>
+
+
 
 
 
@@ -904,6 +913,7 @@ document.getElementById('modal-yearofstudy_credit').textContent = data.yearofstu
 document.getElementById('modal-gwa_credit').textContent = data.gwa;
 document.getElementById('modal-monthly-allowance_credit').textContent = '₱' + data.monthly_allowance;
 document.getElementById('modal-source-of-allowance_credit').textContent = data.source_of_allowance;
+document.getElementById('modal-expenses_credit').textContent = data.monthly_expenses;
 document.getElementById('modal-affiliated-organization_credit').textContent = data.school_community;
 document.getElementById('modal-spending-pattern_credit').textContent = data.spending_pattern;
 document.getElementById('modal-savings-behavior_credit').textContent = data.monthly_savings;
@@ -926,6 +936,7 @@ document.getElementById('spendingPatternScore').textContent = data.spending_patt
 document.getElementById('savingsBehaviorScore').textContent = data.monthly_savings_score;
 document.getElementById('loanPurposeScore').textContent = data.loan_purpose_score;
 document.getElementById('loanAmountScore').textContent = data.loan_amount_score;
+document.getElementById('expensesScore').textContent = data.expense_score;
 
 
             }

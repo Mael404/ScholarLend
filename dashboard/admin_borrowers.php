@@ -386,20 +386,41 @@ if ($result === false) {
                     $transaction_type = 'Payment'; // Default transaction type
                     $transaction_status = $status; // Status from loan_deadlines table
                 } else {
-                    // If no Pending loan deadlines, set default values or skip
+                   
                     $transaction_date = null;
                     $transaction_type = null;
                     $transaction_amount = null;
                     $transaction_status = null;
-                    $transaction_id = ''; // Empty transaction_id if not found
+                    $transaction_id = ''; 
                 }
 
+                $sql_pending = "SELECT COUNT(*) AS pending_count FROM loan_deadlines WHERE user_id = '$user_id' AND status = 'Pending'";
+                $result_pending = $conn->query($sql_pending);
+                $pending_count = 0; // Default to 0 if no pending transactions are found
+                
+                if ($result_pending && $result_pending->num_rows > 0) {
+                    $pending_data = $result_pending->fetch_assoc();
+                    $pending_count = (int) $pending_data['pending_count'];
+                }
+                
+                // Display the row with the button and badge
                 echo "<tr>";
                 echo "<td class='text-center'>{$user_id}</td>";
                 echo "<td class='text-center'>
-                        <button type='button' class='btn btn-link text-primary' data-bs-toggle='modal' data-bs-target='#profileModal{$user_id}' style='font-size: 0.9em;'>See Profile</button>
+                        <button type='button' class='btn text-primary' data-bs-toggle='modal' data-bs-target='#profileModal{$user_id}' style='font-size: 0.9em;'>
+                            See Profile";
+                
+                // Display the badge only if there are pending transactions
+                if ($pending_count > 0) {
+                    echo " <span class='badge bg-danger ms-1'>{$pending_count}</span>";
+                }else{
+                    echo " <span class='badge bg-danger ms-1'>0</span>";
+                }
+                
+                echo "  </button>
                       </td>";
                 echo "</tr>";
+
 
                 // Profile Modal for each user
                 echo "
@@ -567,8 +588,6 @@ document.getElementById('confirmTransferBtn').addEventListener('click', function
 
 </script>
 
-
-
 </div>
 
 
@@ -618,7 +637,6 @@ document.getElementById('confirmTransferBtn').addEventListener('click', function
 
 
 </script>
-
 
 
 <script>

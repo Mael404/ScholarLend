@@ -81,7 +81,7 @@ if ($result->num_rows > 0) {
 
     // Calculate the score based on school community
     $school_community = strtolower($row['school_community']);
-    $school_community_score = ($school_community === 'yes') ? 5 : 4;
+    $school_community_score = ($school_community === 'no') ? 4 : 5;
     $credit_score += $school_community_score;
 
     // Calculate the score based on spending pattern
@@ -106,8 +106,43 @@ if ($result->num_rows > 0) {
 
     // Calculate the score based on loan purpose
     $loan_purpose = strtolower($row['loan_purpose']);
-    $loan_purpose_score = ($loan_purpose === 'Directly Attributable to Studying' || $loan_purpose === 'Overhead to Studying') ? 10 : 8;
+    if ($loan_purpose === 'directly attributable to studying' || $loan_purpose === 'overhead to studying') {
+        $loan_purpose_score = 10;
+    } elseif ($loan_purpose === 'general') {
+        $loan_purpose_score = 8;
+    } else {
+        $loan_purpose_score = 0; // Default in case of an unexpected value
+    }
     $credit_score += $loan_purpose_score;
+    
+
+
+
+    $monthly_expenses = strtolower($row['monthly_expenses']); // Example value, replace with actual value from the database
+
+    // Breakdown of the expenses based on text values
+    if ($monthly_expenses === 'below 1,000') {
+        $expense_score = 20;
+    } elseif ($monthly_expenses === '1,001 - 3,000') {
+        $expense_score = 19;
+    } elseif ($monthly_expenses === '3,001 - 5,000') {
+        $expense_score = 18;
+    } elseif ($monthly_expenses === '5,001 - 7,000') {
+        $expense_score = 17;
+    } elseif ($monthly_expenses === '7,001 - 9,000') {
+        $expense_score = 16;
+    } elseif ($monthly_expenses === '9,001 - 11,000') {
+        $expense_score = 15;
+    } elseif ($monthly_expenses === 'above 11,000') {
+        $expense_score = 14;
+    } else {
+        $expense_score = 0; // Default in case of an unexpected value
+    }
+    
+    // Add the score to the credit score
+    $credit_score += $expense_score;
+
+
 
     // Calculate the score based on loan amount
     $loan_amount = (int)$row['loan_amount'];
@@ -124,35 +159,42 @@ if ($result->num_rows > 0) {
     }
     $credit_score += $loan_amount_score;
 
-    // Calculate the score based on monthly allowance
-    $monthly_allowance = (int)$row['monthly_allowance'];
-    if ($monthly_allowance <= 5000) {
+    $monthly_allowance = $row['monthly_allowance']; // Assuming this retrieves the text value from the dropdown
+
+    if ($monthly_allowance === "above 11,000") {
         $monthly_allowance_score = 20;
-    } elseif ($monthly_allowance <= 20000) {
+    } elseif ($monthly_allowance === "9,001 - 11,000") {
         $monthly_allowance_score = 19;
-    } elseif ($monthly_allowance <= 40000) {
+    } elseif ($monthly_allowance === "7,001 - 9,000") {
         $monthly_allowance_score = 18;
-    } elseif ($monthly_allowance <= 60000) {
+    } elseif ($monthly_allowance === "5,001 - 7,000") {
         $monthly_allowance_score = 17;
-    } elseif ($monthly_allowance <= 80000) {
+    } elseif ($monthly_allowance === "3,001 - 5,000") {
         $monthly_allowance_score = 16;
-    } elseif ($monthly_allowance <= 100000) {
+    } elseif ($monthly_allowance === "1,001 - 3,000") {
         $monthly_allowance_score = 15;
-    } else {
+    } elseif ($monthly_allowance === "below 1,000") {
         $monthly_allowance_score = 14;
+    } else {
+        $monthly_allowance_score = 0; // Default in case of an unexpected value
     }
+    
     $credit_score += $monthly_allowance_score;
+    
 
     // Calculate the score based on source of allowance
-    $source_of_allowance = strtolower($row['source_of_allowance']);
+    $source_of_allowance = strtolower($row['source_of_allowance']); // Convert to lowercase for consistent comparison
     if ($source_of_allowance === 'own business' || $source_of_allowance === 'parental support') {
-        $source_of_allowance_score = 20;
-    } elseif ($source_of_allowance === 'part-time job' || $source_of_allowance === 'scholarships') {
-        $source_of_allowance_score = 19;
+        $source_of_allowance_score = 10;
+    } elseif ($source_of_allowance === 'scholarships') {
+        $source_of_allowance_score = 9;
+    } elseif ($source_of_allowance === 'part-time job') {
+        $source_of_allowance_score = 8;
     } else {
-        $source_of_allowance_score = 18;
+        $source_of_allowance_score = 0; // Default in case of an unexpected value
     }
     $credit_score += $source_of_allowance_score;
+    
 
     // Determine credit score category
     $credit_category = '';
@@ -169,6 +211,7 @@ if ($result->num_rows > 0) {
     }
 
     // Add the scores and credit score category to the response
+    $row['expense_score'] = $expense_score;
     $row['credit_score'] = $credit_score;
     $row['credit_category'] = $credit_category;
     $row['yearsofstudy_score'] = $yearsofstudy_score;

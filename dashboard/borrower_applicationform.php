@@ -427,10 +427,10 @@ echo '</div>';
         echo '<input type="hidden" name="transaction_id" value="' . $_SESSION['transaction_id'] . '">';
         echo '<button type="button" onclick="showConfirmationBox()" style="background-color: #131e3d; color: white; padding: 10px 20px; border: none; border-radius: 5px; margin-top: 10px; cursor: pointer;">Pay Now</button>';
         echo '</form>';
-        echo '</div>'; // End of right-aligned div
+        echo '</div>'; 
         
-        echo '</div>'; // End of flex container
-        echo '</div>'; // End of main container
+        echo '</div>'; 
+        echo '</div>';
         
         // Custom Confirmation Dialog with Larger Size
         echo '
@@ -658,7 +658,6 @@ $conn->close();
                                                         <option value="2.5 - 1.8 (84-91)">2.5 - 1.8 (84-91)</option>
                                                         <option value="2.8 - 2.6 (78-83)">2.8 - 2.6 (78-83)</option>
                                                         <option value="3.0 - 2.9 (75-77)">3.0 - 2.9 (75-77)</option>
-                                                        <option value="4.0 - 3.1 (75 Below)">4.0 - 3.1 (75 Below)</option>
                                                         <option value="5.0 (Failure)">5.0 (Failure)</option>
                                                         </select>
                                                         <label for="gwa">Enter General Weighted Average</label>
@@ -690,13 +689,13 @@ $conn->close();
                                                     <select class="form-select" id="monthly-allowance" name="monthly-allowance" required>
 
                                                         <option value="" disabled selected>Select Monthly Allowance</option>
-                                                        <option value="5,000 and Below">5,000 and Below</option>
-                                                        <option value="5,001 - 20,000">5,001 - 20,000</option>
-                                                        <option value="20,001 - 40,000">20,001 - 40,000</option>
-                                                        <option value="40,001 - 60,000">40,001 - 60,000</option>
-                                                        <option value="60,001 - 80,000">60,001 - 80,000</option>
-                                                        <option value="80,001 - 100,000">80,001 - 100,000</option>
-                                                        <option value="100,001 and Above">100,001 and Above</option>
+                                                        <option value="above 11,000">above 11,000</option>
+                                                        <option value="9,001 - 11,000">9,001 - 11,000</option>
+                                                        <option value="7,001 - 9,000">7,001 - 9,000</option>
+                                                        <option value="5,001 - 7,000">5,001 - 7,000</option>
+                                                        <option value="3,001 - 5,000">3,001 - 5,000</option>
+                                                        <option value="1,001 - 3,000">1,001 - 3,000</option>
+                                                        <option value="	below 1,000">below 1,000</option>
                                                     </select>
                                                     <label for="monthly-allowance">Monthly Allowance</label>
                                                 </div>
@@ -711,9 +710,10 @@ $conn->close();
                                                         <option value="None" disabled selected>Select Source of Allowance</option>
                                                         <option value="Own Business">Own Business</option>
                                                         <option value="Parental Support">Parental Support</option>
-                                                        <option value="Part-time Job">Part-time Job</option>
                                                         <option value="Scholarships">Scholarships</option>
-                                                        <option value="Educational Assistance">Educational Assistance</option>
+                                                        <option value="Part-time Job">Part-time Job</option>
+                                                        
+                                                      
                                                     </select>
                                                     <label for="source-of-allowance">Source of Allowance</label>
                                                 </div>
@@ -726,11 +726,13 @@ $conn->close();
                                                 <div class="form-floating">
                                                     <select class="form-select" id="monthly-expenses" name="monthly-expenses" required>
                                                         <option value="" disabled selected>Select Monthly Expenses</option>
-                                                        <option value="1000">Below 1000</option>
-                                                        <option value="2000">2000</option>
-                                                        <option value="3000">3000</option>
-                                                        <option value="4000">4000</option>
-                                                        <option value="5000">Above 5000</option>
+                                                        <option value="Below 1000">Below 1,000</option>
+                                                        <option value="1,001 - 3,000">1,001 - 3,000</option>
+                                                        <option value="3,001 - 5,000">3,001 - 5,000</option>
+                                                        <option value="5,001 - 7,000">5,001 - 7,000</option>
+                                                        <option value="7,001 - 9,000">7,001 - 9,000</option>
+                                                        <option value="9,001 - 11,000">9,001 - 11,000</option>
+                                                        <option value="Above 11000">Above 11,000</option>
                                                     </select>
                                                     <label for="monthly-expenses">Monthly Expenses</label>
                                                 </div>
@@ -747,10 +749,10 @@ $conn->close();
                                         </div>
                                 
                                       <!-- School Community/Organization Membership -->
-<div class="row mb-3">
+                                      <div class="row mb-3">
     <div class="col-md-12">
         <div class="form-floating">
-            <select class="form-select" id="school_community" name="school_community" required>
+            <select class="form-select" id="school_community" name="school_community" required onchange="toggleInputField()">
                 <option value="" disabled selected>Select Affiliated Organization</option>
                 <option value="yes">Yes</option>
                 <option value="no">No</option>
@@ -759,6 +761,30 @@ $conn->close();
         </div>
     </div>
 </div>
+
+<!-- Hidden input field for additional information -->
+<div class="row mb-3" id="affiliationDetails" style="display: none;">
+    <div class="col-md-12">
+        <div class="form-floating">
+            <input type="text" class="form-control" id="school_community" name="school_community" placeholder="Enter Organization Name">
+            <label for="affiliation_name">Organization Name</label>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleInputField() {
+        const select = document.getElementById("school_community");
+        const affiliationDetails = document.getElementById("affiliationDetails");
+        
+        if (select.value === "yes") {
+            affiliationDetails.style.display = "block";
+        } else {
+            affiliationDetails.style.display = "none";
+        }
+    }
+</script>
+
 
                                 
                                         <!-- Select Spending Pattern -->
@@ -843,7 +869,8 @@ $conn->close();
                                                 <select class="form-control form-control-sm" id="loanPurpose" name="loan_purpose" required>
                                                 <option value="" disabled selected>Select Loan Purpose</option>
                                                         <option value="Directly Attributable to Studying">Directly Attributable to Studying</option>
-                                                        <option value="Overhead to Studying">Overhead to Studying</option>                                               
+                                                        <option value="Overhead to Studying">Overhead to Studying</option>  
+                                                        <option value="General">General</option>                                               
                                                     </select>
                                                     <label for="loanPurpose">Loan Purpose</label>
                                                 </div>
