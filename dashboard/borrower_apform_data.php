@@ -39,7 +39,7 @@ $source_of_allowance = $conn->real_escape_string($_POST['source-of-allowance']);
 $monthly_expenses = $conn->real_escape_string($_POST['monthly-expenses']);
 $school_community = $conn->real_escape_string($_POST['school_community']);
 $spending_pattern = $conn->real_escape_string($_POST['spending-pattern']);
-$monthly_savings = $conn->real_escape_string($_POST['monthly-savings']);
+
 $career_goals = $conn->real_escape_string($_POST['career-goals']);
 $loan_amount = (float) $conn->real_escape_string($_POST['loan_amount']);
 $loan_purpose = $conn->real_escape_string($_POST['loan_purpose']);
@@ -130,7 +130,7 @@ if (!$errorOccurred) {
     $sql = "INSERT INTO borrower_info (
         transaction_id, user_id, fname, mname, lname, birthdate, gender, cellphonenumber, email, school, 
         college, course, yearofstudy, graduationdate, monthly_allowance, source_of_allowance, 
-        monthly_expenses, school_community, spending_pattern, monthly_savings, career_goals, 
+        monthly_expenses, school_community, spending_pattern, career_goals, 
         loan_amount, loan_purpose, loan_description, payment_mode, payment_frequency, due_date, 
         next_deadlines, days_to_next_deadline, account_details, total_amount, interest_earned, 
         share_admin, status, cor1_path, cor2_path, cor3_path, cor4_path, current_address, 
@@ -139,7 +139,7 @@ if (!$errorOccurred) {
         '$transaction_id', '$user_id', '$fname', '$mname', '$lname', '$birthdate', '$gender', 
         '$cellphonenumber', '$email', '$school', '$college', '$course', '$yearofstudy', 
         '$graduationdate', '$monthly_allowance', '$source_of_allowance', '$monthly_expenses', 
-        '$school_community', '$spending_pattern', '$monthly_savings', '$career_goals', 
+        '$school_community', '$spending_pattern', '$career_goals', 
         '$loan_amount', '$loan_purpose', '$loan_description', '$payment_mode', 
         '$payment_frequency', '$due_date', '$next_deadlines', '$days_to_next_deadline', 
         '$account_details', '$total_amount', '$interest_earned', '$share_admin', '$statuss', 

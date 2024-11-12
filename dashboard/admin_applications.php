@@ -53,6 +53,17 @@ $result = $conn->query($sql);
     padding-left: 85px; /* Add padding to move the text leftwards */
 }
 
+.icon-container {
+    display: flex;
+    justify-content: center; /* Align horizontally */
+    align-items: center; /* Align vertically */
+    margin-bottom: 20px;
+   
+}
+
+#refreshButton {
+    cursor: pointer; /* Make the icon clickable */
+}
 
 /* Active sidebar item */
 .list-group-item.active {
@@ -315,7 +326,9 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
 
 
 ?>
-
+<div class="icon-container">
+    <i class="fas fa-sync-alt fa-2x center" onclick="window.location.reload();" id="refreshButton"></i>
+</div>
 <!-- Total Applicants Card -->
 <div id="totalApplicantsCard" class="col-md-4">
   <div class="card text-center rounded">
@@ -532,7 +545,7 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">10</td>
             <td id="spendingPatternScore" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
         </tr>
-        <tr>
+        <tr style="visibility: hidden;">
             <td style="padding: 8px; border: 1px solid #ddd;">Saving Behavior</td>
             <td id="modal-savings-behavior_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">10</td>
@@ -649,7 +662,7 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
             <p><strong>Monthly Expenses:</strong> <span id="modal-monthly-expenses">₱[Expenses]</span></p>
             <p><strong>Affiliated Organization:</strong> <span id="modal-affiliated-organization">[Organization]</span></p>
             <p><strong>Spending Pattern:</strong> <span id="modal-spending-pattern">[Pattern]</span></p>
-            <p><strong>Savings Behavior:</strong> <span id="modal-savings-behavior">[Behavior]</span></p>
+          
         </div>
         <div class="col-md-6">
             <p><strong>Career Goals and Plans:</strong></p>
@@ -664,65 +677,49 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
     <h5>Attachments</h5>
     <div class="row">
         <div class="col-md-3">
-            <a href="#" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="showImage('modal-cor1')">
+            <a href="#" onclick="showPopoutImage('modal-cor1', event)">
                 <img id="modal-cor1" src="path/to/image1.jpg" alt="Attachment 1" class="img-fluid mb-2" />
             </a>
         </div>
         <div class="col-md-3">
-            <a href="#" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="showImage('modal-cor2')">
+            <a href="#" onclick="showPopoutImage('modal-cor2', event)">
                 <img id="modal-cor2" src="path/to/image2.jpg" alt="Attachment 2" class="img-fluid mb-2" />
             </a>
         </div>
         <div class="col-md-3">
-            <a href="#" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="showImage('modal-cor3')">
+            <a href="#" onclick="showPopoutImage('modal-cor3', event)">
                 <img id="modal-cor3" src="path/to/image3.jpg" alt="Attachment 3" class="img-fluid mb-2" />
             </a>
         </div>
         <div class="col-md-3">
-            <a href="#" data-bs-toggle="modal" data-bs-target="#imageModal" onclick="showImage('modal-cor4')">
+            <a href="#" onclick="showPopoutImage('modal-cor4', event)">
                 <img id="modal-cor4" src="path/to/image4.jpg" alt="Attachment 4" class="img-fluid mb-2" />
             </a>
         </div>
     </div>
 </div>
 
-<!-- Modal -->
-<div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel" aria-hidden="true">
-    <div class="modal-dialog" id="imageModalDialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="imageModalLabel">Image Preview</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <img id="modalImage" src="#" alt="Attachment Preview" class="img-fluid" />
-            </div>
-        </div>
-    </div>
+<!-- Popout Image Display -->
+<div id="imagePopout" onclick="hidePopout()" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.8); justify-content: center; align-items: center; z-index: 1000;">
+    <img id="popoutImage" src="#" alt="Attachment Preview" style="max-width: 90%; max-height: 90%;" />
 </div>
 
 <script>
-    function showImage(imageId) {
+    function showPopoutImage(imageId, event) {
+        event.preventDefault();
         const imageElement = document.getElementById(imageId);
-        const modalImage = document.getElementById("modalImage");
+        const popoutImage = document.getElementById("popoutImage");
+        const imagePopout = document.getElementById("imagePopout");
         
-        // Set the modal image src to the clicked image src
-        modalImage.src = imageElement.src;
+        // Set the popout image src to the clicked image src
+        popoutImage.src = imageElement.src;
 
-        // Load the image and adjust modal size based on natural dimensions
-        modalImage.onload = function() {
-            const naturalWidth = modalImage.naturalWidth;
-            const naturalHeight = modalImage.naturalHeight;
-            const maxWidth = window.innerWidth * 0.9; // Limit modal width to 90% of viewport width
-            const maxHeight = window.innerHeight * 0.9; // Limit modal height to 90% of viewport height
-            
-            const width = Math.min(naturalWidth, maxWidth);
-            const height = Math.min(naturalHeight, maxHeight);
+        // Display the popout
+        imagePopout.style.display = "flex";
+    }
 
-            const modalDialog = document.getElementById("imageModalDialog");
-            modalDialog.style.width = width + "px";
-            modalDialog.style.height = height + "px";
-        };
+    function hidePopout() {
+        document.getElementById("imagePopout").style.display = "none";
     }
 </script>
 
@@ -899,7 +896,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById('modal-monthly-expenses').textContent = '₱' + data.monthly_expenses;
                 document.getElementById('modal-affiliated-organization').textContent = data.school_community;
                 document.getElementById('modal-spending-pattern').textContent = data.spending_pattern;
-                document.getElementById('modal-savings-behavior').textContent = data.monthly_savings;
+            
                 document.getElementById('modal-career-goals').textContent = data.career_goals;
 
                 // Set the image sources
@@ -916,7 +913,7 @@ document.getElementById('modal-source-of-allowance_credit').textContent = data.s
 document.getElementById('modal-expenses_credit').textContent = data.monthly_expenses;
 document.getElementById('modal-affiliated-organization_credit').textContent = data.school_community;
 document.getElementById('modal-spending-pattern_credit').textContent = data.spending_pattern;
-document.getElementById('modal-savings-behavior_credit').textContent = data.monthly_savings;
+
 
 // For the loan purpose leave it blank for now
 document.getElementById('modal-loan-amount_credit').textContent = '₱' + data.loan_amount;
@@ -924,7 +921,25 @@ document.getElementById('modal-loan-amount_credit').textContent = '₱' + data.l
 document.getElementById('modal-loan-purpose_credit').textContent = data.loan_purpose || 'N/A'; // Default to 'N/A' if not available
 
 document.getElementById('modal-credit-score').textContent = data.credit_score;
+// Assuming data.credit_category is set based on the credit score category
 document.getElementById('modal-credit-category').textContent = data.credit_category;
+
+// Get the alert box element
+const alertBox = document.querySelector('.alert');
+
+// Change the background color based on the credit category
+if (data.credit_category === 'Fair') {
+    alertBox.style.backgroundColor = 'orange';
+    alertBox.style.color = 'white';
+} else if (data.credit_category === 'Poor') {
+    alertBox.style.backgroundColor = 'red';
+    alertBox.style.color = 'white';
+} else {
+    // Default to green for other categories
+    alertBox.style.backgroundColor = '#4CAF50';
+    alertBox.style.color = 'white';
+}
+
 
 // Example of how to set scores
 document.getElementById('yearsofstudyScore').textContent = data.yearsofstudy_score; // from PHP data

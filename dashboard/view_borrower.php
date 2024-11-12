@@ -18,7 +18,7 @@ $user_id = $_GET['transaction_id'];
 // Query to get the detailed information of the selected user, including the file paths
 $query = "SELECT `fname`, `mname`, `lname`, `birthdate`, `gender`, `cellphonenumber`, `email`, `school`, 
           `college`, `course`, `yearofstudy`, `graduationdate`, `monthly_allowance`, `source_of_allowance`, 
-          `monthly_expenses`, `school_community`, `spending_pattern`, `monthly_savings`, `career_goals`, 
+          `monthly_expenses`, `school_community`, `spending_pattern`, `career_goals`, 
           `loan_amount`, `loan_purpose`, `loan_description`, `payment_mode`, `payment_frequency`, `due_date`, 
           `account_details`, `total_amount`,`interest_earned`, `next_deadlines`,`days_to_next_deadline`, `cor1_path`, `cor2_path`, `cor3_path`, `cor4_path`, `current_address`, `permanent_address`, `gwa`
           FROM borrower_info WHERE transaction_id = $user_id";
@@ -44,7 +44,6 @@ if ($result->num_rows > 0) {
     $gwa_score = 0;
     $school_community_score = 0;
     $spending_pattern_score = 0;
-    $monthly_savings_score = 0;
     $loan_purpose_score = 0;
     $loan_amount_score = 0;
     $monthly_allowance_score = 0;
@@ -89,20 +88,7 @@ if ($result->num_rows > 0) {
     $spending_pattern_score = ($spending_pattern === 'regular expenses') ? 10 : 8;
     $credit_score += $spending_pattern_score;
 
-    // Calculate the score based on monthly savings
-    $monthly_savings = (int)$row['monthly_savings'];
-    if ($monthly_savings >= 1000) {
-        $monthly_savings_score = 10;
-    } elseif ($monthly_savings >= 800) {
-        $monthly_savings_score = 9;
-    } elseif ($monthly_savings >= 600) {
-        $monthly_savings_score = 8;
-    } elseif ($monthly_savings >= 400) {
-        $monthly_savings_score = 7;
-    } else {
-        $monthly_savings_score = 6;
-    }
-    $credit_score += $monthly_savings_score;
+    
 
     // Calculate the score based on loan purpose
     $loan_purpose = strtolower($row['loan_purpose']);
@@ -211,18 +197,18 @@ if ($result->num_rows > 0) {
     }
 
     // Add the scores and credit score category to the response
-    $row['expense_score'] = $expense_score;
+    
     $row['credit_score'] = $credit_score;
     $row['credit_category'] = $credit_category;
     $row['yearsofstudy_score'] = $yearsofstudy_score;
     $row['gwa_score'] = $gwa_score;
     $row['school_community_score'] = $school_community_score;
     $row['spending_pattern_score'] = $spending_pattern_score;
-    $row['monthly_savings_score'] = $monthly_savings_score;
     $row['loan_purpose_score'] = $loan_purpose_score;
     $row['loan_amount_score'] = $loan_amount_score;
     $row['monthly_allowance_score'] = $monthly_allowance_score;
     $row['source_of_allowance_score'] = $source_of_allowance_score;
+    $row['expense_score'] = $expense_score;
 
     echo json_encode($row); // Return the row as a JSON object
     

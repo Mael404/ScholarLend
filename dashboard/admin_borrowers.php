@@ -237,15 +237,56 @@ $result = $conn->query($sql);
     <a href="admindashboard.php" class="list-group-item list-group-item-action">
         <i class="lnr lnr-home me-2"></i> Home
     </a>
-    <a href="admin_applications.php" class="list-group-item ">
-        <i class="lnr lnr-file-empty me-2"></i>Applications
-    </a>
+    <?php
+include'condb.php';
+
+// SQL query to count 'pending' statuses in the loan-deadlines table
+$sql = "SELECT COUNT(*) AS pending_count FROM borrower_info WHERE status = 'invested' OR status = 'pending'";
+
+$result = $conn->query($sql);
+
+// Fetch the count
+$pending_count = 0;
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $pending_count = $row['pending_count'];
+}
+
+$conn->close();
+?>
+
+<a href="admin_applications.php" class="list-group-item position-relative">
+    <i class="lnr lnr-file-empty me-2"></i>Applications
+    <?php if ($pending_count > 0): ?>
+        <span class="badge bg-danger position-absolute top-0 end-0 translate-middle rounded-pill"><?php echo $pending_count; ?></span>
+    <?php endif; ?>
+</a>
     <a href="admin_lenders.php" class="list-group-item">
         <i class="lnr lnr-briefcase me-2"></i>Lenders
     </a>
-    <a href="admin_borrowers.php" class="list-group-item active">
-        <i class="lnr lnr-users me-2"></i>Borrowers
-    </a>
+    <?php
+include'condb.php';
+
+// SQL query to count 'pending' statuses in the loan-deadlines table
+$sql = "SELECT COUNT(*) AS pending_count FROM loan_deadlines WHERE status = 'pending'";
+$result = $conn->query($sql);
+
+// Fetch the count
+$pending_count = 0;
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $pending_count = $row['pending_count'];
+}
+
+$conn->close();
+?>
+
+<a href="admin_borrowers.php" class="list-group-item active position-relative">
+    <i class="lnr lnr-users me-2"></i>Borrowers
+    <?php if ($pending_count > 0): ?>
+        <span class="badge bg-danger position-absolute top-0 end-0 translate-middle rounded-pill"><?php echo $pending_count; ?></span>
+    <?php endif; ?>
+</a>
     <a href="admin_loans.php" class="list-group-item">
         <i class="lnr lnr-book me-2"></i>Loans
     </a>
@@ -293,7 +334,21 @@ $result = $conn->query($sql);
     .wallet-balance {
         font-weight: bold;
     }
+
+    .icon-container {
+    display: flex;
+    justify-content: center; /* Align horizontally */
+    align-items: center; /* Align vertically */
+    margin-bottom: 20px;
+   
+}
+
+#refreshButton {
+    cursor: pointer; /* Make the icon clickable */
+}
+
 </style>
+
 <?php
 // Database connection
 include 'condb.php';
@@ -326,7 +381,12 @@ if ($result === false) {
     die("Error executing query: " . htmlspecialchars($conn->error));
 }
 ?>
+
 <div class="container mt-4">
+<div class="icon-container">
+    <i class="fas fa-sync-alt fa-2x center" onclick="window.location.reload();" id="refreshButton"></i>
+</div>
+
     <div class="row">
         <div class="col-12">
             <div class="card p-4 text-center" style="background-color:#f4f1ec;">

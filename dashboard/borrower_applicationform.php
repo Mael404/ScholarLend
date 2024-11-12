@@ -124,10 +124,10 @@ if (isset($_SESSION['insufficient_balance'])) {
             <br>
         
             <div class="list-group list-group-flush my-3">
-    <a href="admindashboard.php" class="list-group-item list-group-item-action active">
+    <a href="borrower_applicaitonform.php" class="list-group-item list-group-item-action active">
         <i class="fas fa-tachometer-alt me-2"></i>Dashboard
     </a>
-    <a href="#" class="list-group-item">
+    <a href="borrower_messages.php" class="list-group-item">
         <i class="fas fa-envelope me-2"></i>Messages
     </a>
    
@@ -163,7 +163,7 @@ if (isset($_SESSION['insufficient_balance'])) {
             </h2>
         </div>
 
-       
+   
 
         <!-- Wallet Section (Positioned Where User Dropdown Was) -->
         
@@ -182,6 +182,15 @@ if (isset($_SESSION['insufficient_balance'])) {
     .wallet-balance {
         font-weight: bold;
     }
+    #refreshButton {
+  cursor: pointer;
+  transition: transform 0.4s ease-in-out;
+}
+
+#refreshButton.refreshing {
+  transform: rotate(360deg);
+}
+
 </style>
 
 
@@ -189,7 +198,8 @@ if (isset($_SESSION['insufficient_balance'])) {
                 <div class="row justify-content-center">
                     <div class="col-12 col-sm-12 col-md-10 col-lg-10 col-xl-9 text-center p-0 mt-3 mb-2">
                         <div class="card px-0 pt-0 pb-0 mt-3 mb-3">
-                       
+                        <i class="fas fa-sync-alt fa-2x" onclick="window.location.reload();" id="refreshButton"></i>
+
                         <?php
 
 // Ensure user is logged in
@@ -323,11 +333,27 @@ echo '</div>';
 } elseif ($has_invested_application) {
     $invested_application = $result_invested->fetch_assoc();
     $total_amount = $posted_or_approved_application['total_amount']; // Retrieve or default to 0 if not set
-    $next_deadlines = $invested_application['next_deadlines'] ?? '';
+    $next_deadlines = $posted_or_approved_application['next_deadlines'] ?? '';
+    if (!empty($next_deadlines)) {
+        // Split the string into individual dates
+        $next_deadlines_array = array_map('trim', explode(',', $next_deadlines));
     
-    // Extract the first deadline if available
-    $next_deadlines_array = array_map('trim', explode(',', $next_deadlines));
-    $first_deadline = !empty($next_deadlines_array) ? $next_deadlines_array[0] : 'No deadlines available';
+        // Convert each date to the format 'Y-m-d'
+        $formatted_deadlines = [];
+        foreach ($next_deadlines_array as $deadline) {
+            // Convert from mm/dd/yyyy to yyyy-mm-dd
+            $date = DateTime::createFromFormat('m/d/Y', $deadline);
+            if ($date) {
+                $formatted_deadlines[] = $date->format('Y-m-d');
+            }
+        }
+    
+        // If there's a valid date, display the first one, else show a default message
+        $first_deadline = !empty($formatted_deadlines) ? date('M. j, Y', strtotime($formatted_deadlines[0])) : 'No deadlines available';
+    } else {
+        $first_deadline = 'No deadlines available';
+    }
+    
 
     echo '<p style="background: linear-gradient(135deg, #dbbf94, #ccac82); padding: 15px; border-radius: 4px; color: #333333; font-size: 20px; text-align: left; width: 100%; margin: 10px auto; border: 1px solid #b29c84;"><strong>PENDING:</strong> Your application has been fully funded and is awaiting the final transfer of funds by the administrator</p>';
 
@@ -402,35 +428,36 @@ echo '</div>';
         
     } else {
        
-        echo '<div style="background-color: #f4f1ec; border-radius: 9px; padding: 15px; margin: 10px auto; color: #333; font-family: Arial, sans-serif; width: 90%;">';
-        echo '<h2 style="font-family: Georgia, serif; font-weight: bold; color: #131e3d; margin-bottom: 10px; text-align:left;">Your Loans</h2>';
-        // Flex container with three columns
-        echo '<div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0;">';
-        
-        // First column (Amount)
-        echo '<div style="text-align: left;">';
-        echo '<p style="font-size: 15px; color: #131e3d; font-weight: 200; margin: 0;">AMOUNT</p>';
-        echo '<p style="font-size: 36px; color: #cdad7d; font-weight: bold; margin: 5px 0;">₱' . number_format($total_amount, 2) . '</p>';
-        echo '</div>';
-        
-        // Second column (Due Date)
-        echo '<div style="text-align: center;">';
-        echo '<p style="font-size: 15px; color: #131e3d; font-weight: 200; margin: 0;">FIRST PAYMENT IS DUE ON</p>';
-        echo '<p style="font-size: 24px; color: #a6a6a6; font-weight: bold; margin: 5px 0;">' . date('M. j, Y', strtotime($first_deadline)) . '</p>';
-        echo '</div>';
-        
-        // Third column (Button and Form)
-        echo '<div style="text-align: right;">';
-        echo '<form id="payForm" action="remove_deadline.php" method="POST" style="display: inline;">';
-        echo '<input type="hidden" name="user_id" value="' . $user_id . '">';
-        echo '<input type="hidden" name="deadline" value="' . htmlspecialchars($first_deadline) . '">';
-        echo '<input type="hidden" name="transaction_id" value="' . $_SESSION['transaction_id'] . '">';
-        echo '<button type="button" onclick="showConfirmationBox()" style="background-color: #131e3d; color: white; padding: 10px 20px; border: none; border-radius: 5px; margin-top: 10px; cursor: pointer;">Pay Now</button>';
-        echo '</form>';
-        echo '</div>'; 
-        
-        echo '</div>'; 
-        echo '</div>';
+        echo '<div style="background-color: #f4f1ec; border-radius: 9px; padding: 30px; margin: 20px auto; color: #333; font-family: Arial, sans-serif; width: 100%;">';
+echo '<h2 style="font-family: Georgia, serif; font-weight: bold; color: #131e3d; margin-bottom: 20px; text-align:left; font-size: 32px;">Your Loans</h2>';
+// Flex container with three columns
+echo '<div style="display: flex; justify-content: space-between; align-items: center; padding: 30px 0;">';
+
+// First column (Amount)
+echo '<div style="text-align: left;">';
+echo '<p style="font-size: 20px; color: #131e3d; font-weight: 200; margin: 0;">AMOUNT</p>';
+echo '<p style="font-size: 48px; color: #cdad7d; font-weight: bold; margin: 10px 0;">₱' . number_format($total_amount, 2) . '</p>';
+echo '</div>';
+
+// Second column (Due Date)
+echo '<div style="text-align: center;">';
+echo '<p style="font-size: 20px; color: #131e3d; font-weight: 200; margin: 0;">FIRST PAYMENT IS DUE ON</p>';
+echo '<p style="font-size: 30px; color: #a6a6a6; font-weight: bold; margin: 10px 0;">' . date('M. j, Y', strtotime($first_deadline)) . '</p>';
+echo '</div>';
+
+// Third column (Button and Form)
+echo '<div style="text-align: right;">';
+echo '<form id="payForm" action="remove_deadline.php" method="POST" style="display: inline;">';
+echo '<input type="hidden" name="user_id" value="' . $user_id . '">';
+echo '<input type="hidden" name="deadline" value="' . htmlspecialchars($first_deadline) . '">';
+echo '<input type="hidden" name="transaction_id" value="' . $_SESSION['transaction_id'] . '">';
+echo '<button type="button" onclick="showConfirmationBox()" style="background-color: #131e3d; color: white; padding: 15px 30px; font-size: 20px; border: none; border-radius: 8px; margin-top: 15px; cursor: pointer;">Pay Now</button>';
+echo '</form>';
+echo '</div>';
+
+echo '</div>'; 
+echo '</div>';
+
         
         // Custom Confirmation Dialog with Larger Size
         echo '
@@ -802,22 +829,7 @@ $conn->close();
                                             </div>
                                         </div>
                                 
-                                        <!-- Monthly Savings -->
-                                        <div class="row mb-3">
-                                            <div class="col-md-12">
-                                                <div class="form-floating">
-                                                    <select class="form-select" id="monthly-savings" name="monthly-savings" required>
-                                                        <option value="" disabled selected>Select How Much You Save in a Month</option>
-                                                        <option value="1000 and above">1000 and above</option>
-                                                        <option value="800-999">800-999</option>
-                                                        <option value="600-799">600-799</option>
-                                                        <option value="400-599">400-599</option>
-                                                        <option value="Below 400">Below 400</option>
-                                                    </select>
-                                                    <label for="monthly-savings">Savings Behaviour</label>
-                                                </div>
-                                            </div>
-                                        </div>
+                                    
                                 
                                         <!-- Career Goals and Plans -->
                                         <div class="row mb-3">
@@ -1529,6 +1541,14 @@ document.getElementById('modalDueDate').textContent = selectedDueDate.toLocaleDa
     function confirmSubmission() {
         document.getElementById('msform').submit();
     }
+    document.getElementById('refreshButton').addEventListener('click', function() {
+  this.classList.add('refreshing');
+  setTimeout(function() {
+    // Reload the page after the animation completes
+    window.location.reload();
+  }, 400);  // Match the duration of the CSS animation
+});
+
 </script>
 
 

@@ -118,7 +118,7 @@ include 'display_user_wallet.php';
     <a href="lender.php" class="list-group-item list-group-item-action active ">
         <i class="fas fa-tachometer-alt me-2"></i>Dashboard
     </a>
-    <a href="#" class="list-group-item">
+    <a href="lender_messages.php" class="list-group-item">
         <i class="fas fa-envelope me-2"></i>Messages
     </a>
    
@@ -148,7 +148,7 @@ include 'display_user_wallet.php';
         <nav class="navbar navbar-expand-lg navbar-light bg-transparent py-4 px-4">
     <div class="container-fluid">
         <div class="d-flex align-items-center">
-            <i class="fas fa-align-left primary-text fs-4 me-3" id="menu-toggle"></i>
+            <i class="fas fa-align-left primary-text fs-4 me-3" id="menu-toggle"> DASHBOARD</i>
             <h2 class="fs-2 m-0" style="font-family: 'Times New Roman', Times, serif; font-weight: bold;">
            
             </h2>
