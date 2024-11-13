@@ -31,8 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['id'])) {
         // Step 2: Insert message into the `messages` table
         $message = "Fund is completely transferred";
         $status = "unread";
-        $createdAt = date('Y-m-d H:i:s'); // Optional, as it can be automatically set by MySQL
-
+      
         $stmt = $conn->prepare("INSERT INTO messages (borrower_id, message, status, created_at) VALUES (?, ?, ?, ?)");
         $stmt->bind_param("isss", $userId, $message, $status, $createdAt);
 

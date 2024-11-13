@@ -124,23 +124,52 @@ if (isset($_SESSION['insufficient_balance'])) {
             <br>
         
             <div class="list-group list-group-flush my-3">
-    <a href="borrower_applicaitonform.php" class="list-group-item list-group-item-action active">
+    <a href="borrower_applicationform.php" class="list-group-item list-group-item-action active">
         <i class="fas fa-tachometer-alt me-2"></i>Dashboard
     </a>
-    <a href="borrower_messages.php" class="list-group-item">
-        <i class="fas fa-envelope me-2"></i>Messages
-    </a>
+    <?php
+include 'condb.php';
+
+// Get the logged-in user's ID from session
+$user_id = $_SESSION['user_id']; // assuming user_id is stored in session
+
+// SQL query to count unread messages for the current user
+$sql = "SELECT COUNT(*) AS unread_count FROM messages WHERE borrower_id = ? AND status = 'unread'";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Fetch the count
+$unread_count = 0;
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $unread_count = $row['unread_count'];
+}
+
+$stmt->close();
+$conn->close();
+?>
+
+<a href="borrower_messages.php" class="list-group-item position-relative">
+    <i class="fas fa-envelope me-2"></i>Messages
+    <?php if ($unread_count > 0): ?>
+        <span class="badge bg-danger position-absolute top-2 end-0 translate-middle rounded-pill" style="z-index: 2;"><?php echo $unread_count; ?></span>
+    <?php endif; ?>
+</a>
+
+
    
-    <a href="#" class="list-group-item">
+    <a href="borrower_transactions.php" class="list-group-item">
         <i class="fas fa-exchange-alt me-2"></i>Transactions
     </a>
-    <a href="#" class="list-group-item">
+    <a href="borrower_settings.php" class="list-group-item">
         <i class="fas fa-cog me-2"></i>Settings
     </a>
-    <a href="#" class="list-group-item">
+    <a href="borrower_contactus.php" class="list-group-item">
         <i class="fas fa-address-book me-2"></i>Contact Us
     </a>
-    <a href="#" class="list-group-item list-group-item-action text-danger fw-bold">
+    <a href="/butterfly/index.html" class="list-group-item list-group-item-action text-danger fw-bold">
         <i class="fas fa-power-off me-2"></i>Logout
     </a>
 </div>
@@ -493,10 +522,9 @@ echo '</div>';
         
     }
 } else {
-    // Handle case when there are no applications
 
 
-// Close the database connection
+
 $conn->close();
 ?>
 
@@ -722,7 +750,7 @@ $conn->close();
                                                         <option value="5,001 - 7,000">5,001 - 7,000</option>
                                                         <option value="3,001 - 5,000">3,001 - 5,000</option>
                                                         <option value="1,001 - 3,000">1,001 - 3,000</option>
-                                                        <option value="	below 1,000">below 1,000</option>
+                                                        <option value="below 1,000">below 1,000</option>
                                                     </select>
                                                     <label for="monthly-allowance">Monthly Allowance</label>
                                                 </div>
@@ -753,13 +781,13 @@ $conn->close();
                                                 <div class="form-floating">
                                                     <select class="form-select" id="monthly-expenses" name="monthly-expenses" required>
                                                         <option value="" disabled selected>Select Monthly Expenses</option>
-                                                        <option value="Below 1000">Below 1,000</option>
+                                                        <option value="Below 1,000">Below 1,000</option>
                                                         <option value="1,001 - 3,000">1,001 - 3,000</option>
                                                         <option value="3,001 - 5,000">3,001 - 5,000</option>
                                                         <option value="5,001 - 7,000">5,001 - 7,000</option>
                                                         <option value="7,001 - 9,000">7,001 - 9,000</option>
                                                         <option value="9,001 - 11,000">9,001 - 11,000</option>
-                                                        <option value="Above 11000">Above 11,000</option>
+                                                        <option value="Above 11,000">Above 11,000</option>
                                                     </select>
                                                     <label for="monthly-expenses">Monthly Expenses</label>
                                                 </div>

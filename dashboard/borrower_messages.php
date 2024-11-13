@@ -124,23 +124,52 @@ if (isset($_SESSION['insufficient_balance'])) {
             <br>
         
             <div class="list-group list-group-flush my-3">
-    <a href="borrower_applicationform.php" class="list-group-item list-group-item-action ">
+    <a href="borrower_applicationform.php" class="list-group-item list-group-item-action">
         <i class="fas fa-tachometer-alt me-2"></i>Dashboard
     </a>
-    <a href="borrower_messages.php" class="list-group-item active">
-        <i class="fas fa-envelope me-2"></i>Messages
-    </a>
+    <?php
+include 'condb.php';
+
+// Get the logged-in user's ID from session
+$user_id = $_SESSION['user_id']; // assuming user_id is stored in session
+
+// SQL query to count unread messages for the current user
+$sql = "SELECT COUNT(*) AS unread_count FROM messages WHERE borrower_id = ? AND status = 'unread'";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Fetch the count
+$unread_count = 0;
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $unread_count = $row['unread_count'];
+}
+
+$stmt->close();
+$conn->close();
+?>
+
+<a href="borrower_messages.php" class="list-group-item position-relative active" style="z-index: 1;">
+    <i class="fas fa-envelope me-2"></i>Messages
+    <?php if ($unread_count > 0): ?>
+        <span class="badge bg-danger position-absolute top-2 end-0 translate-middle rounded-pill" style="z-index: 2;"><?php echo $unread_count; ?></span>
+    <?php endif; ?>
+</a>
+
+
    
-    <a href="#" class="list-group-item">
+    <a href="borrower_transactions.php" class="list-group-item">
         <i class="fas fa-exchange-alt me-2"></i>Transactions
     </a>
-    <a href="#" class="list-group-item">
+    <a href="borrower_settings.php" class="list-group-item">
         <i class="fas fa-cog me-2"></i>Settings
     </a>
-    <a href="#" class="list-group-item">
+    <a href="borrower_contactus.php" class="list-group-item">
         <i class="fas fa-address-book me-2"></i>Contact Us
     </a>
-    <a href="#" class="list-group-item list-group-item-action text-danger fw-bold">
+    <a href="/butterfly/index.html" class="list-group-item list-group-item-action text-danger fw-bold">
         <i class="fas fa-power-off me-2"></i>Logout
     </a>
 </div>
@@ -232,10 +261,9 @@ function markAsRead(messageId) {
 }
 </script>
 
-<!-- Custom CSS for styling -->
 <style>
-    .notification {
-        max-width: 600px;
+.notification {
+        max-width: 900px;
         margin: auto;
         font-family: Arial, sans-serif;
     }
@@ -250,8 +278,8 @@ function markAsRead(messageId) {
     }
 
     .notification-item i {
-        font-size: 24px;
-        margin-right: 10px;
+        font-size: 44px;
+        margin-right: 40px;
         color: #aaa;
     }
 
@@ -267,10 +295,7 @@ function markAsRead(messageId) {
         color: #aaa;
     }
 
-    .badge {
-        font-size: 0.75rem;
-        padding: 0.5em;
-    }
+    
 </style>
 
 

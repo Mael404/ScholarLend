@@ -107,7 +107,7 @@ if ($result->num_rows > 0) {
     $monthly_expenses = strtolower($row['monthly_expenses']); // Example value, replace with actual value from the database
 
     // Breakdown of the expenses based on text values
-    if ($monthly_expenses === 'below 1,000') {
+    if ($monthly_expenses === 'Below 1,000') {
         $expense_score = 20;
     } elseif ($monthly_expenses === '1,001 - 3,000') {
         $expense_score = 19;

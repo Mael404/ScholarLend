@@ -35,14 +35,12 @@ if ($email_check_result->num_rows > 0) {
     header("Location: email_failed.php");
     exit();
 } else {
-    // Generate OTP
+    // otp digdi
     $otp = rand(100000, 999999);
     $otp_expiry = date('Y-m-d H:i:s', strtotime('+10 minutes'));
 
-    // Generate a unique 11-digit custom ID
     $customID = '02000' . str_pad(mt_rand(0, 999999), 6, '0', STR_PAD_LEFT);
 
-    // Prepare SQL statement with custom ID as the user_id
     $sql = "INSERT INTO users_tb (user_id, first_name, middle_name, last_name, birthdate, phone_number, email, password, otp, otp_expiry, account_role) 
             VALUES ('$customID', '$firstName', '$middleName', '$lastName', '$birthdate', '$phoneNumber', '$email', '$password', '$otp', '$otp_expiry', '$accountRole')";
 
@@ -109,6 +107,8 @@ if ($email_check_result->num_rows > 0) {
     }
 }
 
+
+$
 $conn->close();
 
 // Function to send email using PHPMailer

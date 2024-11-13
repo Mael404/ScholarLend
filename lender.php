@@ -115,27 +115,26 @@ include 'display_user_wallet.php';
             <br>
         
             <div class="list-group list-group-flush my-3">
-    <a href="lender.php" class="list-group-item list-group-item-action active ">
+    <a href="lender.php" class="list-group-item list-group-item-action active  ">
         <i class="fas fa-tachometer-alt me-2"></i>Dashboard
     </a>
-    <a href="lender_messages.php" class="list-group-item">
+    <a href="lender_messages.php" class="list-group-item ">
         <i class="fas fa-envelope me-2"></i>Messages
     </a>
    
-    <a href="#" class="list-group-item">
+    <a href="lender_transactions.php" class="list-group-item">
         <i class="fas fa-exchange-alt me-2"></i>Transactions
     </a>
-    <a href="#" class="list-group-item">
+    <a href="lender_settings.php" class="list-group-item">
         <i class="fas fa-cog me-2"></i>Settings
     </a>
-    <a href="#" class="list-group-item">
+    <a href="lender_contactus.php" class="list-group-item">
         <i class="fas fa-address-book me-2"></i>Contact Us
     </a>
     <a href="index.html" class="list-group-item list-group-item-action text-danger fw-bold">
         <i class="fas fa-power-off me-2"></i>Logout
     </a>
 </div>
-
 
             
             

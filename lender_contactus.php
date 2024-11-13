@@ -79,6 +79,41 @@ include 'display_user_wallet.php';
     border-bottom: 3.5px solid #f0f0f0 !important;
 }
 
+.section-titlez {
+    color: #d49f3f;
+    font-weight: bold;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+    font-size: larger;
+}
+.section-titlez::before {
+    content: "●";
+    margin-right: 8px;
+    font-size: 24px;
+    color: #d49f3f;
+}
+.contact-container {
+    display: flex;
+    gap: 0px;
+    max-width: 1000px; /* Increased max width for better space utilization */
+    margin: auto;
+    padding-top: 20px;
+}
+.form-control {
+    border-color: #d49f3f;
+}
+.form-control::placeholder {
+    color: #d49f3f;
+}
+.btn-send {
+    background-color: #d49f3f;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-weight: bold;
+}
 
     </style>
 </head>
@@ -118,17 +153,17 @@ include 'display_user_wallet.php';
     <a href="lender.php" class="list-group-item list-group-item-action  ">
         <i class="fas fa-tachometer-alt me-2"></i>Dashboard
     </a>
-    <a href="lender_messages.php" class="list-group-item active">
+    <a href="lender_messages.php" class="list-group-item">
         <i class="fas fa-envelope me-2"></i>Messages
     </a>
    
-    <a href="lender_transactions.php" class="list-group-item">
+    <a href="#" class="list-group-item">
         <i class="fas fa-exchange-alt me-2"></i>Transactions
     </a>
-    <a href="lender_settings.php" class="list-group-item">
+    <a href="#" class="list-group-item">
         <i class="fas fa-cog me-2"></i>Settings
     </a>
-    <a href="lender_contactus.php" class="list-group-item">
+    <a href="#" class="list-group-item active">
         <i class="fas fa-address-book me-2"></i>Contact Us
     </a>
     <a href="index.html" class="list-group-item list-group-item-action text-danger fw-bold">
@@ -184,98 +219,40 @@ $conn->close();
         </div>
     </nav>
 
-    <div class="container mt-4">
-        
-        <div class="notification">
-        <div class="container-fluid">
-            <div class="d-flex align-items-center">
-              
-                <h2 class="fs-3 m-1" style="font-weight: bold;">
-                    Notifications
-                </h2>
-                <span class="badge bg-danger ms-2" style="border-radius: 50%;">
-                    <?php echo count($messages); // Display the count of unread messages ?>
-                </span>
+    <div class="container mt-2">
+    <div class="contact-container">
+       
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8">
+                <div class="section-titlez">Send Us Message</div>
+                <p>To reach our customer support, submit a ticket or schedule a call below. Please provide a detailed description of your problem or questions.</p>
+                <form method="POST" action="contactus.php"> <!-- Adjust action to your file's path -->
+    <div class="mb-3">
+        <select class="form-control" name="subject" aria-label="Subject" required>
+            <option value="" selected>Select Subject</option>
+            <option value="Inquiry">Inquiry</option>
+            <option value="Follow-up">Follow-up</option>
+            <option value="Technical Problem">Technical Problem</option>
+            <option value="Other Loan Application Concern">Other Loan Application Concern</option>
+        </select>
+    </div>
+    <div class="mb-4">
+        <textarea class="form-control" name="message" rows="5" placeholder="Enter Message" required></textarea>
+    </div>
+    <button type="submit" class="btn btn-send">Send Message</button>
+</form>
+
             </div>
-        </div>
-            
-            <?php if (!empty($messages)) : ?>
-                <?php foreach ($messages as $msg) : ?>
-                    <div class="notification-item" 
-                         onclick="markAsRead(<?php echo $msg['id']; ?>)" 
-                         style="<?php echo ($msg['status'] == 'unread') ? 'font-weight: bold;' : ''; ?>">
-                        <i class="fas fa-comment-dots"></i>
-                        <div>
-                            <h5 class="mb-1">Message</h5>
-                            <p><?php echo htmlspecialchars($msg['message']); ?></p>
-                            <small class="text-muted"><?php echo date("F j, Y, g:i a", strtotime($msg['created_at'])); ?></small>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php else : ?>
-                <p>No new notifications.</p>
-            <?php endif; ?>
+
+            <div class="col-12 col-md-4">
+                <div class="section-titlez">Contact Number</div>
+                <p>Landline:</p>
+                <p>Smart:</p>
+                <p>Globe:</p>
+            </div>
         </div>
     </div>
 </div>
-
-<!-- JavaScript and AJAX to Mark as Read -->
-<script>
-function markAsRead(messageId) {
-    // Send AJAX request to update message status to "read"
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "mark_as_read.php", true);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            // Remove bold style after marking as read
-            document.querySelector(`[onclick="markAsRead(${messageId})"]`).style.fontWeight = 'normal';
-        }
-    };
-    xhr.send("id=" + messageId);
-}
-</script>
-
-<!-- Custom CSS for styling -->
-<style>
-    .notification {
-        max-width: 900px;
-        margin: auto;
-        font-family: Arial, sans-serif;
-    }
-
-    .notification-item {
-        display: flex;
-        align-items: flex-start;
-        padding: 10px 5px;
-        border-bottom: 1px solid #e0e0e0;
-        margin-left: -20px;
-        cursor: pointer;
-    }
-
-    .notification-item i {
-        font-size: 44px;
-        margin-right: 40px;
-        color: #aaa;
-    }
-
-    .notification-item h5 {
-        margin: 0;
-    }
-
-    .notification-item p {
-        margin: 0;
-    }
-
-    .notification-item .text-muted {
-        color: #aaa;
-    }
-
- 
-</style>
-
-
-   
 
                    
 

@@ -2,8 +2,27 @@
     <a href="admindashboard.php" class="list-group-item list-group-item-action">
         <i class="lnr lnr-home me-2"></i> Home
     </a>
+    <?php
+include'condb.php';
+
+// SQL query to count 'pending' statuses in the loan-deadlines table
+$sql = "SELECT COUNT(*) AS pending_count FROM borrower_info WHERE status = 'pending'";
+$results = $conn->query($sql);
+
+// Fetch the count
+$pending_count = 0;
+if ($results->num_rows > 0) {
+    $row = $results->fetch_assoc();
+    $pending_count = $row['pending_count'];
+}
+
+$conn->close();
+?>
     <a href="admin_applications.php" class="list-group-item active">
         <i class="lnr lnr-file-empty me-2"></i>Applications
+        <?php if ($pending_count > 0): ?>
+        <span class="badge bg-danger position-absolute top-0 end-0 translate-middle rounded-pill"><?php echo $pending_count; ?></span>
+    <?php endif; ?>
     </a>
     <a href="admin_lenders.php" class="list-group-item">
         <i class="lnr lnr-briefcase me-2"></i>Lenders

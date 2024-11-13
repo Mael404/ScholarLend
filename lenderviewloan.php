@@ -37,7 +37,7 @@ if (isset($_GET['transaction_id'], $_GET['loan_description'], $_GET['loan_amount
 <head>
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Starter Page - Butterfly Bootstrap Template</title>
+  <title>Scholarlend</title>
   <meta name="description" content="">
   <meta name="keywords" content="">
 
@@ -144,7 +144,7 @@ function maskName($name) {
 
 <h5><?php echo htmlspecialchars(maskName($fname)); ?></h5>
 
-            <p class="text-muted mb-0">Junior</p>
+            <p class="text-muted mb-0"><?php echo $course; ?></p>
         </div>
     </div>
     <p><?php echo $loan_description; ?></p>
@@ -152,7 +152,7 @@ function maskName($name) {
     <!-- Tags -->
     <div class="d-flex mt-auto">
         <span class="badge bg-light text-dark me-2" style="padding: 10px; border-radius: 20px;">
-            <i class="fas fa-graduation-cap"></i> BS Entrepreneurship
+            <i class="fas fa-graduation-cap"></i> <?php echo $course; ?>
         </span>
         <span class="badge bg-light text-dark" style="padding: 10px; border-radius: 20px;">
             Expenses
@@ -241,8 +241,8 @@ function maskName($name) {
         
         <h6>Access documents here:</h6>
         <ul>
-          <li><a href="#">Risk assessment Report</a></li>
-          <li><a href="#">Credit score Breakdown</a></li>
+         
+        <li><a href="#" data-bs-toggle="modal" data-bs-target="#creditScoreModal">Credit score Breakdown</a></li>
           <li><a href="#">Academic Transcript</a></li>
         </ul>
       </div>
@@ -254,8 +254,23 @@ function maskName($name) {
 </div>
 
 
-
-<!-- Modal for Loan Details -->
+<div class="modal fade" id="creditScoreModal" tabindex="-1" aria-labelledby="creditScoreModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="creditScoreModalLabel">Credit Score Breakdown</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Content for credit score breakdown goes here -->
+        <p>Your credit score breakdown information will be displayed here.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- Modal for Loan Details -->
 <div class="modal fade" id="loanDetailsModal" tabindex="-1" aria-labelledby="loanDetailsModalLabel" aria-hidden="true">
   <div class="modal-dialog">

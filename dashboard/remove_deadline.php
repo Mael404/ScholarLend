@@ -125,7 +125,7 @@ if ($row) {
         $conn->close();
 
         // Redirect back to borrower_applicationform.php
-        header("Location: borrower_applicationform.php");
+        header("Location: borrower_paymentsuccess.php");
         exit();
     } else {
         // Set session variable for insufficient balance
