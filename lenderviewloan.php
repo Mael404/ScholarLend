@@ -5,8 +5,11 @@ session_start();
 include 'condb.php';
 $transaction_id = $_GET['transaction_id']; // Assuming transaction_id is passed via GET request
 
-$query = "SELECT created_at, total_amount, payment_frequency, days_to_next_deadline, fname, lname, course, career_goals FROM borrower_info WHERE transaction_id = ?";
-
+// Retrieve borrower information from borrower_info table
+$query = "SELECT created_at, total_amount, payment_frequency, days_to_next_deadline, fname, lname, course, career_goals,
+          yearofstudy, gwa, school_community, spending_pattern, loan_amount, loan_purpose, monthly_allowance, 
+          source_of_allowance, monthly_expenses
+          FROM borrower_info WHERE transaction_id = ?";
 $stmt = $conn->prepare($query);
 $stmt->bind_param('i', $transaction_id);
 $stmt->execute();
@@ -18,16 +21,135 @@ $fname = htmlspecialchars($loan['fname'] ?? "Unknown Borrower");
 $lname = htmlspecialchars($loan['lname'] ?? ""); // Assuming lname is also fetched
 $course = htmlspecialchars($loan['course'] ?? "Course not specified");
 $career_goals = htmlspecialchars($loan['career_goals'] ?? "No goals specified.");
+$total_amount = (int) ($loan['total_amount'] ?? 0);
+$days_to_next_deadline = (int) ($loan['days_to_next_deadline'] ?? 0);
 
-// Optional: Check if other parameters are set, if needed
-if (isset($_GET['transaction_id'], $_GET['loan_description'], $_GET['loan_amount'])) {
-    $transaction_id = $_GET['transaction_id'];
+// Reintroducing loan description and loan amount for displaying
+if (isset($_GET['loan_description'], $_GET['loan_amount'])) {
     $loan_description = htmlspecialchars($_GET['loan_description']); // Sanitize the input
     $loan_amount = htmlspecialchars($_GET['loan_amount']); // Sanitize the input
 } else {
     // Default values if parameters are missing
     $loan_description = "No description available.";
     $loan_amount = "0.00"; // Default value
+}
+
+// Initialize credit score and criteria-specific scores
+$credit_score = 0;
+$yearsofstudy_score = 0;
+$gwa_score = 0;
+$school_community_score = 0;
+$spending_pattern_score = 0;
+$loan_purpose_score = 0;
+$loan_amount_score = 0;
+$monthly_allowance_score = 0;
+$source_of_allowance_score = 0;
+$expense_score = 0;
+
+// Calculate the credit score based on year of study
+$yearsofstudy = $loan['yearofstudy'];
+switch ($yearsofstudy) {
+    case '4th year': $yearsofstudy_score = 7; break;
+    case '3rd year': $yearsofstudy_score = 6; break;
+    case '2nd year': $yearsofstudy_score = 5; break;
+    case '1st year': $yearsofstudy_score = 4; break;
+}
+$credit_score += $yearsofstudy_score;
+
+// Calculate the score based on GWA
+$gwa = (float) $loan['gwa'];
+if ($gwa >= 1.0 && $gwa <= 1.4) {
+    $gwa_score = 8;
+} elseif ($gwa >= 1.5 && $gwa <= 1.7) {
+    $gwa_score = 7;
+} elseif ($gwa >= 1.8 && $gwa <= 2.5) {
+    $gwa_score = 6;
+} elseif ($gwa >= 2.6 && $gwa <= 2.8) {
+    $gwa_score = 5;
+} elseif ($gwa >= 2.9 && $gwa <= 3.0) {
+    $gwa_score = 4;
+} elseif ($gwa >= 3.1 && $gwa <= 4.0) {
+    $gwa_score = 3;
+} else {
+    $gwa_score = 2;
+}
+$credit_score += $gwa_score;
+
+// Calculate the score based on school community
+$school_community = strtolower($loan['school_community']);
+$school_community_score = ($school_community === 'no') ? 4 : 5;
+$credit_score += $school_community_score;
+
+// Calculate the score based on spending pattern
+$spending_pattern = strtolower($loan['spending_pattern']);
+$spending_pattern_score = ($spending_pattern === 'regular expenses') ? 10 : 8;
+$credit_score += $spending_pattern_score;
+
+// Calculate the score based on loan purpose
+$loan_purpose = strtolower($loan['loan_purpose']);
+$loan_purpose_score = ($loan_purpose === 'directly attributable to studying' || $loan_purpose === 'overhead to studying') ? 10 : (($loan_purpose === 'general') ? 8 : 0);
+$credit_score += $loan_purpose_score;
+
+// Calculate the score based on monthly expenses
+$monthly_expenses = strtolower($loan['monthly_expenses']);
+switch ($monthly_expenses) {
+    case 'below 1,000': $expense_score = 20; break;
+    case '1,001 - 3,000': $expense_score = 19; break;
+    case '3,001 - 5,000': $expense_score = 18; break;
+    case '5,001 - 7,000': $expense_score = 17; break;
+    case '7,001 - 9,000': $expense_score = 16; break;
+    case '9,001 - 11,000': $expense_score = 15; break;
+    case 'above 11,000': $expense_score = 14; break;
+    default: $expense_score = 0;
+}
+$credit_score += $expense_score;
+
+// Calculate the score based on loan amount
+$loan_amount = (int) $loan['loan_amount'];
+if ($loan_amount == 500 || $loan_amount == 1000) {
+    $loan_amount_score = 10;
+} elseif ($loan_amount == 2000) {
+    $loan_amount_score = 9;
+} elseif ($loan_amount == 3000) {
+    $loan_amount_score = 8;
+} elseif ($loan_amount == 4000) {
+    $loan_amount_score = 7;
+} else {
+    $loan_amount_score = 6;
+}
+$credit_score += $loan_amount_score;
+
+// Calculate the score based on monthly allowance
+$monthly_allowance = strtolower($loan['monthly_allowance']);
+switch ($monthly_allowance) {
+    case 'above 11,000': $monthly_allowance_score = 20; break;
+    case '9,001 - 11,000': $monthly_allowance_score = 19; break;
+    case '7,001 - 9,000': $monthly_allowance_score = 18; break;
+    case '5,001 - 7,000': $monthly_allowance_score = 17; break;
+    case '3,001 - 5,000': $monthly_allowance_score = 16; break;
+    case '1,001 - 3,000': $monthly_allowance_score = 15; break;
+    case 'below 1,000': $monthly_allowance_score = 14; break;
+    default: $monthly_allowance_score = 0;
+}
+$credit_score += $monthly_allowance_score;
+
+// Calculate the score based on source of allowance
+$source_of_allowance = strtolower($loan['source_of_allowance']);
+$source_of_allowance_score = ($source_of_allowance === 'own business' || $source_of_allowance === 'parental support') ? 10 : (($source_of_allowance === 'scholarships') ? 9 : (($source_of_allowance === 'part-time job') ? 8 : 0));
+$credit_score += $source_of_allowance_score;
+
+// Determine credit score category
+$credit_category = '';
+if ($credit_score >= 90) {
+    $credit_category = 'Excellent';
+} elseif ($credit_score >= 80) {
+    $credit_category = 'Very Good';
+} elseif ($credit_score >= 70) {
+    $credit_category = 'Good';
+} elseif ($credit_score >= 51) {
+    $credit_category = 'Fair';
+} else {
+    $credit_category = 'Poor';
 }
 ?>
 
@@ -224,7 +346,7 @@ function maskName($name) {
     }
 </script>
 
-<!-- Modal for Borrower Profile -->
+<!-- Borrower Profile Modal -->
 <div class="modal fade" id="borrowerProfileModal" tabindex="-1" aria-labelledby="borrowerProfileModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -233,16 +355,15 @@ function maskName($name) {
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <h5><?php echo htmlspecialchars($fname); ?> <?php echo isset($lname) ? htmlspecialchars($lname) : ''; ?></h5>
-        <p class="text-muted"><?php echo isset($course) ? htmlspecialchars($course) : 'Course not specified'; ?></p>
+        <h5><?php echo htmlspecialchars($fname); ?> <?php echo htmlspecialchars($lname); ?></h5>
+        <p class="text-muted"><?php echo htmlspecialchars($course); ?></p>
 
         <h6>Career goals and plans</h6>
-        <p><?php echo isset($career_goals) ? htmlspecialchars($career_goals) : 'No goals specified.'; ?></p>
+        <p><?php echo htmlspecialchars($career_goals); ?></p>
         
         <h6>Access documents here:</h6>
         <ul>
-         
-        <li><a href="#" data-bs-toggle="modal" data-bs-target="#creditScoreModal">Credit score Breakdown</a></li>
+          <li><a href="#" data-bs-toggle="modal" data-bs-target="#creditScoreModal">Credit Score Breakdown</a></li>
           <li><a href="#">Academic Transcript</a></li>
         </ul>
       </div>
@@ -253,7 +374,7 @@ function maskName($name) {
   </div>
 </div>
 
-
+<!-- Credit Score Breakdown Modal -->
 <div class="modal fade" id="creditScoreModal" tabindex="-1" aria-labelledby="creditScoreModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -261,10 +382,12 @@ function maskName($name) {
         <h5 class="modal-title" id="creditScoreModalLabel">Credit Score Breakdown</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="modal-body">
-        <!-- Content for credit score breakdown goes here -->
-        <p>Your credit score breakdown information will be displayed here.</p>
-      </div>
+     <!-- Modal content -->
+<div class="modal-body">
+    <p>Total Credit Score: <?php echo $credit_score; ?></p>
+    <p>Credit Score Category: <?php echo $credit_category; ?></p>
+</div>
+
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
@@ -325,7 +448,7 @@ function maskName($name) {
 
         <!-- Repayment Schedule Link -->
         <div style="margin-top: 20px;">
-          <a href="#" style="color: #dbbf94; font-weight: bold; text-decoration: none;">DETAILED REPAYMENT SCHEDULE &gt;</a>
+          <a href="#" style="color: #dbbf94; font-weight: bold; text-decoration: none;">DETAILED REPAYMENT SCHEDULE <i class="bi bi-chevron-right" style="margin-left: 0px; font-weight:bold; font-size: 1.0rem;"></i></a>
         </div>
       </div>
       <div class="modal-footer">
