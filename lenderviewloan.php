@@ -163,9 +163,8 @@ if ($credit_score >= 90) {
   <meta name="description" content="">
   <meta name="keywords" content="">
 
-  <!-- Favicons -->
-  <link href="assets/img/favicon.png" rel="icon">
-  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+   <link href="assets/img/fslogo.png" rel="icon">
+  <link href="assets/img/fslogo.png" rel="apple-touch-icon">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 
@@ -288,7 +287,7 @@ function maskName($name) {
     <!-- Help Fund Section -->
   
     <div class="col-12 col-md-4">
-    <div class="help-fund card p-4" style="background-color: #fff; border-radius: 10px;">
+    <div class="help-fund card p-4" style="background-color: #fff; border-radius: 10px; font-weight:bolder;">
         <h5>Help fund this loan</h5>
         
         <!-- Open Confirmation Box Button -->
@@ -304,10 +303,10 @@ function maskName($name) {
         <!-- Borrower Profile and Loan Details -->
         <div class="d-flex justify-content-between align-items-center mt-4" style="color: #dbbf94;">
             <span data-bs-toggle="modal" data-bs-target="#borrowerProfileModal" style="cursor: pointer;">
-                <i class="fas fa-user"></i> Borrower Profile
+                <i class="fas fa-user" style="color: black;"></i> Borrower Profile
             </span>
             <span data-bs-toggle="modal" data-bs-target="#loanDetailsModal" style="cursor: pointer;">
-                <i class="fas fa-bars"></i> Loan details
+                <i class="fas fa-bars" style="color: black;"></i> Loan details
             </span>
         </div>
     </div>
@@ -373,8 +372,25 @@ function maskName($name) {
     </div>
   </div>
 </div>
+<style>
+  /* Style for the credit score modal */
+  #creditScoreModal p {
+    font-size: 1.2rem; /* Slightly larger font for better readability */
+    font-weight: 500;  /* Semi-bold text for emphasis */
+    margin-bottom: 10px; /* Space between paragraphs */
+    color: #333; /* Neutral text color */
+  }
 
-<!-- Credit Score Breakdown Modal -->
+  #creditScoreModal #score-value {
+    font-weight: bold; /* Highlight the credit score value */
+    color: #0056b3; /* Matches the active card background color */
+  }
+
+  #creditScoreModal canvas {
+    margin-top: 20px; /* Add space above the bar chart */
+  }
+</style>
+
 <div class="modal fade" id="creditScoreModal" tabindex="-1" aria-labelledby="creditScoreModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
@@ -382,18 +398,70 @@ function maskName($name) {
         <h5 class="modal-title" id="creditScoreModalLabel">Credit Score Breakdown</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-     <!-- Modal content -->
-<div class="modal-body">
-    <p>Total Credit Score: <?php echo $credit_score; ?></p>
-    <p>Credit Score Category: <?php echo $credit_category; ?></p>
-</div>
+      <div class="modal-body text-center">
+        <p>Total Credit Score: <span id="score-value"><?php echo $credit_score; ?></span></p>
+        <p>Credit Score Category: <?php echo $credit_category; ?></p>
 
+        <!-- Bar Chart Container -->
+        <canvas id="creditScoreBarChart" width="200" height="100"></canvas>
+      </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const ctx = document.getElementById("creditScoreBarChart").getContext("2d");
+    const score = <?php echo $credit_score; ?>;
+
+    // Determine color based on score
+    let color;
+    if (score >= 90) {
+      color = "#50C878"; // Green for Excellent
+    } else if (score >= 80) {
+      color = "#50C878"; // Green for Very Good
+    } else if (score >= 70) {
+      color = "#f9ca24"; // Yellow for Good
+    } else if (score >= 51) {
+      color = "#f0932b"; // Orange for Fair
+    } else {
+      color = "#eb4d4b"; // Red for Poor
+    }
+
+    // Initialize the chart
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: ["Credit Score"],
+        datasets: [{
+          label: "Score",
+          data: [score],
+          backgroundColor: color,
+          borderWidth: 1
+        }]
+      },
+      options: {
+        indexAxis: 'y', // Makes the bar horizontal
+        scales: {
+          x: {
+            min: 0,
+            max: 100
+          }
+        },
+        plugins: {
+          legend: {
+            display: false
+          }
+        }
+      }
+    });
+  });
+</script>
+
+
 <!-- Modal for Loan Details -->
 <div class="modal fade" id="loanDetailsModal" tabindex="-1" aria-labelledby="loanDetailsModalLabel" aria-hidden="true">
   <div class="modal-dialog">
@@ -495,6 +563,7 @@ function maskName($name) {
   <script src="assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
   <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
   <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>

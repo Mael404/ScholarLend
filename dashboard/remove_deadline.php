@@ -10,6 +10,14 @@ $user_id = $_POST['user_id'];
 $deadline_to_transfer = $_POST['deadline'];
 $transaction_id = $_POST['transaction_id'];
 
+
+// Check if the deadline is empty
+if (empty($deadline_to_transfer)) {
+    // Redirect the user to the borrower_completepayment.php page
+    header("Location: borrower_completepayment.php");
+    exit();
+}
+
 // Ensure transaction_id is in the session
 if (!isset($_SESSION['transaction_id'])) {
     die("Transaction ID not found in session.");

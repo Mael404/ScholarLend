@@ -270,7 +270,23 @@ if (isset($_SESSION['first_name'])) {
 
 
 
-            <?php if (empty($borrowerLoans)): ?>
+            <?php
+function maskName($name) {
+    $length = strlen($name);
+    if ($length <= 2) {
+        return $name; // Don't mask if the name is too short
+    }
+    $first = $name[0];
+    $last = $name[$length - 1];
+    $middle = substr($name, 1, $length - 2);
+
+    // Mask the middle characters, keeping the first and last character
+    $maskedMiddle = str_repeat('*', strlen($middle));
+    return $first . $maskedMiddle . $last;
+}
+?>
+
+<?php if (empty($borrowerLoans)): ?>
     <div class="col-12">
         <div class="alert text-center p-5" role="alert" style="background-color: #f4f1ec; font-size: 2.3rem; border-radius: 10px; height:30vh">
             No loans available.
@@ -288,29 +304,11 @@ if (isset($_SESSION['first_name'])) {
                 </div>
                 <div class="card-body d-flex flex-column">
                     <p class="card-text">Transaction ID: <?php echo htmlspecialchars($loan['transaction_id']); ?></p> <!-- Display transaction ID -->
-                    <?php
-function maskName($name) {
-    $length = strlen($name);
-    if ($length <= 2) {
-        return $name; // Don't mask if the name is too short
-    }
-    $first = $name[0];
-    $last = $name[$length - 1];
-    $middle = substr($name, 1, $length - 2);
-
-    // Mask the middle characters, keeping the first and last character
-    $maskedMiddle = str_repeat('*', strlen($middle));
-    return $first . $maskedMiddle . $last;
-}
-?>
-
-<p class="card-text">
-    Php <?php echo number_format($loan['loan_amount'], 2); ?> is requested by 
-    <?php echo htmlspecialchars(maskName($loan['fname'])); ?> 
-    to meet their financial needs. (<?php echo htmlspecialchars($loan['loan_description']); ?>)
-</p>
-
-
+                    <p class="card-text">
+                        Php <?php echo number_format($loan['loan_amount'], 2); ?> is requested by 
+                        <?php echo htmlspecialchars(maskName($loan['fname'])); ?> 
+                        to meet their financial needs. (<?php echo htmlspecialchars($loan['loan_description']); ?>)
+                    </p>
                     <div class="mt-auto text-end">
                         <a href="lenderviewloan.php?transaction_id=<?php echo htmlspecialchars($loan['transaction_id']); ?>&fname=<?php echo urlencode($loan['fname']); ?>&loan_description=<?php echo urlencode($loan['loan_description']); ?>&loan_amount=<?php echo urlencode($loan['loan_amount']); ?>" class="btn btn-primary" style="background-color: #131E3D;">View Loan</a>
                     </div>
@@ -319,6 +317,7 @@ function maskName($name) {
         </div>
     <?php endforeach; ?>
 <?php endif; ?>
+
 
 
 
