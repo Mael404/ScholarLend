@@ -272,9 +272,11 @@ $stmt->close();
 $conn->close();
 ?>
 
+
+
 <!-- Loans Modal -->
 <div class="modal fade" id="loansModal" tabindex="-1" aria-labelledby="loansModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="loansModalLabel">Loans Made</h5>
@@ -298,11 +300,10 @@ $conn->close();
                                     <td><?php echo htmlspecialchars($loan['transaction_id']); ?></td>
                                     <td>₱<?php echo number_format($loan['loan_amount'], 2); ?></td>
                                     <td>
-    <?php 
-    echo ($loan['status'] == 'Invested' || $loan['status'] == 'Fund Transferred') ? 'Ongoing' : htmlspecialchars($loan['status']); 
-    ?>
-</td>
-
+                                        <?php 
+                                        echo ($loan['status'] == 'Invested' || $loan['status'] == 'Fund Transferred') ? 'Ongoing' : htmlspecialchars($loan['status']); 
+                                        ?>
+                                    </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
@@ -316,7 +317,6 @@ $conn->close();
         </div>
     </div>
 </div>
-
 
 
             

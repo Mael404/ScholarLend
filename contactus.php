@@ -30,7 +30,8 @@ if (isset($_SESSION['user_id']) && $_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Execute the statement and check for success
     if ($stmt->execute()) {
-        echo "Message sent successfully!";
+        header("Location: lender_messagesuccess.php");
+        exit(); 
     } else {
         echo "Error: " . $stmt->error;
     }
