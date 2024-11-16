@@ -6,7 +6,7 @@ include 'condb.php';
 $transaction_id = $_GET['transaction_id']; // Assuming transaction_id is passed via GET request
 
 // Retrieve borrower information from borrower_info table
-$query = "SELECT created_at, total_amount, payment_frequency, days_to_next_deadline, fname, lname, course, career_goals,
+$query = "SELECT created_at, total_amount, payment_frequency, days_to_next_deadline,next_deadlines, fname, lname, course, career_goals,
           yearofstudy, gwa, school_community, spending_pattern, loan_amount, loan_purpose, monthly_allowance, 
           source_of_allowance, monthly_expenses
           FROM borrower_info WHERE transaction_id = ?";
@@ -185,6 +185,30 @@ if ($credit_score >= 90) {
   <!-- Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
    <style>
+    .go-back-btn {
+    background-color: transparent; /* No background */
+    color: #FDD7A3; /* Light orange text */
+    border: none; /* No border */
+    font-size: 18px; /* Adjust font size as needed */
+    display: flex; /* Align icon and text */
+    align-items: center;
+    cursor: pointer; /* Pointer cursor for better UX */
+    font-family: 'Arial', sans-serif; /* Clean font */
+    position: absolute; /* Position relative to parent section */
+    top: 20px; /* Distance from top */
+    left: 20px; /* Distance from left */
+    z-index: 10; /* Ensure it appears above other elements */
+}
+
+.go-back-icon {
+    margin-right: 8px; /* Space between the arrow and text */
+    font-size: 18px; /* Arrow size */
+}
+
+.go-back-btn:hover {
+    text-decoration: underline; /* Add underline effect on hover */
+}
+
      .gcash-title {
       font-size: 24px;
       color: #caaa82;
@@ -231,13 +255,20 @@ if ($credit_score >= 90) {
   <main class="main">
 
     <section id="hero" class="hero section light-background" style="position: relative; background-image: url('assets/img/hero-bg.jpg'); background-size: cover; background-position: center; background-repeat: no-repeat; min-height: 100vh;">
+      
         <div class="overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: #131e3d; opacity: 0.7;"></div>
-    <div class="container mt-5">
+     <!-- Add the Go Back button -->
+     <button class="go-back-btn" onclick="redirectToLender()">
+    <i class="fas fa-arrow-left go-back-icon"></i> Go Back
+</button>
+
+        <div class="container mt-5">
+      
     <!-- Borrower Profile Section -->
     <div class="row">
     <div class="col-12 col-md-8 mb-4">
     
-
+ 
     
     <div class="borrower-profile card p-4" style="border-radius: 10px; background-color: #fff; min-height: 400px; position: relative; display: flex; flex-direction: column;">
     <div class="d-flex align-items-center mb-3 position-relative">
@@ -347,7 +378,7 @@ function maskName($name) {
 
 <!-- Borrower Profile Modal -->
 <div class="modal fade" id="borrowerProfileModal" tabindex="-1" aria-labelledby="borrowerProfileModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="borrowerProfileModalLabel">Borrower Profile</h5>
@@ -366,9 +397,7 @@ function maskName($name) {
           <li><a href="#">Academic Transcript</a></li>
         </ul>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
+     
     </div>
   </div>
 </div>
@@ -405,9 +434,7 @@ function maskName($name) {
         <!-- Bar Chart Container -->
         <canvas id="creditScoreBarChart" width="200" height="100"></canvas>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
+     
     </div>
   </div>
 </div>
@@ -462,9 +489,9 @@ function maskName($name) {
 </script>
 
 
-<!-- Modal for Loan Details -->
+<!-- Loan Details Modal -->
 <div class="modal fade" id="loanDetailsModal" tabindex="-1" aria-labelledby="loanDetailsModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="loanDetailsModalLabel">Loan Details</h5>
@@ -475,56 +502,66 @@ function maskName($name) {
           <li><strong>Loan amount</strong> <span style="float: right;">₱<?php echo $loan_amount; ?></span></li>
           <li><strong>Application date</strong> <span style="float: right;"><?php echo date('F j, Y', strtotime($loan['created_at'])); ?></span></li>
           <li><strong>Days to next deadline</strong> 
-    <span style="float: right;">
-        <?php 
-            // Fetch the payment frequency
-            $frequency = strtolower($loan['payment_frequency']);
-            $days_to_next_deadline = $loan['days_to_next_deadline'];
-
-            // Determine the correct label based on the payment frequency
-            switch ($frequency) {
-                case 'daily':
-                    $label = 'Days';
-                    break;
-                case 'weekly':
-                    $label = 'Weeks';
-                    break;
-                case 'monthly':
-                    $label = 'Months';
-                    break;
-                default:
-                    $label = 'Days'; // Default to Days if no match
-            }
-
-            // Output the days and label
-            echo $days_to_next_deadline . ' ' . $label;
-        ?>
-    </span>
-</li>
-
-<li><strong>Frequency of payment</strong> 
-    <span style="float: right;"><?php echo ucfirst($loan['payment_frequency']); ?></span>
-</li>
-
-          <li><strong>Amount paid per installment</strong> 
-    <span style="float: right;">₱<?php echo number_format($loan['total_amount'], 2); ?></span>
-</li>
-
-
+            <span style="float: right;">
+              <?php 
+                  $frequency = strtolower($loan['payment_frequency']);
+                  $days_to_next_deadline = $loan['days_to_next_deadline'];
+                  switch ($frequency) {
+                      case 'daily': $label = 'Days'; break;
+                      case 'weekly': $label = 'Weeks'; break;
+                      case 'monthly': $label = 'Months'; break;
+                      default: $label = 'Days';
+                  }
+                  echo $days_to_next_deadline . ' ' . $label;
+              ?>
+            </span>
+          </li>
+          <li><strong>Frequency of payment</strong> <span style="float: right;"><?php echo ucfirst($loan['payment_frequency']); ?></span></li>
+          <li><strong>Amount paid per installment</strong> <span style="float: right;">₱<?php echo number_format($loan['total_amount'], 2); ?></span></li>
           <li><strong>Is the borrower paying interest?</strong> <span style="float: right;">Yes</span></li>
         </ul>
-
         <!-- Repayment Schedule Link -->
         <div style="margin-top: 20px;">
-          <a href="#" style="color: #dbbf94; font-weight: bold; text-decoration: none;">DETAILED REPAYMENT SCHEDULE <i class="bi bi-chevron-right" style="margin-left: 0px; font-weight:bold; font-size: 1.0rem;"></i></a>
+        <a href="#" id="detailedRepaymentSchedule" style="color: #dbbf94; font-weight: bold; text-decoration: none;">
+  DETAILED REPAYMENT SCHEDULE
+  <i class="bi bi-chevron-right" style="margin-left: 0px; font-weight: bold; font-size: 1.0rem;"></i>
+</a>
+
         </div>
       </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-      </div>
+     
     </div>
   </div>
 </div>
+
+<div class="modal fade" id="repaymentScheduleModal" tabindex="-1" aria-labelledby="repaymentScheduleLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="repaymentScheduleLabel">Detailed Repayment Schedule</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Total Amount</th>
+              <th>Next Deadline</th>
+            </tr>
+          </thead>
+          <tbody id="repaymentScheduleTableBody">
+            <!-- Rows will be dynamically inserted here via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    
+    </div>
+  </div>
+</div>
+
+
+
+
 
 
 
@@ -568,6 +605,79 @@ function maskName($name) {
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
 
+   <script>
+document.addEventListener("DOMContentLoaded", function () {
+  const repaymentLink = document.querySelector("#detailedRepaymentSchedule");
+  const repaymentTableBody = document.querySelector("#repaymentScheduleTableBody");
+
+  repaymentLink.addEventListener("click", function (event) {
+    event.preventDefault();
+
+    // Show the modal
+    const repaymentModal = new bootstrap.Modal(document.querySelector("#repaymentScheduleModal"));
+    repaymentModal.show();
+
+    // Make AJAX request to fetch the repayment schedule and total amount
+    const transactionId = <?php echo json_encode($transaction_id); ?>;
+
+    fetch(`fetch_repayment_schedule.php?transaction_id=${transactionId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        // Clear existing rows
+        repaymentTableBody.innerHTML = "";
+
+        if (data.next_deadlines) {
+          // Split next_deadlines into an array of dates
+          const deadlines = data.next_deadlines.split(", ");
+
+          // Generate table rows
+          deadlines.forEach((deadline) => {
+            const row = document.createElement("tr");
+
+            // Format the date into text format
+            const dateObj = new Date(deadline);
+            const formattedDate = new Intl.DateTimeFormat('en-US', {
+              month: 'long',
+              day: 'numeric',
+              year: 'numeric',
+            }).format(dateObj);
+
+            // Add Total Amount column
+            const totalAmountCell = document.createElement("td");
+            totalAmountCell.textContent = data.total_amount ?? "N/A";
+            row.appendChild(totalAmountCell);
+
+            // Add Next Deadline column
+            const nextDeadlineCell = document.createElement("td");
+            nextDeadlineCell.textContent = formattedDate;
+            row.appendChild(nextDeadlineCell);
+
+            // Append row to the table body
+            repaymentTableBody.appendChild(row);
+          });
+        } else {
+          // Handle case where no deadlines exist
+          const row = document.createElement("tr");
+          const cell = document.createElement("td");
+          cell.setAttribute("colspan", 2);
+          cell.className = "text-center";
+          cell.textContent = "No repayment schedule available.";
+          row.appendChild(cell);
+          repaymentTableBody.appendChild(row);
+        }
+      })
+      .catch((error) => {
+        repaymentTableBody.innerHTML = `<tr><td colspan="2" class="text-danger text-center">Failed to load repayment schedule. Please try again later.</td></tr>`;
+        console.error("Error fetching repayment schedule:", error);
+      });
+  });
+});
+
+function redirectToLender() {
+    window.location.href = "lenderdashboard.php";
+}
+
+   </script>
 </body>
 
 </html>

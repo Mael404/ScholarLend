@@ -533,7 +533,7 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
             <td id="expensesScore" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
         </tr>
         <tr>
-            <td rowspan="3" style="padding: 8px; border: 1px solid #ddd; vertical-align: middle;">Alternative Data Points</td>
+            <td rowspan="2" style="padding: 8px; border: 1px solid #ddd; vertical-align: middle;">Alternative Data Points</td>
             <td style="padding: 8px; border: 1px solid #ddd;">Affiliated Organization</td>
             <td id="modal-affiliated-organization_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">5</td>
@@ -545,12 +545,7 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">10</td>
             <td id="spendingPatternScore" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
         </tr>
-        <tr style="visibility: hidden;">
-            <td style="padding: 8px; border: 1px solid #ddd;">Saving Behavior</td>
-            <td id="modal-savings-behavior_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
-            <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">10</td>
-            <td id="savingsBehaviorScore" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
-        </tr>
+       
         <tr>
             <td rowspan="2" style="padding: 8px; border: 1px solid #ddd; vertical-align: middle;">Loan Purpose and Repayment Plan</td>
             <td style="padding: 8px; border: 1px solid #ddd;">Loan Purpose</td>
@@ -948,7 +943,6 @@ document.getElementById('monthlyAllowanceScore').textContent = data.monthly_allo
 document.getElementById('sourceOfAllowanceScore').textContent = data.source_of_allowance_score;
 document.getElementById('affiliatedOrganizationScore').textContent = data.school_community_score;
 document.getElementById('spendingPatternScore').textContent = data.spending_pattern_score;
-document.getElementById('savingsBehaviorScore').textContent = data.monthly_savings_score;
 document.getElementById('loanPurposeScore').textContent = data.loan_purpose_score;
 document.getElementById('loanAmountScore').textContent = data.loan_amount_score;
 document.getElementById('expensesScore').textContent = data.expense_score;

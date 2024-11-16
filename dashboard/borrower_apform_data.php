@@ -37,7 +37,7 @@ $graduationdate = $conn->real_escape_string($_POST['graduationdate']);
 $monthly_allowance = $conn->real_escape_string($_POST['monthly-allowance']);
 $source_of_allowance = $conn->real_escape_string($_POST['source-of-allowance']);
 $monthly_expenses = $conn->real_escape_string($_POST['monthly-expenses']);
-$school_community = $conn->real_escape_string($_POST['school_community']);
+$school_community = trim($_POST['school_community']) === '' ? 'No' : $conn->real_escape_string($_POST['school_community']);
 $spending_pattern = $conn->real_escape_string($_POST['spending-pattern']);
 
 $career_goals = $conn->real_escape_string($_POST['career-goals']);
