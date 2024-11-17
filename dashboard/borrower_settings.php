@@ -350,6 +350,15 @@ document.getElementById('reset-password-btn').addEventListener('click', function
 
     xhr.send(data);
 });
+document.getElementById('forgot-email').addEventListener('input', function () {
+    if (this.value) {
+        document.getElementById('password-fields').style.display = 'block';
+        document.getElementById('confirm-password-fields').style.display = 'block';
+    } else {
+        document.getElementById('password-fields').style.display = 'none';
+        document.getElementById('confirm-password-fields').style.display = 'none';
+    }
+});
 
 
 </script>

@@ -18,13 +18,7 @@ if ($conn->connect_error) {
 }
 
 // Get form data
-$accountRole = 'Borrower';
-$firstName = $_POST['firstName'];
-$middleName = $_POST['middleName'];
-$lastName = $_POST['lastName'];
-$birthdate = $_POST['birthdate'];
-$phoneNumber = $_POST['phoneNumber'];
-$email = $_POST['email'];
+
 $password = password_hash($_POST['password'], PASSWORD_BCRYPT);
 
 // Check if the email is already registered

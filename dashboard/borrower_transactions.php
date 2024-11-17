@@ -292,7 +292,12 @@ $transactions = $stmt->get_result();
                                 <td>₱<?php echo number_format($row['loan_amount'], 2); ?></td>
                                 <td><?php echo htmlspecialchars(date('F j, Y', strtotime($row['created_at']))); ?></td>
 
-                                <td><?php echo htmlspecialchars($row['status']); ?></td>
+                                <td>
+    <?php 
+    echo htmlspecialchars($row['status']) === "Completed" ? "Completed" : "Ongoing"; 
+    ?>
+</td>
+
                             </tr>
                         <?php endwhile; ?>
                     <?php else: ?>
