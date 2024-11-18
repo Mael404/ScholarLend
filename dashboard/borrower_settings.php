@@ -249,36 +249,38 @@ $conn->close();
   </div>
 </div>
 
-
 <!-- Update Password Modal -->
 <div class="modal fade" id="updatePasswordModal" tabindex="-1" aria-labelledby="updatePasswordModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="updatePasswordModalLabel">Update Password</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="mb-3">
-            <label for="current-password" class="form-label">Current Password</label>
-            <input type="password" class="form-control" id="current-password" placeholder="Enter current password" required>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="updatePasswordModalLabel">Update Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="updatePasswordForm">
+                    <div class="mb-3">
+                        <label for="currentPassword" class="form-label">Current Password</label>
+                        <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">New Password</label>
+                        <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">Confirm New Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="updatePasswordBtn">Update Password</button>
+            </div>
         </div>
-        <div class="mb-3">
-            <label for="new-password" class="form-label">New Password</label>
-            <input type="password" class="form-control" id="new-password" placeholder="Enter new password" required>
-        </div>
-        <div class="mb-3">
-            <label for="confirm-password" class="form-label">Confirm New Password</label>
-            <input type="password" class="form-control" id="confirm-password" placeholder="Confirm new password" required>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Update Password</button>
-      </div>
     </div>
-  </div>
 </div>
+
 
 <!-- Change Email Modal -->
 <div class="modal fade" id="changeEmailModal" tabindex="-1" aria-labelledby="changeEmailModalLabel" aria-hidden="true">
@@ -360,6 +362,71 @@ document.getElementById('forgot-email').addEventListener('input', function () {
     }
 });
 
+// Event listener for the update password button
+document.getElementById('updatePasswordBtn').addEventListener('click', function () {
+    var currentPassword = document.getElementById('currentPassword').value;
+    var newPassword = document.getElementById('newPassword').value;
+    var confirmPassword = document.getElementById('confirmPassword').value;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+        alert('Please fill in all fields.');
+        return;
+    }
+
+    if (newPassword !== confirmPassword) {
+        alert('New password and confirm password do not match.');
+        return;
+    }
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "update_password.php", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            var response = JSON.parse(xhr.responseText);
+            alert(response.message); // Show the response message
+
+            if (response.success) {
+                $('#updatePasswordModal').modal('hide'); // Hide the modal if successful
+            }
+        }
+    };
+
+    // Sending the data to the server
+    var data = "currentPassword=" + encodeURIComponent(currentPassword) + 
+               "&newPassword=" + encodeURIComponent(newPassword) + 
+               "&confirmPassword=" + encodeURIComponent(confirmPassword);
+    xhr.send(data);
+});
+
+
+
+document.querySelector('#changeEmailModal .btn-primary').addEventListener('click', function () {
+    var newEmail = document.getElementById('new-email').value;
+
+    if (!newEmail) {
+        alert('Please enter a new email address.');
+        return;
+    }
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "change_email.php", true);
+    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4 && xhr.status == 200) {
+            var response = JSON.parse(xhr.responseText);
+            if (response.success) {
+                alert(response.message);
+                $('#changeEmailModal').modal('hide');
+            } else {
+                alert(response.message);
+            }
+        }
+    };
+
+    var data = "new_email=" + encodeURIComponent(newEmail);
+    xhr.send(data);
+});
 
 </script>
 

@@ -309,6 +309,54 @@ $transactions = $stmt->get_result();
             </table>
         </div>
     </div>
+
+<!-- Modal -->
+<div class="modal fade" id="transactionModal" tabindex="-1" aria-labelledby="transactionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="transactionModalLabel">Loan Information</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Loan Information Section -->
+                <div class="mb-4">
+                    <h5 class="fw-bold">Loan-<span id="loan_id"></span> Information</h5>
+                    <ul class="list-unstyled">
+                        <li><strong>LOAN AMOUNT: </strong>₱<span id="loan_amount"></span></li>
+                        <li><strong>TERMS: </strong><span id="loan_terms"></span></li>
+                        <li><strong>DATE RELEASED: </strong><span id="date_released"></span></li>
+                        <li><strong>DATE APPLIED: </strong><span id="date_applied"></span></li>
+                        <li><strong>STATUS: </strong><span id="loan_status"></span></li>
+                    </ul>
+                </div>
+                <hr>
+                <!-- Repayment Schedule Section -->
+                <div>
+                    <h5 class="fw-bold">Loan-<span id="loan_id_2"></span> Repayment Schedule</h5>
+                    <p>Repayments begin in <strong><span id="repayment_start"></span></strong></p>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead class="bg-light">
+                                <tr>
+                                    <th>Due Date</th>
+                                    <th>Amount</th>
+                                    <th>Payment Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="repayment_schedule">
+                                <!-- JavaScript will populate this dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 </div>
 
 
@@ -327,6 +375,75 @@ $transactions = $stmt->get_result();
 
 
 
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const rows = document.querySelectorAll("#applicantsTable tbody tr");
+
+    rows.forEach(function (row) {
+        row.addEventListener("click", function () {
+            const transactionId = row.cells[0].innerText; // Assuming transaction ID is in the first column
+
+            // Fetch loan data (already existing logic)
+            fetch(`fetch_loan_data.php?transaction_id=${transactionId}`)
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.error) {
+                        alert(data.error);
+                        return;
+                    }
+
+                    // Populate loan information (existing logic)
+                    document.getElementById("loan_id").innerText = transactionId;
+                    document.getElementById("loan_amount").innerText = `₱${parseFloat(data.loan_amount).toFixed(2)}`;
+                    document.getElementById("loan_terms").innerText = data.terms;
+                    document.getElementById("date_released").innerText = data.date_released;
+                    document.getElementById("date_applied").innerText = data.date_applied;
+                    document.getElementById("loan_status").innerText = data.status;
+
+                    // Populate repayment schedule
+                    fetch(`fetch_loan_schedule.php?transaction_id=${transactionId}`)
+                        .then((response) => response.json())
+                        .then((scheduleData) => {
+                            if (scheduleData.error) {
+                                alert(scheduleData.error);
+                                return;
+                            }
+
+                            const scheduleTable = document.getElementById("repayment_schedule");
+                            scheduleTable.innerHTML = ""; // Clear existing rows
+
+                            // Populate rows
+                            scheduleData.forEach((item) => {
+                                const row = `
+                                    <tr>
+                                        <td>${item.deadline}</td>
+                                        <td>₱${parseFloat(item.amount).toFixed(2)}</td>
+                                        <td>${item.payment_date || "Not Yet Paid"}</td>
+                                        <td>${item.status}</td>
+                                    </tr>
+                                `;
+                                scheduleTable.innerHTML += row;
+                            });
+                        })
+                        .catch((error) => {
+                            console.error("Error fetching repayment schedule:", error);
+                            alert("An error occurred while fetching repayment schedule.");
+                        });
+
+                    // Show the modal
+                    new bootstrap.Modal(document.getElementById("transactionModal")).show();
+                })
+                .catch((error) => {
+                    console.error("Error fetching loan data:", error);
+                    alert("An error occurred while fetching loan data.");
+                });
+        });
+    });
+});
+
+
+
+</script>
 
 
 </body>
