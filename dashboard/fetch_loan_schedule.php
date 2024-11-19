@@ -22,8 +22,8 @@ if (!$transaction_id) {
 
 // Fetch repayment schedule data from loan_deadlines
 $sql_deadlines = "SELECT deadline, amount, created_at AS payment_date, status 
-                  FROM loan_deadlines 
-                  WHERE transaction_id = ?";
+                  FROM loan_deadlines
+                  WHERE transaction_id = ? AND status = 'Fund Transferred'";
 $stmt_deadlines = $conn->prepare($sql_deadlines);
 $stmt_deadlines->bind_param("s", $transaction_id);
 $stmt_deadlines->execute();
@@ -35,9 +35,9 @@ while ($row = $result_deadlines->fetch_assoc()) {
 }
 
 // Fetch loan details from borrower_info
-$sql_borrower = "SELECT next_deadlines, loan_amount 
+$sql_borrower = "SELECT next_deadlines, total_amount 
                  FROM borrower_info 
-                 WHERE transaction_id = ?";
+                 WHERE transaction_id = ? AND status ='Approved'";
 $stmt_borrower = $conn->prepare($sql_borrower);
 $stmt_borrower->bind_param("s", $transaction_id);
 $stmt_borrower->execute();
@@ -46,17 +46,19 @@ $result_borrower = $stmt_borrower->get_result();
 if ($row_borrower = $result_borrower->fetch_assoc()) {
     // Extract next deadlines and loan amount
     $next_deadlines = explode(",", $row_borrower['next_deadlines']); // Assuming multiple dates separated by commas
-    $loan_amount = $row_borrower['loan_amount'];
+    $loan_amount = $row_borrower['total_amount'];
 
     // Merge with repayment schedule
     foreach ($next_deadlines as $deadline) {
         $schedule[] = [
-            "deadline" => $deadline,
+            "deadline" => date("F j, Y", strtotime($deadline)), // Format deadline
             "amount" => $loan_amount,
-            "payment_date" => "N/A",
-            "status" => "<button class='btn btn-primary btn-sm pay-now'>PAY NOW</button>"
+            "payment_date" => "N/A", // Default value for now
+          "status" => "<a href='borrower_applicationform.php' class='btn btn-primary btn-sm pay-now'>PAY NOW</a>"
+
         ];
     }
+    
 }
 
 // Close connections

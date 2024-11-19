@@ -56,8 +56,7 @@ if (isset($_SESSION['insufficient_balance'])) {
     .list-group-item:hover {
         background-color: #dbbf94; /* Set background color on hover */
         color: white; /* Set text color on hover */
-        padding: 14px 18px; /* Adjust padding for hover effect */
-        transform: scale(1.05); /* Scale up */
+       
     }
 
     .user-info {
@@ -1480,9 +1479,25 @@ document.getElementById('modalDueDate').textContent = selectedDueDate.toLocaleDa
         const currentDate = new Date();
         const minDate = new Date(currentDate);
         const maxDate = new Date(currentDate);
-
+     //ANDITO UNG CODE!!
+     //ANDITO UNG CODE!!
+     //ANDITO UNG CODE!!
+     //ANDITO UNG CODE!!
+     //ANDITO UNG CODE!!
+     //ANDITO UNG CODE!!
+     //ANDITO UNG CODE!!
+     //ANDITO UNG CODE!!
+     //ANDITO UNG CODE!!
+     //ANDITO UNG CODE!!
+     //ANDITO UNG CODE!!
+     //ANDITO UNG CODE!!
+     //ANDITO UNG CODE!!
+     //ANDITO UNG CODE!!
+     //ANDITO UNG CODE!!
+     //ANDITO UNG CODE!!
+     //ANDITO UNG CODE!!
         // Set minimum date to tomorrow
-        minDate.setDate(minDate.getDate() + 1);
+        minDate.setDate(minDate.getDate() + 5);
 
         // Set maximum date to 3 months from today
         maxDate.setMonth(maxDate.getMonth() + 3);

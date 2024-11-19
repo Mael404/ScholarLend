@@ -54,7 +54,7 @@ $result = $conn->query($sql);
 
 /* Active sidebar item */
 .list-group-item.active {
-    background-color: #caac82; /* Set the background color for active item */
+    background-color: #dbbf94; /* Set the background color for active item */
     color: rgb(255, 255, 255); /* Set the text color for active item */
     font-weight: bold; /* Make the text bold for active item */
     border-radius: 8px; /* Keep the rounded corners */
@@ -62,7 +62,7 @@ $result = $conn->query($sql);
 }
 
     .list-group-item:hover {
-        background-color: #caac82; /* Set background color on hover */
+        background-color: #dbbf94; /* Set background color on hover */
         color: white; 
      
     }
@@ -290,9 +290,31 @@ $conn->close();
     <a href="admin_loans.php" class="list-group-item">
         <i class="lnr lnr-book me-2"></i>Loans
     </a>
-    <a href="admin_messages.php" class="list-group-item">
-        <i class="lnr lnr-envelope me-2"></i>Messages
-    </a>
+    <?php
+include 'condb.php';
+
+// SQL query to count unread messages in the contactus table
+$sql = "SELECT COUNT(*) AS unread_count FROM contactus WHERE status = 'unread'";
+
+$result = $conn->query($sql);
+
+// Fetch the count
+$unread_count = 0;
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $unread_count = $row['unread_count'];
+}
+
+$conn->close();
+?>
+
+<a href="admin_messages.php" class="list-group-item position-relative">
+    <i class="lnr lnr-file-empty me-2"></i>Messages
+    <?php if ($unread_count > 0): ?>
+        <span class="badge bg-danger position-absolute top-0 end-0 translate-middle rounded-pill"><?php echo $unread_count; ?></span>
+    <?php endif; ?>
+</a>
+
     <a href="admin_reports.php" class="list-group-item">
         <i class="lnr lnr-chart-bars me-2"></i>Reports
     </a>

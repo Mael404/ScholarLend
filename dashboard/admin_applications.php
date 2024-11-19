@@ -67,7 +67,7 @@ $result = $conn->query($sql);
 
 /* Active sidebar item */
 .list-group-item.active {
-    background-color: #caac82; /* Set the background color for active item */
+    background-color: #dbbf94; /* Set the background color for active item */
     color: rgb(255, 255, 255); /* Set the text color for active item */
     font-weight: bold; /* Make the text bold for active item */
     border-radius: 8px; /* Keep the rounded corners */
@@ -75,7 +75,7 @@ $result = $conn->query($sql);
 }
 
     .list-group-item:hover {
-        background-color: #caac82; /* Set background color on hover */
+        background-color: #dbbf94; /* Set background color on hover */
         color: white; 
     }
 

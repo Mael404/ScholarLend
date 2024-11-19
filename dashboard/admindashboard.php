@@ -226,6 +226,47 @@ $result = $conn->query($sql);
 }
 
 
+  .dashboard-card {
+            background-color: #F5E0C3;
+            border-radius: 5px;
+            padding: 20px;
+            color: #212529;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 180px; /* Set a fixed height */
+            position: relative;
+            text-align: left;
+        }
+        .dashboard-card h5 {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 0;
+        }
+        .dashboard-card p {
+            font-size: 32px;
+            margin: 0;
+            font-weight: bold;
+        }
+        .dashboard-card a {
+            color: #212529;
+            background-color: #e8d1ae;
+            padding: 8px 16px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 14px;
+            position: absolute;
+            bottom: 20px; /* Stick to bottom padding */
+            left: 20px;
+            right: 20px;
+            text-align: center;
+        }
+        .dashboard-card a:hover {
+            color: #212529;
+            background-color: #b89470;
+            text-decoration: none;
+        }
+
     </style>
 </head>
 
@@ -265,10 +306,9 @@ $result = $conn->query($sql);
                 </div>  
                             </div>
 
-          
         
                             <div class="list-group list-group-flush my-3">
-    <a href="admindashboard.php" class="list-group-item  list-group-item-action">
+    <a href="admindashboard.php" class="list-group-item active list-group-item-action">
         <i class="lnr lnr-home me-2"></i> Home
     </a>
     <?php
@@ -342,7 +382,7 @@ if ($result->num_rows > 0) {
 $conn->close();
 ?>
 
-<a href="admin_messages.php" class="list-group-item active position-relative">
+<a href="admin_messages.php" class="list-group-item position-relative">
     <i class="lnr lnr-file-empty me-2"></i>Messages
     <?php if ($unread_count > 0): ?>
         <span class="badge bg-danger position-absolute top-0 end-0 translate-middle rounded-pill"><?php echo $unread_count; ?></span>
@@ -370,7 +410,7 @@ $conn->close();
   <nav class="navbar navbar-expand-lg navbar-light bg-transparent py-4 px-4">
     <div class="d-flex align-items-center">
       <i class="fas fa-align-left primary-text fs-4 me-3" id="menu-toggle"></i>
-      <h2 class="fs-2 m-0" style="font-family: 'Times New Roman', Times, serif;">Loans</h2>
+      <h2 class="fs-2 m-0" style="font-family: 'Times New Roman', Times, serif;">Dashboard</h2>
     </div>
 
     
@@ -391,129 +431,48 @@ $conn->close();
         font-weight: bold;
     }
 </style>
-<?php
-require 'condb.php'; // include your database connection file
 
-// Prepare the query to fetch all messages for the admin view
-$sql = "SELECT inquiry_id, borrower_id, subject, message, created_at, status 
-        FROM contactus ORDER BY created_at DESC";
-$result = $conn->query($sql);
-
-$messages = [];
-if ($result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $messages[] = $row;
-    }
-}
-
-$conn->close();
-?>
-
-<!-- HTML Code to Display Messages -->
-<div id="page-content-wrapper">
-    <div class="container-fluid">
-        <div class="d-flex align-items-center">
-            <h2 class="fs-2 m-4" style="font-family: 'Times New Roman', Times, serif; font-weight: bold;">
-                Notifications
-            </h2>
-            <span class="badge bg-danger ms-1" style="border-radius: 50%;" id="unreadCount">
-                <?php echo count(array_filter($messages, fn($msg) => $msg['status'] == 'unread')); ?>
-            </span>
+<div class="container mt-4">
+   
+    <div class="row">
+        <div class="col-md-3">
+            <div class="dashboard-card">
+                <div>
+                    <h5>APPLICATIONS TODAY</h5>
+                    <p>5</p>
+                </div>
+                <a href="#">View Applications &raquo;</a>
+            </div>
         </div>
-    </div>
-
-    <div class="container mt-4">
-        <div class="notification">
-            <?php if (!empty($messages)) : ?>
-                <?php foreach ($messages as $msg) : ?>
-                    <div class="notification-item" 
-                         onclick="markAsRead(<?php echo $msg['inquiry_id']; ?>)" 
-                         style="<?php echo ($msg['status'] == 'unread') ? 'font-weight: bold;' : ''; ?>">
-                        <i class="fas fa-comment-dots"></i>
-                        <div>
-                            <h5 class="mb-1">Message from Borrower ID: <?php echo htmlspecialchars($msg['borrower_id']); ?></h5>
-                            <p><?php echo htmlspecialchars($msg['message']); ?></p>
-                            <small class="text-muted"><?php echo date("F j, Y, g:i a", strtotime($msg['created_at'])); ?></small>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            <?php else : ?>
-                <p>No new notifications.</p>
-            <?php endif; ?>
+        <div class="col-md-3">
+            <div class="dashboard-card">
+                <div>
+                    <h5>LENDERS</h5>
+                    <p>20</p>
+                </div>
+                <a href="#">View Lenders &raquo;</a>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="dashboard-card">
+                <div>
+                    <h5>BORROWERS</h5>
+                    <p>18</p>
+                </div>
+                <a href="#">View Borrowers &raquo;</a>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="dashboard-card">
+                <div>
+                    <h5>ACTIVE LOANS</h5>
+                    <p>15</p>
+                </div>
+                <a href="#">View Loans &raquo;</a>
+            </div>
         </div>
     </div>
 </div>
-
-<script>
-function markAsRead(inquiry_id) {
-    // Send an AJAX request to update the message status to 'read' for a specific inquiry_id
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "admin_mark_as_read.php", true);
-    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            if (xhr.responseText === "success") {
-                // Update the clicked notification item to remove bold style
-                var notificationItem = document.querySelector(`[onclick='markAsRead(${inquiry_id})']`);
-                notificationItem.style.fontWeight = "normal";
-                
-                // Update the unread badge count
-                var unreadCount = document.getElementById("unreadCount");
-                var count = parseInt(unreadCount.textContent);
-                unreadCount.textContent = count > 0 ? count - 1 : 0;
-            }
-        }
-    };
-    xhr.send("inquiry_id=" + inquiry_id);
-}
-</script>
-
-
-
-
-<style>
-.notification {
-        max-width: 900px;
-        margin: auto;
-        font-family: Arial, sans-serif;
-    }
-
-    .notification-item {
-        display: flex;
-        align-items: flex-start;
-        padding: 10px 5px;
-        border-bottom: 1px solid #e0e0e0;
-        margin-left: -20px;
-        cursor: pointer;
-    }
-
-    .notification-item i {
-        font-size: 44px;
-        margin-right: 40px;
-        color: #aaa;
-    }
-
-    .notification-item h5 {
-        margin: 0;
-    }
-
-    .notification-item p {
-        margin: 0;
-    }
-
-    .notification-item .text-muted {
-        color: #aaa;
-    }
-
-    
-</style>
-
-
-
-
-
-
-
 
 <!-- Bootstrap JS 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script> -->
@@ -545,15 +504,6 @@ function markAsRead(inquiry_id) {
         toggleButton.onclick = function () {
             el.classList.toggle("toggled");
         };
-
-        $(document).ready(function() {
-        $('#lendersTable').DataTable({
-            "paging": false,
-            "searching": true,
-            "info": false,
-            "ordering": false
-        });
-    });
 
 
     </script>

@@ -56,8 +56,7 @@ if (isset($_SESSION['insufficient_balance'])) {
     .list-group-item:hover {
         background-color: #dbbf94; /* Set background color on hover */
         color: white; /* Set text color on hover */
-        padding: 14px 18px; /* Adjust padding for hover effect */
-        transform: scale(1.05); /* Scale up */
+        
     }
 
     .user-info {

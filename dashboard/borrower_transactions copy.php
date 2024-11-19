@@ -56,7 +56,8 @@ if (isset($_SESSION['insufficient_balance'])) {
     .list-group-item:hover {
         background-color: #dbbf94; /* Set background color on hover */
         color: white; /* Set text color on hover */
-       
+        padding: 14px 18px; /* Adjust padding for hover effect */
+        transform: scale(1.05); /* Scale up */
     }
 
     .user-info {
@@ -397,7 +398,7 @@ $transactions = $stmt->get_result();
 
 <!-- Modal -->
 <div class="modal fade" id="transactionModal" tabindex="-1" aria-labelledby="transactionModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-m">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header bg-light">
                 <h5 class="modal-title fw-bold" id="transactionModalLabel">Loan Information</h5>
@@ -407,15 +408,15 @@ $transactions = $stmt->get_result();
                 <!-- Loan Information Section -->
                 <div class="mb-4">
                     <h5 class="fw-bold">Loan-<span id="loan_id"></span> Information</h5>
-                    <ul class="list-unstyled loan-info">
-    <li><strong>LOAN AMOUNT:</strong> <span id="loan_amount"></span></li>
-    <li><strong>TERMS:</strong> <span id="loan_terms"></span></li>
-    <li><strong>DATE RELEASED:</strong> <span id="date_released"></span></li>
-    <li><strong>DATE APPLIED:</strong> <span id="date_applied"></span></li>
-    <li><strong>STATUS:</strong> <span id="loan_status"></span></li>
-</ul>
-
-
+                    <div class="text-center"> <!-- Wrap the <ul> inside a text-center container -->
+    <ul class="list-unstyled loan-info">
+        <li><strong>LOAN AMOUNT:</strong> <span id="loan_amount"></span></li>
+        <li><strong>TERMS:</strong> <span id="loan_terms"></span></li>
+        <li><strong>DATE RELEASED:</strong> <span id="date_released"></span></li>
+        <li><strong>DATE APPLIED:</strong> <span id="date_applied"></span></li>
+        <li><strong>STATUS:</strong> <span id="loan_status"></span></li>
+    </ul>
+</div>
                 </div>
                 <hr>
                 <!-- Repayment Schedule Section -->
@@ -526,13 +527,12 @@ document.getElementById("date_applied").innerText = new Date(data.date_applied).
     const paymentDate = item.payment_date ? formatDate(item.payment_date) : "Not Yet Paid";
 
     const row = `
-        <tr style="font-size: 0.8em;">
-    <td>${deadline}</td>
-    <td>₱${parseFloat(item.amount).toFixed(2)}</td>
-    <td>${paymentDate}</td>
-    <td>${item.status}</td>
-</tr>
-
+        <tr>
+            <td>${deadline}</td>
+            <td>₱${parseFloat(item.amount).toFixed(2)}</td>
+            <td>${paymentDate}</td>
+            <td>${item.status}</td>
+        </tr>
     `;
     scheduleTable.innerHTML += row;
 });

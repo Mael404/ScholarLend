@@ -54,7 +54,7 @@ $result = $conn->query($sql);
 
 /* Active sidebar item */
 .list-group-item.active {
-    background-color: #caac82; /* Set the background color for active item */
+    background-color: #dbbf94; /* Set the background color for active item */
     color: rgb(255, 255, 255); /* Set the text color for active item */
     font-weight: bold; /* Make the text bold for active item */
     border-radius: 8px; /* Keep the rounded corners */
@@ -62,7 +62,7 @@ $result = $conn->query($sql);
 }
 
     .list-group-item:hover {
-        background-color: #caac82; /* Set background color on hover */
+        background-color: #dbbf94; /* Set background color on hover */
         color: white; /* Set text color on hover */
        
     }
@@ -268,24 +268,87 @@ $result = $conn->query($sql);
           
         
                             <div class="list-group list-group-flush my-3">
-    <a href="admindashboard.php" class="list-group-item list-group-item-action">
+    <a href="admindashboard.php" class="list-group-item  list-group-item-action">
         <i class="lnr lnr-home me-2"></i> Home
     </a>
-    <a href="admin_applications.php" class="list-group-item ">
-        <i class="lnr lnr-file-empty me-2"></i>Applications
-    </a>
-    <a href="admin_lenders.php" class="list-group-item ">
+    <?php
+include'condb.php';
+
+// SQL query to count 'pending' statuses in the loan-deadlines table
+$sql = "SELECT COUNT(*) AS pending_count FROM borrower_info WHERE status = 'invested' OR status = 'pending'";
+
+$result = $conn->query($sql);
+
+// Fetch the count
+$pending_count = 0;
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $pending_count = $row['pending_count'];
+}
+
+$conn->close();
+?>
+
+<a href="admin_applications.php" class="list-group-item position-relative">
+    <i class="lnr lnr-file-empty me-2"></i>Applications
+    <?php if ($pending_count > 0): ?>
+        <span class="badge bg-danger position-absolute top-0 end-0 translate-middle rounded-pill"><?php echo $pending_count; ?></span>
+    <?php endif; ?>
+</a>
+    <a href="admin_lenders.php" class="list-group-item">
         <i class="lnr lnr-briefcase me-2"></i>Lenders
     </a>
-    <a href="admin_borrowers.php" class="list-group-item">
-        <i class="lnr lnr-users me-2"></i>Borrowers
-    </a>
+    <?php
+include'condb.php';
+
+// SQL query to count 'pending' statuses in the loan-deadlines table
+$sql = "SELECT COUNT(*) AS pending_count FROM loan_deadlines WHERE status = 'pending'";
+$result = $conn->query($sql);
+
+// Fetch the count
+$pending_count = 0;
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $pending_count = $row['pending_count'];
+}
+
+$conn->close();
+?>
+
+<a href="admin_borrowers.php" class="list-group-item position-relative">
+    <i class="lnr lnr-users me-2"></i>Borrowers
+    <?php if ($pending_count > 0): ?>
+        <span class="badge bg-danger position-absolute top-0 end-0 translate-middle rounded-pill"><?php echo $pending_count; ?></span>
+    <?php endif; ?>
+</a>
     <a href="admin_loans.php" class="list-group-item active">
         <i class="lnr lnr-book me-2"></i>Loans
     </a>
-    <a href="admin_messages.php" class="list-group-item">
-        <i class="lnr lnr-envelope me-2"></i>Messages
-    </a>
+    <?php
+include 'condb.php';
+
+// SQL query to count unread messages in the contactus table
+$sql = "SELECT COUNT(*) AS unread_count FROM contactus WHERE status = 'unread'";
+
+$result = $conn->query($sql);
+
+// Fetch the count
+$unread_count = 0;
+if ($result->num_rows > 0) {
+    $row = $result->fetch_assoc();
+    $unread_count = $row['unread_count'];
+}
+
+$conn->close();
+?>
+
+<a href="admin_messages.php" class="list-group-item position-relative">
+    <i class="lnr lnr-file-empty me-2"></i>Messages
+    <?php if ($unread_count > 0): ?>
+        <span class="badge bg-danger position-absolute top-0 end-0 translate-middle rounded-pill"><?php echo $unread_count; ?></span>
+    <?php endif; ?>
+</a>
+
     <a href="admin_reports.php" class="list-group-item">
         <i class="lnr lnr-chart-bars me-2"></i>Reports
     </a>
@@ -296,6 +359,7 @@ $result = $conn->query($sql);
         <i class="lnr lnr-power-switch me-2"></i>Logout
     </a>
 </div>
+
             
             
         </div>     
@@ -495,7 +559,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 <!-- Loan Details Modal -->
 <div class="modal fade" id="loanModal" tabindex="-1" aria-labelledby="loanModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-m">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="loanModalLabel">Loan ID <span id="modalLoanId"></span></h5>
@@ -505,7 +569,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 <p><strong>STATUS:</strong> <span id="modalStatus" class="status-box"></span></p>
                 
                 <h6 class="section-titles">Basic Loan Information</h6>
-                <div class="loan-info">
+                <div class="loan-info" style="margin-left: 75px;">
                     <p>Name of Borrower / ID: <span id="modalBorrowerName"></span></p>
                     <p>Loan Amount: <span id="modalLoanAmount"></span></p>
                     <p>Mode of Payment: <span id="modalPaymentMode"></span></p>
@@ -525,9 +589,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 </div>
                 
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
+           
         </div>
     </div>
 </div>
@@ -549,10 +611,10 @@ function performAction(transactionId) {
             document.getElementById('modalOtherone').textContent = data.loan_amount;
             document.getElementById('modalPaymentMode').textContent = data.payment_mode;
             document.getElementById('modalLenderName').textContent = data.lender_name;
-            // Assuming data.created_at is in the format 'YYYY-MM-DD HH:MM:SS'
+            
 const date = new Date(data.created_at);
 
-// Create an options object for formatting
+
 const options = { year: 'numeric', month: 'long', day: 'numeric' };
 
 // Format the date
