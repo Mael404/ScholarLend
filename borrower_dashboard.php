@@ -191,13 +191,12 @@ session_start();
             
 
           
-            
-      
-            <li class="nav-item d-flex align-items-center mx-3">
-              <div style="background-color: black; border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; cursor: pointer;">
-                <i class="bi bi-person" style="font-size: 1.5rem; color: white;"></i>
-              </div>
-            </li>
+            <li class="nav-item d-flex align-items-center mx-3" onclick="window.location.href='dashboard/borrower_applicationform.php';" style="cursor: pointer;">
+  <div style="background-color: black; border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center;">
+    <i class="bi bi-person" style="font-size: 1.5rem; color: white;"></i>
+  </div>
+</li>
+
             
             
           </ul>
@@ -225,7 +224,7 @@ session_start();
 ?>
 
 
-          <h1 class="mt-4" style="text-align: left; font-weight:400;">Recommended loans for you</h1>
+          <h1 class="mt-4" style="text-align: left; font-weight:400;">Get a Loan in 3 Easy Steps!</h1>
         </div>
       </div>
   

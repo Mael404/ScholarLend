@@ -320,7 +320,7 @@ $result_pending = $conn->query($sql_pending);
 $pending_applicants = $result_pending->fetch_assoc()['pending_count'];
 
 // Count approved applicants
-$sql_approved = "SELECT COUNT(*) AS approved_count FROM borrower_info WHERE status = 'Approved'";
+$sql_approved = "SELECT COUNT(*) AS approved_count FROM borrower_info WHERE status != 'Pending'";
 $result_approved = $conn->query($sql_approved);
 $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
 
@@ -484,7 +484,7 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
     <a href="#" class="text-white" id="viewCreditScoring" style="text-decoration: none;">
     View Credit Scoring <i class="fas fa-angle-right"></i>
 </a>
-
+<div id="modal-credit-category" style="cursor: pointer; display: none;">Excellent</div>
 </div>
 
 <div id="creditScoringTable" style="display: none; margin-top: 20px;">
@@ -652,9 +652,9 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
     <h5>Financial & Other Information</h5>
     <div class="row">
         <div class="col-md-6">
-            <p><strong>Monthly Allowance:</strong> <span id="modal-monthly-allowance">₱[Monthly Allowance]</span></p>
+            <p><strong>Monthly Allowance:</strong> <span id="modal-monthly-allowance">[Monthly Allowance]</span></p>
             <p><strong>Source of Allowance:</strong> <span id="modal-source-of-allowance">[Source]</span></p>
-            <p><strong>Monthly Expenses:</strong> <span id="modal-monthly-expenses">₱[Expenses]</span></p>
+            <p><strong>Monthly Expenses:</strong> <span id="modal-monthly-expenses">[Expenses]</span></p>
             <p><strong>Affiliated Organization:</strong> <span id="modal-affiliated-organization">[Organization]</span></p>
             <p><strong>Spending Pattern:</strong> <span id="modal-spending-pattern">[Pattern]</span></p>
           
@@ -919,20 +919,24 @@ document.getElementById('modal-credit-score').textContent = data.credit_score;
 // Assuming data.credit_category is set based on the credit score category
 document.getElementById('modal-credit-category').textContent = data.credit_category;
 
-// Get the alert box element
+// Get the alert box element and the span element for the text
 const alertBox = document.querySelector('.alert');
+const zoneText = alertBox.querySelector('span');
 
-// Change the background color based on the credit category
+// Change the background color and text based on the credit category
 if (data.credit_category === 'Fair') {
     alertBox.style.backgroundColor = 'orange';
     alertBox.style.color = 'white';
+    zoneText.textContent = 'Credit Scoring: Orange zone';
 } else if (data.credit_category === 'Poor') {
     alertBox.style.backgroundColor = 'red';
     alertBox.style.color = 'white';
+    zoneText.textContent = 'Credit Scoring: Red zone';
 } else {
     // Default to green for other categories
     alertBox.style.backgroundColor = '#4CAF50';
     alertBox.style.color = 'white';
+    zoneText.textContent = 'Credit Scoring: Green zone';
 }
 
 
@@ -982,23 +986,32 @@ document.getElementById('expensesScore').textContent = data.expense_score;
     });
 
     // Event listener for the "View Credit Scoring" link
-    $(document).ready(function() {
-        $('#viewCreditScoring').on('click', function(e) {
-          
-                document.getElementById('viewCreditScoring').addEventListener('click', function(event) {
-        event.preventDefault(); // Prevent default anchor click behavior
-        const table = document.getElementById('creditScoringTable');
-        table.style.display = table.style.display === 'none' ? 'block' : 'none'; // Toggle visibility
+    $(document).ready(function () {
+    // Event listener for the "View Credit Scoring" span
+    $('#viewCreditScoring').on('click', function () {
+        // Hide the "View Credit Scoring" link
+        $(this).hide();
+        $(this).fadeOut();
+    $('#modal-credit-category').fadeIn();
+    $('#creditScoringTable').fadeIn();
+        // Show the "modal-credit-category" and the credit scoring table
+        $('#modal-credit-category').show();
+        $('#creditScoringTable').show();
     });
 
-            // Log the current transaction ID
-            console.log("Credit Scoring ID:", currentTransactionId);
-            
-            // Here you can add logic to populate the credit scoring table
-            // For example, make an AJAX call to fetch data and populate the table
-            $('#creditScoringTable').show(); // Show the table
-        });
+    // Event listener for the "modal-credit-category" div
+    $('#modal-credit-category').on('click', function () {
+        // Hide the "modal-credit-category" and the credit scoring table
+        $(this).hide();
+        $('#creditScoringTable').hide();
+        $(this).fadeOut();
+    $('#creditScoringTable').fadeOut();
+    $('#viewCreditScoring').fadeIn();
+        // Show the "View Credit Scoring" link
+        $('#viewCreditScoring').show();
     });
+});
+
 </script>
 
 
