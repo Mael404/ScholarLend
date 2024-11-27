@@ -432,14 +432,50 @@ $conn->close();
     }
 </style>
 
+<?php
+// Establish a database connection
+$mysqli = new mysqli("localhost", "username", "password", "scholarlend_db");
+
+// Check connection
+if ($mysqli->connect_error) {
+    die("Connection failed: " . $mysqli->connect_error);
+}
+
+// Get the application count for today
+$today = date('Y-m-d'); // Get today's date
+$applications_today_query = "SELECT COUNT(*) FROM borrower_info WHERE DATE(created_at) = ?";
+$stmt = $mysqli->prepare($applications_today_query);
+$stmt->bind_param("s", $today);
+$stmt->execute();
+$stmt->bind_result($applications_today);
+$stmt->fetch();
+$stmt->close();
+
+// Get the lenders count
+$lenders_query = "SELECT COUNT(*) FROM users_tb WHERE account_role = 'Lender'";
+$lenders_result = $mysqli->query($lenders_query);
+$lenders_count = $lenders_result->fetch_row()[0];
+
+// Get the borrowers count
+$borrowers_query = "SELECT COUNT(*) FROM users_tb WHERE account_role = 'Borrower'";
+$borrowers_result = $mysqli->query($borrowers_query);
+$borrowers_count = $borrowers_result->fetch_row()[0];
+
+// Get the active loans count
+$active_loans_query = "SELECT COUNT(*) FROM borrower_info WHERE status NOT IN ('Pending', 'Completed')";
+$active_loans_result = $mysqli->query($active_loans_query);
+$active_loans_count = $active_loans_result->fetch_row()[0];
+
+$mysqli->close();
+?>
+
 <div class="container mt-4">
-   
     <div class="row">
         <div class="col-md-3">
             <div class="dashboard-card">
                 <div>
                     <h5>APPLICATIONS TODAY</h5>
-                    <p>5</p>
+                    <p><?php echo $applications_today; ?></p>
                 </div>
                 <a href="#">View Applications &raquo;</a>
             </div>
@@ -448,7 +484,7 @@ $conn->close();
             <div class="dashboard-card">
                 <div>
                     <h5>LENDERS</h5>
-                    <p>20</p>
+                    <p><?php echo $lenders_count; ?></p>
                 </div>
                 <a href="#">View Lenders &raquo;</a>
             </div>
@@ -457,7 +493,7 @@ $conn->close();
             <div class="dashboard-card">
                 <div>
                     <h5>BORROWERS</h5>
-                    <p>18</p>
+                    <p><?php echo $borrowers_count; ?></p>
                 </div>
                 <a href="#">View Borrowers &raquo;</a>
             </div>
@@ -466,13 +502,14 @@ $conn->close();
             <div class="dashboard-card">
                 <div>
                     <h5>ACTIVE LOANS</h5>
-                    <p>15</p>
+                    <p><?php echo $active_loans_count; ?></p>
                 </div>
                 <a href="#">View Loans &raquo;</a>
             </div>
         </div>
     </div>
 </div>
+
 
 <!-- Bootstrap JS 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script> -->

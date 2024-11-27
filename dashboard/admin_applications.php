@@ -525,7 +525,7 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">10</td>
             <td id="sourceOfAllowanceScore" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
         </tr>
-        <!-- Added Expenses Sub-category under Financial Information -->
+       
         <tr>
             <td style="padding: 8px; border: 1px solid #ddd;">Expenses</td>
             <td id="modal-expenses_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
@@ -561,8 +561,9 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
         </tr>
         <tr style="background-color: #f3e8d6;">
             <td colspan="3" style="padding: 8px; border: 1px solid #ddd; text-align: right;"><strong>TOTAL</strong></td>
-            <td id="modal-credit-score" style="padding: 8px; border: 1px solid #ddd; text-align: center;"><strong>100</strong></td>
             <td id="modal-credit-category" style="padding: 8px; border: 1px solid #ddd; text-align: center;"><strong>100</strong></td>
+            <td id="modal-credit-score" style="padding: 8px; border: 1px solid #ddd; text-align: center;"><strong>100</strong></td>
+           
         </tr>
     </tbody>
 </table>

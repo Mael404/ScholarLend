@@ -183,7 +183,7 @@ $conn->close();
         <label class="form-check-label ms-2" for="rememberMe" style="font-weight: 400;">Remember me</label>
     </div>
     <div class="text-center mt-2">
-        <a href="#" style="color: #caac82; font-weight: 400; text-decoration: none; padding-bottom: 10px; border-bottom: 2px solid #caac82;">Forgot password?</a>
+        <a href="forgot_password.php" style="color: #caac82; font-weight: 400; text-decoration: none; padding-bottom: 10px; border-bottom: 2px solid #caac82;">Forgot password?</a>
     </div>
 </form>
 

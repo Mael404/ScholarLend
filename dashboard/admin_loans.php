@@ -431,84 +431,123 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
 
 <div class="row">
   <div class="col-12">
-    <div class="card p-1" style="background-color: #ffffff; border: none;">
-      <div class="d-flex justify-content-around mt-3">
+    <div class="d-flex justify-content-around">
+      <!-- Total Loans Card -->
+      <div class="text-center p-3" style="background-color: #f0e6d4; border-radius: 8px; width: 200px;">
+        <small class="text-uppercase" style="font-weight: bold; color: #2c2f43;">Total Loans</small>
+        <div class="d-flex align-items-center justify-content-center mt-2">
+          <i class="fas fa-user" style="font-size: 2rem; margin-right: 10px; color: #2c2f43;"></i>
+          <h2 class="fw-bold mb-0" style="color: #2c2f43;"><?php echo $total_applicants; ?></h2>
+        </div>
+      </div>
 
-      <div id="totalLoansCard" class="p-3 card-filter" style="background-color: #f4f4f4; border-radius: 8px; width: 220px;">
-                    <small class="text-uppercase" style="color: #2c2f43; font-weight: bold;">Total Loans</small>
-                    <div class="d-flex align-items-center mt-2">
-                        <i class="fas fa-user" style="font-size: 1.5rem; color: #ffffff; margin-right: 10px;"></i>
-                        <h2 class="fw-bold mb-0" style="color: #2c2f43;"><?php echo $total_applicants; ?></h2>
-                    </div>
-                </div>
+      <!-- Pending Loans Card -->
+      <div class="text-center p-3" style="background-color: #f9f9f9; border-radius: 8px; width: 200px;">
+        <small class="text-uppercase" style="font-weight: bold; color: #2c2f43;">Pending</small>
+        <div class="d-flex align-items-center justify-content-center mt-2">
+          <i class="fas fa-spinner" style="font-size: 2rem; margin-right: 10px; color: #2c2f43;"></i>
+          <h2 class="fw-bold mb-0" style="color: #2c2f43;"><?php echo $pending_applicants; ?></h2>
+        </div>
+      </div>
 
-                <!-- Pending Card -->
-                <div id="pendingLoansCard" class="p-3 card-filter" style="background-color: #f4f4f4; border-radius: 8px; width: 220px;">
-                    <small class="text-uppercase" style="color: #2c2f43; font-weight: bold;">Pending</small>
-                    <div class="d-flex align-items-center mt-2">
-                        <i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; color: #2c2f43; margin-right: 10px;"></i>
-                        <h2 class="fw-bold mb-0" style="color: #2c2f43;"><?php echo $pending_applicants; ?></h2>
-                    </div>
-                </div>
-
-                <!-- Approved Card -->
-                <div id="completedLoansCard" class="p-3 card-filter" style="background-color: #f4f4f4; border-radius: 8px; width: 220px;">
-                    <small class="text-uppercase" style="color: #2c2f43; font-weight: bold;">Approved</small>
-                    <div class="d-flex align-items-center mt-2">
-                        <i class="fas fa-check-circle" style="font-size: 1.5rem; color: #2c2f43; margin-right: 10px;"></i>
-                        <h2 class="fw-bold mb-0" style="color: #2c2f43;"><?php echo $approved_applicants; ?></h2>
-                    </div>
-                </div>
-
+      <!-- Completed Loans Card -->
+      <div class="text-center p-3" style="background-color: #f9f9f9; border-radius: 8px; width: 200px;">
+        <small class="text-uppercase" style="font-weight: bold; color: #2c2f43;">Completed</small>
+        <div class="d-flex align-items-center justify-content-center mt-2">
+          <i class="fas fa-check-circle" style="font-size: 2rem; margin-right: 10px; color: #2c2f43;"></i>
+          <h2 class="fw-bold mb-0" style="color: #2c2f43;"><?php echo $approved_applicants; ?></h2>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Data Table Section -->
-<div class="row mt-5">
+<div class="row my-4">
   <div class="col-12">
-  <table id="applicantsTable" class="table table-bordered table-striped">
-            <thead class="table-dark">
-                <tr>
-                    <th scope="col" class="text-center">Transaction ID</th>
-                    <th scope="col" class="text-center">Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                // Fetch applicants data
-                $sql_applicants = "SELECT transaction_id, status FROM borrower_info";
-                $result_applicants = $conn->query($sql_applicants);
+    <div class="d-flex justify-content-start align-items-center gap-2">
+      <!-- Search Box -->
+      <div class="input-group" style="width: 300px;">
+        <input type="text" class="form-control" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-secondary" type="button"><i class="fas fa-search"></i></button>
+      </div>
 
-                if ($result_applicants->num_rows > 0) {
-                    while ($row = $result_applicants->fetch_assoc()) {
-                        $transaction_id = htmlspecialchars($row['transaction_id']);
-                        $status = htmlspecialchars($row['status']);
-                        echo "<tr data-status='{$status}'>";
-                        echo "<td class='text-center'>{$transaction_id}</td>";
-                        echo "<td class='text-center'>
-                                <button type='button' class='btn btn-primary' onclick='performAction({$transaction_id})' data-bs-toggle='modal' data-bs-target='#loanModal'>
-                                    View Details
-                                </button>
-                              </td>";
-                        echo "</tr>";
-                    }
-                } else {
-                    echo "<tr><td class='text-center' colspan='2'>No applicants found</td></tr>";
-                }
-                $conn->close();
-                ?>
-            </tbody>
-        </table>
+      <!-- Filter Button -->
+      <button class="btn btn-outline-secondary">Filter</button>
+
+      <!-- Download Button -->
+      <button class="btn btn-outline-secondary">Download</button>
+    </div>
   </div>
 </div>
+
+
+<div class="row mt-5">
+  <div class="col-12">
+    <table id="applicantsTable" class="table table-bordered table-striped">
+      <thead class="table-dark">
+        <tr>
+          <th scope="col" class="text-center">Transaction ID</th>
+          <th scope="col" class="text-center">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <?php
+        // Fetch applicants data
+        $sql_applicants = "SELECT transaction_id, status FROM borrower_info";
+        $result_applicants = $conn->query($sql_applicants);
+
+        if ($result_applicants->num_rows > 0) {
+          while ($row = $result_applicants->fetch_assoc()) {
+            $transaction_id = htmlspecialchars($row['transaction_id']);
+            $status = htmlspecialchars($row['status']);
+            echo "<tr data-status='{$status}'>";
+            echo "<td class='text-center'>{$transaction_id}</td>";
+            echo "<td class='text-center'>
+                    <button type='button' class='btn custom-btn' onclick='performAction({$transaction_id})' data-bs-toggle='modal' data-bs-target='#loanModal'>
+                      View Details
+                    </button>
+                  </td>";
+            echo "</tr>";
+          }
+        } else {
+          echo "<tr><td class='text-center' colspan='2'>No applicants found</td></tr>";
+        }
+        $conn->close();
+        ?>
+      </tbody>
+    </table>
+  </div>
+</div>
+
 
 <style>
   .active-card {
     background-color: #cdad7d !important; /* Active color */
     color: white !important;
   }
+  
+  table tbody tr:hover {
+    background-color: #f0f8ff; /* Add hover effect for table rows */
+  }
+  .btn-secondary {
+    background-color: brown;
+    border: none;
+  }
+  .btn-secondary:hover {
+    background-color: #964b00;
+  }
+  .custom-btn {
+  background-color: #dbbf94; /* Button background color */
+  color: #fff; /* Text color */
+  border: none; /* Remove border */
+}
+
+.custom-btn:hover {
+  background-color: #bda07b; /* Darker shade for hover effect */
+  color: #fff; /* Maintain white text */
+}
+
+
 </style>
 
 <script>

@@ -315,7 +315,19 @@ $stmt_deadlines->close();
 
 // If the user has a pending payment, show the message
 if ($has_pending_payment) {
-    echo "<p>Your payment is being processed</p>";
+    echo "</br>";
+echo "</br>";
+echo "</br>";
+echo "</br>";
+echo "</br>";
+echo "</br>";
+echo "</br>";
+echo "<p style='font-family: \"Segoe UI\", Tahoma, Geneva, Verdana, sans-serif; font-size: 24px; font-weight: bold; color: #4CAF50; text-align: center;'>
+        <i class='fas fa-check-circle' style='margin-right: 10px;'></i> 
+        Your payment is being processed
+      </p>";
+
+
 }
 elseif ($has_pending_application) {
     $pending_application = $result_pending->fetch_assoc();
