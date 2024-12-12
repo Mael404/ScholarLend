@@ -1148,45 +1148,15 @@ $conn->close();
 </div>
 
 <script>
-// Example function to calculate due dates and populate table
 function calculateDueDates() {
-    const frequency = document.getElementById('modalFrequency').innerText;
-    const dueDateString = document.getElementById('modalDueDate').innerText;
+    const paymentMode = document.getElementById('modalPaymentMode').innerText; // Get payment mode
+    const frequency = document.getElementById('modalFrequency').innerText; // Get frequency
+    const dueDateString = document.getElementById('modalDueDate').innerText; // Get due date
+    const totalAmount = parseFloat(document.getElementById('modalTotalAmount').innerText).toFixed(2); // Total amount
 
+    const options = { year: 'numeric', month: 'short', day: 'numeric' }; // Date format
     const dueDate = new Date(dueDateString);
-    let today = new Date();
 
-    if (frequency === 'Daily') {
-        today.setDate(today.getDate() + 1);
-        dueDate.setDate(dueDate.getDate() + 1);
-    } else if (frequency === 'Weekly') {
-        today.setDate(today.getDate() + 7);
-        dueDate.setDate(dueDate.getDate() + 7);
-    } else if (frequency === 'Monthly') {
-        today.setMonth(today.getMonth() + 1);
-        dueDate.setMonth(dueDate.getMonth() + 1);
-    }
-
-    let nextDeadlines = [];
-    if (frequency === 'Daily') {
-        while (today <= dueDate) {
-            nextDeadlines.push(new Date(today));
-            today.setDate(today.getDate() + 1);
-        }
-    } else if (frequency === 'Weekly') {
-        while (today <= dueDate) {
-            nextDeadlines.push(new Date(today));
-            today.setDate(today.getDate() + 7);
-        }
-    } else if (frequency === 'Monthly') {
-        while (today <= dueDate) {
-            nextDeadlines.push(new Date(today));
-            today.setMonth(today.getMonth() + 1);
-        }
-    }
-
-    // Create table structure for deadlines
-    const options = { year: 'numeric', month: 'short', day: 'numeric' };
     let tableHTML = `
         <table class="table table-bordered">
             <thead class="bg-dark text-white">
@@ -1198,15 +1168,47 @@ function calculateDueDates() {
             <tbody>
     `;
 
-    const installmentAmount = (parseFloat(document.getElementById('modalTotalAmount').innerText)).toFixed(2);
-    nextDeadlines.forEach(date => {
+    if (paymentMode === 'Lump Sum') {
+        // For Lump Sum, only show the total amount and due date
         tableHTML += `
             <tr>
-                <td>${installmentAmount}</td>
-                <td>${date.toLocaleDateString('en-US', options)}</td>
+                <td>${totalAmount}</td>
+                <td>${dueDate.toLocaleDateString('en-US', options)}</td>
             </tr>
         `;
-    });
+    } else {
+        // For Installments, calculate next deadlines
+        let nextDeadlines = [];
+        let today = new Date();
+
+        if (frequency === 'Daily') {
+            while (today <= dueDate) {
+                nextDeadlines.push(new Date(today));
+                today.setDate(today.getDate() + 1);
+            }
+        } else if (frequency === 'Weekly') {
+            while (today <= dueDate) {
+                nextDeadlines.push(new Date(today));
+                today.setDate(today.getDate() + 7);
+            }
+        } else if (frequency === 'Monthly') {
+            while (today <= dueDate) {
+                nextDeadlines.push(new Date(today));
+                today.setMonth(today.getMonth() + 1);
+            }
+        }
+
+        // Add rows for installments
+        const installmentAmount = (totalAmount / nextDeadlines.length).toFixed(2); // Divide total into installments
+        nextDeadlines.forEach(date => {
+            tableHTML += `
+                <tr>
+                    <td>${installmentAmount}</td>
+                    <td>${date.toLocaleDateString('en-US', options)}</td>
+                </tr>
+            `;
+        });
+    }
 
     tableHTML += `</tbody></table>`;
     document.getElementById('modalNextDeadlines').innerHTML = tableHTML;
@@ -1215,6 +1217,7 @@ function calculateDueDates() {
 // Call the function when the modal is shown
 document.getElementById('summaryModal').addEventListener('show.bs.modal', calculateDueDates);
 </script>
+
 
 
 
