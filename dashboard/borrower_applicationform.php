@@ -1177,33 +1177,56 @@ function calculateDueDates() {
             </tr>
         `;
     } else {
-        // For Installments, calculate next deadlines
-        let nextDeadlines = [];
-        let today = new Date();
+       // For Installments, calculate next deadlines
+let nextDeadlines = [];
+let today = new Date();
 
-        if (frequency === 'Daily') {
-            while (today <= dueDate) {
-                nextDeadlines.push(new Date(today));
-                today.setDate(today.getDate() + 1);
-            }
-        } else if (frequency === 'Weekly') {
-            while (today <= dueDate) {
-                nextDeadlines.push(new Date(today));
-                today.setDate(today.getDate() + 7);
-            }
-        } else if (frequency === 'Monthly') {
-            while (today <= dueDate) {
-                nextDeadlines.push(new Date(today));
-                today.setMonth(today.getMonth() + 1);
-            }
-        }
+if (frequency === 'Daily') {
+    let minStartDate = new Date(dueDate); // Start from the due date
+    minStartDate.setDate(minStartDate.getDate() - 5); // Subtract 5 days
+
+    // Start the loop from the minimum start date (5 days before the due date)
+    while (minStartDate <= dueDate) {
+        nextDeadlines.push(new Date(minStartDate));
+        minStartDate.setDate(minStartDate.getDate() + 1); // Move to the next day
+    }
+
+
+} else if (frequency === 'Weekly') {
+    while (today <= dueDate) {
+        nextDeadlines.push(new Date(today));
+        today.setDate(today.getDate() + 7);
+    }
+    // Advance the final date by 1 additional week
+    if (nextDeadlines.length > 0) {
+        let lastDate = new Date(nextDeadlines[nextDeadlines.length - 1]);
+        lastDate.setDate(lastDate.getDate() + 7);
+        nextDeadlines.push(lastDate);
+    }
+} else if (frequency === 'Monthly') {
+    while (today <= dueDate) {
+        nextDeadlines.push(new Date(today));
+        today.setMonth(today.getMonth() + 1);
+    }
+    // Advance the final date by 1 additional month
+    if (nextDeadlines.length > 0) {
+        let lastDate = new Date(nextDeadlines[nextDeadlines.length - 1]);
+        lastDate.setMonth(lastDate.getMonth() + 1);
+        nextDeadlines.push(lastDate);
+    }
+}
+
+// Trim the first value
+if (nextDeadlines.length > 0) {
+    nextDeadlines.shift();
+}
 
         // Add rows for installments
         const installmentAmount = (totalAmount / nextDeadlines.length).toFixed(2); // Divide total into installments
         nextDeadlines.forEach(date => {
             tableHTML += `
                 <tr>
-                    <td>${installmentAmount}</td>
+                    <td>${totalAmount}</td>
                     <td>${date.toLocaleDateString('en-US', options)}</td>
                 </tr>
             `;
