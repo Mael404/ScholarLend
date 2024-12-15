@@ -1,6 +1,4 @@
 <?php
-// Start output buffering
-ob_start();
 
 // Start the session
 session_start();
@@ -22,26 +20,59 @@ if ($conn->connect_error) {
 if (isset($_SESSION['first_name'])) {
     $firstName = $_SESSION['first_name'];
     $walletBalance = $_SESSION['wallet_balance']; // Get the wallet balance from the session
+}
+ // Fetch all posted loans
+$period = '';
+$paymentMode = '';
+$creditScore = '';
+$timeOfApplication = '';
 
-    // Fetch all posted loans
-    $sql = "SELECT transaction_id, fname, course, loan_amount, loan_description FROM borrower_info WHERE status = 'posted'"; // Use fname in the query
-    $result = $conn->query($sql);
-
-    // Check if any rows were returned
-    if ($result->num_rows == 0) {
-     
+// Fetch filtered loans
+$whereClauses = ["status = 'posted'"];
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    if (!empty($_GET['period'])) {
+        $period = intval($_GET['period']);
+        $whereClauses[] = "days_to_next_deadline <= $period";
     }
+    if (!empty($_GET['payment_mode'])) {
+        $paymentMode = $conn->real_escape_string($_GET['payment_mode']);
+        $whereClauses[] = "payment_mode = '$paymentMode'";
+    }
+    if (!empty($_GET['credit_score'])) {
+        $creditScore = $conn->real_escape_string($_GET['credit_score']);
+        $whereClauses[] = "credit_score = '$creditScore'";
+    }
+    if (!empty($_GET['time_of_application'])) {
+        $timeOfApplication = $_GET['time_of_application'];
+        $dateLimit = '';
+        if ($timeOfApplication === 'week') {
+            $dateLimit = date('Y-m-d', strtotime('-1 week'));
+        } elseif ($timeOfApplication === 'month') {
+            $dateLimit = date('Y-m-d', strtotime('-1 month'));
+        } elseif ($timeOfApplication === '3_months') {
+            $dateLimit = date('Y-m-d', strtotime('-3 months'));
+        }
+        if ($dateLimit) {
+            $whereClauses[] = "created_at >= '$dateLimit'";
+        }
+    }
+}
 
-    $borrowerLoans = [];
+// Combine conditions
+$whereSql = implode(" AND ", $whereClauses);
+
+// Fetch filtered loans
+$sql = "SELECT transaction_id, fname, course, loan_amount, loan_description FROM borrower_info WHERE $whereSql";
+$result = $conn->query($sql);
+
+$borrowerLoans = [];
+if ($result && $result->num_rows > 0) {
     while ($row = $result->fetch_assoc()) {
-        $borrowerLoans[] = $row; // Store each loan in an array
+        $borrowerLoans[] = $row;
     }
-} else {
-    $firstName = "User"; // Fallback in case the user is not logged in
-    $walletBalance = 0; // Fallback value for wallet balance
-    $borrowerLoans = []; // No loans if the user is not logged in
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -286,95 +317,125 @@ function maskName($name) {
 }
 ?>
 
-<?php if (empty($borrowerLoans)): ?>
-    <div class="col-12">
-        <div class="alert text-center p-5" role="alert" style="background-color: #f4f1ec; font-size: 2.3rem; border-radius: 10px; height:30vh">
-            No loans available.
+<div class="container mt-4">
+    <!-- Filter Form -->
+    <form method="GET" class="row g-3 mb-4 justify-content-center align-items-end">
+        <div class="col-lg-2 col-md-3">
+            <label for="period" class="form-label">Period (Days)</label>
+            <input type="number" name="period" id="period" class="form-control" value="<?php echo htmlspecialchars($period); ?>">
         </div>
-    </div>
-<?php else: ?>
-    <?php foreach ($borrowerLoans as $loan): ?>
-        <div class="col-12 col-md-4 mb-4">
-            <div class="card h-100">
-                <div class="image-container">
-                    <img src="assets/img/hero-bg.jpg" class="card-img-top" alt="Loan">
-                    <div class="overlay">
-                        <p><i class="bi bi-book"></i> <?php echo htmlspecialchars($loan['course']); ?></p>
+        <div class="col-lg-2 col-md-3">
+            <label for="payment_mode" class="form-label">Mode of Payment</label>
+            <select name="payment_mode" id="payment_mode" class="form-select">
+                <option value="">Select</option>
+                <option value="Lump Sum" <?php echo $paymentMode === 'Lump Sum' ? 'selected' : ''; ?>>Lump Sum</option>
+                <option value="Installment" <?php echo $paymentMode === 'Installment' ? 'selected' : ''; ?>>Installment</option>
+            </select>
+        </div>
+        <div class="col-lg-2 col-md-3">
+            <label for="credit_score" class="form-label">Credit Score</label>
+            <select name="credit_score" id="credit_score" class="form-select">
+                <option value="">Select</option>
+                <option value="Excellent" <?php echo $creditScore === 'Excellent' ? 'selected' : ''; ?>>Excellent</option>
+                <option value="Very Good" <?php echo $creditScore === 'Very Good' ? 'selected' : ''; ?>>Very Good</option>
+                <option value="Good" <?php echo $creditScore === 'Good' ? 'selected' : ''; ?>>Good</option>
+                <option value="Fair" <?php echo $creditScore === 'Fair' ? 'selected' : ''; ?>>Fair</option>
+                <option value="Poor" <?php echo $creditScore === 'Poor' ? 'selected' : ''; ?>>Poor</option>
+            </select>
+        </div>
+        <div class="col-lg-2 col-md-3">
+            <label for="time_of_application" class="form-label">Time of Application</label>
+            <select name="time_of_application" id="time_of_application" class="form-select">
+                <option value="">Select</option>
+                <option value="week" <?php echo $timeOfApplication === 'week' ? 'selected' : ''; ?>>Within the week</option>
+                <option value="month" <?php echo $timeOfApplication === 'month' ? 'selected' : ''; ?>>Within the month</option>
+                <option value="3_months" <?php echo $timeOfApplication === '3_months' ? 'selected' : ''; ?>>Within the past 3 months</option>
+            </select>
+        </div>
+        <div class="col-lg-2 col-md-3">
+        <button type="submit" class="btn w-100" style="background-color: #ccac82; border-color: #ccac82; color: #fff;">Filter</button>
+
+        </div>
+    </form>
+</div>
+
+
+
+<div class="row">
+    <?php if (empty($borrowerLoans)): ?> 
+        <div class="col-12">
+            <div class="alert text-center p-5" role="alert" style="background-color: #f4f1ec; font-size: 2.3rem; border-radius: 10px; height:30vh">
+                No loans available.
+            </div>
+        </div>
+    <?php else: ?>
+        <?php foreach ($borrowerLoans as $loan): ?>
+            <div class="col-12 col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="image-container">
+                        <img src="assets/img/hero-bg.jpg" class="card-img-top" alt="Loan">
+                        <div class="overlay">
+                            <p><i class="bi bi-book"></i> <?php echo htmlspecialchars($loan['course']); ?></p>
+                        </div>
                     </div>
-                </div>
-                <div class="card-body d-flex flex-column">
-                    <p class="card-text">Transaction ID: <?php echo htmlspecialchars($loan['transaction_id']); ?></p> <!-- Display transaction ID -->
-                    <p class="card-text">
-                        Php <?php echo number_format($loan['loan_amount'], 2); ?> is requested by 
-                        <?php echo htmlspecialchars(maskName($loan['fname'])); ?> 
-                        to meet their financial needs. (<?php echo htmlspecialchars($loan['loan_description']); ?>)
-                    </p>
-                    <div class="mt-auto text-end">
-                        <a href="lenderviewloan.php?transaction_id=<?php echo htmlspecialchars($loan['transaction_id']); ?>&fname=<?php echo urlencode($loan['fname']); ?>&loan_description=<?php echo urlencode($loan['loan_description']); ?>&loan_amount=<?php echo urlencode($loan['loan_amount']); ?>" class="btn btn-primary" style="background-color: #131E3D;">View Loan</a>
+                    <div class="card-body d-flex flex-column">
+                        <p class="card-text">Transaction ID: <?php echo htmlspecialchars($loan['transaction_id']); ?></p>
+                        <p class="card-text">
+                            Php <?php echo number_format($loan['loan_amount'], 2); ?> is requested by 
+                            <?php
+                                $name = htmlspecialchars($loan['fname']);
+                                $length = strlen($name);
+                                
+                                if ($length > 2) {
+                                    $firstLetter = $name[0];
+                                    $lastLetter = $name[$length - 1];
+                                    $middle = str_repeat('*', $length - 2);
+                                    $name = $firstLetter . $middle . $lastLetter;
+                                }
+                                echo $name;
+                            ?> 
+                            to meet their financial needs. (<?php echo htmlspecialchars($loan['loan_description']); ?>)
+                        </p>
+                        <div class="mt-auto text-end">
+                            <a href="lenderviewloan.php?transaction_id=<?php echo htmlspecialchars($loan['transaction_id']); ?>&fname=<?php echo urlencode($loan['fname']); ?>&loan_description=<?php echo urlencode($loan['loan_description']); ?>&loan_amount=<?php echo urlencode($loan['loan_amount']); ?>" class="btn btn-primary" style="background-color: #131E3D;">View Loan</a>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    <?php endforeach; ?>
-<?php endif; ?>
-
-
-
+        <?php endforeach; ?>
+    <?php endif; ?>
+</div>
 
 
              
-      
-        <!-- Carousel controls -->
-        <button class="carousel-control-prev" type="button" data-bs-target="#loanCarousel" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Previous</span>
-        </button>
-        <button class="carousel-control-next" type="button" data-bs-target="#loanCarousel" data-bs-slide="next">
-          <span class="carousel-control-next-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">Next</span>
-        </button>
-      </div>
-      
-      
-      
-  
-      <div class="mt-1">
-        <div class="row">
-          <div class="col-12 col-md-4 mb-3">
-            <div class="mb-3">
-              <label for="purpose" class="form-label">Purpose</label>
-              <select id="purpose" class="form-select">
-                <option value="home">Home</option>
-                <option value="education">Education</option>
-                <option value="business">Business</option>
-              </select>
-            </div>
-          </div>
-          <div class="col-12 col-md-4 mb-3">
-            <div class="mb-3">
-              <label for="gender" class="form-label">Gender</label>
-              <select id="gender" class="form-select">
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
-          </div>
-          <div class="col-12 col-md-4 mb-3">
-            <div class="d-flex align-items-center">
-              <div class="flex-grow-1 me-2">
-                <label for="courses" class="form-label">Courses</label>
-                <select id="courses" class="form-select">
-                  <option value="course1">Course 1</option>
-                  <option value="course2">Course 2</option>
-                  <option value="course3">Course 3</option>
-                </select>
-              </div>
-              <button type="button" class="btn btn-primary" style="margin-top: 30px; background-color: #caac82; border-color: #caac82;">Filter Loans</button>
-            </div>
-          </div>
-        </div>
-      </div>
+    
+
+<!-- Results Container -->
+<div id="loanResults" class="row mt-4">
+    <!-- Filtered loans will appear here -->
+</div>
+
+<script>
+    document.getElementById('filterLoans').addEventListener('click', function () {
+        const period = document.getElementById('period').value;
+        const paymentMode = document.getElementById('paymentMode').value;
+        const creditScore = document.getElementById('creditScore').value;
+        const applicationTime = document.getElementById('applicationTime').value;
+
+        // Make AJAX request to fetch filtered data
+        fetch('fetch_loans.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ period, paymentMode, creditScore, applicationTime })
+        })
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('loanResults').innerHTML = data;
+        })
+        .catch(error => console.error('Error:', error));
+    });
+</script>
+
       
 
 

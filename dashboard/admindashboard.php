@@ -414,10 +414,7 @@ $conn->close();
     </div>
 
     
-    <a class="nav-link wallet-link second-text fw-bold ms-auto" href="#">
-    <i class="fas fa-wallet me-2"></i>Balance: 
-    <span class="wallet-balance">PHP <?php echo number_format($wallet_balance, 2); ?></span>
-</a>
+    
     
   </nav>
   <style>
@@ -434,7 +431,7 @@ $conn->close();
 
 <?php
 // Establish a database connection
-$mysqli = new mysqli("localhost", "username", "password", "scholarlend_db");
+$mysqli = new mysqli("localhost", "root", "", "scholarlend_db");
 
 // Check connection
 if ($mysqli->connect_error) {
@@ -465,6 +462,21 @@ $borrowers_count = $borrowers_result->fetch_row()[0];
 $active_loans_query = "SELECT COUNT(*) FROM borrower_info WHERE status NOT IN ('Pending', 'Completed')";
 $active_loans_result = $mysqli->query($active_loans_query);
 $active_loans_count = $active_loans_result->fetch_row()[0];
+
+// Get the total number of rows in the borrower_info table, excluding 'Pending' and 'Rejected' statuses
+$transaction_fee_query = "SELECT COUNT(*) FROM borrower_info WHERE status NOT IN ('Pending', 'Rejected')";
+$transaction_fee_result = $mysqli->query($transaction_fee_query);
+$row_count = $transaction_fee_result->fetch_row()[0];
+
+// Multiply the row count by 15 to calculate the total transaction fee earned
+$total_transaction_fee_earned = $row_count * 15;
+
+
+
+// Get the total interest earned from the admin's wallet_balance
+$interest_earned_query = "SELECT wallet_balance FROM users_tb WHERE account_role = 'Admin'";
+$interest_earned_result = $mysqli->query($interest_earned_query);
+$total_interest_earned = $interest_earned_result->fetch_row()[0];
 
 $mysqli->close();
 ?>
@@ -505,6 +517,28 @@ $mysqli->close();
                     <p><?php echo $active_loans_count; ?></p>
                 </div>
                 <a href="#">View Loans &raquo;</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Section for Total Interest Earned and Total Transaction Fee Earned -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="dashboard-card">
+                <div>
+                    <h5>TOTAL INTEREST EARNED</h5>
+                    <p><?php echo $total_interest_earned; ?></p>
+                </div>
+                <a href="#">View Details &raquo;</a>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="dashboard-card">
+                <div>
+                    <h5>TOTAL TRANSACTION FEE EARNED</h5>
+                    <p><?php echo $total_transaction_fee_earned; ?></p>
+                </div>
+                <a href="#">View Details &raquo;</a>
             </div>
         </div>
     </div>

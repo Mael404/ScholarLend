@@ -128,7 +128,7 @@ $conn->close();
           <li><a href="#services">Services</a></li>
           
           <li><a href="#contact">Contact</a></li>
-          <li><a href="login.html" class="active">Log-in</a></li>
+          <li><a href="login.php" class="active">Log-in</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>

@@ -1129,6 +1129,21 @@ $conn->close();
     </div>
 </div>
 
+<style>
+    .signatories-table {
+        width: 100%;
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .signatories-table td {
+        padding: 10px;
+    }
+
+    .signatories-label {
+        font-size: 14px;
+    }
+</style>
 <div class="modal fade" id="termsandcon" tabindex="-1" role="dialog" aria-labelledby="termsandconLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
@@ -1181,7 +1196,73 @@ $conn->close();
                 <p>The parties agree as follows:</p>
                 <p><b>Loan Amount:</b> Lender agrees to loan Borrower the principal sum of <span id="loanAmountText"></span>, together with interest on the outstanding principal amount of the Loan, and in accordance with the terms set forth below.</p>
      
+<script>
+document.getElementById('paymentMode').addEventListener('change', function() {
+    // Hide payment frequency by default
+    document.getElementById('frequencyContainer').style.display = 'none';
+    // Uncheck all boxes
+    document.getElementById('singlePayment').checked = false;
+    document.getElementById('installment').checked = false;
+    document.getElementById('dailyInstallments').checked = false;
+    document.getElementById('weeklyInstallments').checked = false;
+    document.getElementById('monthlyInstallments').checked = false;
+    
+    // Show checkboxes for the selected mode
+    if (this.value === 'Lump Sum') {
+        document.getElementById('singlePayment').checked = true;
+        // Show the due date input when Lump Sum is selected
+        document.getElementById('dueDate').style.display = 'inline';
+    } else if (this.value === 'Installment') {
+        document.getElementById('installment').checked = true;
+        document.getElementById('frequencyContainer').style.display = 'block';
+        // Hide the due date input when Installment is selected
+        document.getElementById('dueDate').style.display = 'none';
+    }
+});
 
+document.getElementById('paymentFrequency').addEventListener('change', function() {
+    // Uncheck frequency-specific checkboxes
+    document.getElementById('dailyInstallments').checked = false;
+    document.getElementById('weeklyInstallments').checked = false;
+    document.getElementById('monthlyInstallments').checked = false;
+
+    // Check the relevant frequency checkbox based on selection
+    if (this.value === 'Daily') {
+        document.getElementById('dailyInstallments').checked = true;
+    } else if (this.value === 'Weekly') {
+        document.getElementById('weeklyInstallments').checked = true;
+    } else if (this.value === 'Monthly') {
+        document.getElementById('monthlyInstallments').checked = true;
+    }
+});
+
+document.getElementById("dueDate").addEventListener("change", function() {
+    // Get the selected due date
+    var selectedDate = this.value;
+    
+    // Check if a date was selected
+    if (selectedDate) {
+        // Convert the string date into a Date object
+        var dateObj = new Date(selectedDate);
+        
+        // Define an array of month names
+        var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        
+        // Format the date to "Month day, year"
+        var formattedDate = months[dateObj.getMonth()] + " " + dateObj.getDate() + ", " + dateObj.getFullYear();
+        
+        // Update the text where you want to show the formatted date
+        document.getElementById("dueDateText").textContent = formattedDate;
+    } else {
+        // Default text if no date is selected
+        document.getElementById("dueDateText").textContent = "________";
+    }
+});
+
+
+
+
+</script>
 
 <p><b>Repayment of Loan:</b> (Check one.)</p>
 <p>
@@ -1219,23 +1300,13 @@ $conn->close();
                 <p><b>IN WITNESS WHEREOF, we hereunto affix our signatures this ___ day of _______, 20__.</b></p>
 
                 <p>
-               
+                <img src="path/to/admin.jpg" alt="Admin" style="width: 100%; max-width: 300px; margin-bottom: 20px;">
 
-                <table class="signatories-table">
+<table class="signatories-table">
     <tr>
-        <td>
-            <div class="underline" style="margin-top:75%"></div>
-        </td>
-        <td>
-            <div class="underline" style="margin-top:75%"></div>
-        </td>
-        <td>
-    <img src="admin.png" alt="Admin" style="width: 100%; max-width: 200px; margin-bottom: 0px;">
-    
-    <div style="font-size: 14px; margin-top: 5px; text-align: center;">Eppeito Manaloto</div>
-    <div class="underline"></div>
-</td>
-
+        <td>_______________________</td>
+        <td>_______________________</td>
+        <td>_______________________</td>
     </tr>
     <tr>
         <td class="signatories-label">Signature over Printed Name<br>Lender</td>
@@ -1243,28 +1314,6 @@ $conn->close();
         <td class="signatories-label">Signature over Printed Name<br>General Manager, ScholarLend</td>
     </tr>
 </table>
-
-<style>
-    .signatories-table {
-        width: 100%;
-        text-align: center;
-        margin-top: 20px;
-    }
-
-    .signatories-table td {
-        padding: 10px;
-    }
-
-    .signatories-label {
-        font-size: 14px;
-    }
-
-    .underline {
-        border-bottom: 2px solid black;
-        width: 80%;  /* Adjust width of underline */
-        margin: 5px auto; /* Center align and space below the image */
-    }
-</style>
 
 </p>
 

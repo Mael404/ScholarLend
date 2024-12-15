@@ -49,7 +49,7 @@
           <li><a href="#services">Services</a></li>
           
           <li><a href="#contact">Contact</a></li>
-          <li><a href="login.html">Log-in</a></li>
+          <li><a href="login.php">Log-in</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
@@ -133,14 +133,14 @@
 
       <div class="d-grid gap-2 mt-3">
         <button type="submit" class="btn btn-primary" id="submitBtn" style="background: #caac82; border-color: #caac82; font-size: 0.9rem;">Create Account</button>
-        <a href="login.html" class="btn btn-outline-primary" style="color: #caac82; border-color: #caac82; font-size: 0.9rem;">Log In</a>
+        <a href="login.php" class="btn btn-outline-primary" style="color: #caac82; border-color: #caac82; font-size: 0.9rem;">Log In</a>
       </div>
     </form>
 
 
-         <!-- MODALS -->
+    <!-- MODALS -->
 <div class="modal fade" id="accountModal" tabindex="-1" aria-labelledby="accountModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="accountModalLabel" style="font-family: 'Times New Roman', Times, serif; color:#caac82;">Oops, one more thing</h5>
@@ -148,6 +148,96 @@
       </div>
       <div class="modal-body">
         <p>To finish creating your account, please agree to the user terms and conditions:</p>
+        <h6>Terms and Conditions for Lenders</h6>
+        <p>
+          These Terms and Conditions govern the use by lenders of the Peer-to-Peer (P2P) Microloan Platform, hereinafter referred to as ScholarLend. By registering as a Lender on the Platform, you agree to comply with and be bound by the following terms. Please read them carefully before proceeding.
+        </p>
+
+        <h6>General Terms and Conditions</h6>
+        <h6>Eligibility Requirements</h6>
+        <ul>
+          <li>You must be a bona fide student of Bicol University and at least 18 years of age to be bound by this contract.</li>
+          <li>You must have a valid university ID and an active student number to verify your status as a student.</li>
+          <li>You must have sufficient financial resources to fund loan applications of your desire.</li>
+        </ul>
+
+        <h6>Platform User Obligations</h6>
+        <ul>
+          <li>You agree to act in good faith and in accordance with ScholarLend's rules and regulations.</li>
+          <li>You must not engage in any activity that could harm the reputation of ScholarLend or the student community.</li>
+        </ul>
+
+        <h6>Account Creation and Management</h6>
+        <h6>Account Setup Information</h6>
+        <p>
+          In creating an account in ScholarLend, accurate and complete personal information must be provided as required during the registration process. You are responsible for updating changes in your account information.
+        </p>
+
+        <h6>Account Management</h6>
+        <p>
+          You are responsible for the management of your account login information and for all activities that occur under your account.
+        </p>
+
+        <h6>Lending Terms and Conditions</h6>
+        <h6>Loan Selection</h6>
+        <p>
+          You reserve the right to choose a loan application to fund. Notifications of loan requests from students will be sent to your provided email address. You may review and assess the provided information on the website and choose to lend based on your own discretion.
+        </p>
+
+        <h6>Access to Borrower’s Information</h6>
+        <p>
+          In browsing loan applications, you will be provided all information necessary to make informed lending decisions, including loan details, payment terms, as well as credit score breakdown and academic transcript.
+        </p>
+
+        <h6>Loan Contract</h6>
+        <p>
+          A loan contract will be presented to you, and you will be required to electronically affix your signature to the contract after selecting a loan application to fund. The loan contract is between you, the borrower, and the intermediary (administrator). By affixing your signature, you acknowledge and consent that your personal information, including your name and payment details, will be disclosed to the other parties of the loan contract.
+        </p>
+        <p>
+          The loan contract binds you to the conditions and details set forth in the contract, including commissions, interest earned, and modes and dates of payment applied for by the borrower.
+        </p>
+
+        <h6>Payments and Returns</h6>
+        <p>
+          Payments of loans will be sent directly to your account on the date indicated in the payment schedule. ScholarLend will charge a commission fee of 30% of the interest earned, which will be deducted automatically before the interest is credited to your account.
+        </p>
+
+        <h6>Risk Acknowledgement</h6>
+        <h6>Credit Risk Understanding</h6>
+        <p>
+          Lending on ScholarLend involves credit risk or the possibility of loss due to the borrower’s non-repayment of the loan. You acknowledge and accept this risk by participating as a Lender.
+        </p>
+
+        <h6>Liability in Risk of Loss</h6>
+        <p>
+          The corporation’s liability for any loss incurred by lenders due to borrower default shall not exceed 25% of the outstanding amount, regardless of the circumstances.
+        </p>
+
+        <h6>Data Protection and Privacy Policy</h6>
+        <h6>Data Collection and Usage</h6>
+        <p>
+          We collect and process your personal data to administer and manage your account in ScholarLend and for the platform’s database and administrative records. This may include but is not limited to your name, contact information, date of birth, and any other information provided on this form.
+        </p>
+
+        <h6>Data Security</h6>
+        <p>
+          We take the security of your personal data seriously. Your data will only be accessible to authorized officers for the purposes mentioned in this notice.
+        </p>
+
+        <h6>Amendment and Termination</h6>
+        <h6>Amendments</h6>
+        <p>
+          ScholarLend reserves the right to amend these Terms and Conditions at any time. You will be notified of any changes, and continued use of ScholarLend constitutes acceptance of the revised terms.
+        </p>
+
+        <h6>Suspension and Termination</h6>
+        <p>
+          ScholarLend reserves the right to suspend or terminate your account if you violate these Terms and Conditions or engage in any fraudulent or harmful activity.
+        </p>
+
+        <p>
+          By checking the box below, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions. If you do not agree with these terms, please do not use ScholarLend.
+        </p>
         <div class="form-check mb-3">
           <input class="form-check-input" type="checkbox" id="agreeTerms">
           <label class="form-check-label" for="agreeTerms">I agree to the terms and conditions (required)</label>
@@ -164,6 +254,7 @@
     </div>
   </div>
 </div>
+
           <!-- Terms Notice Modal -->
           <div class="modal fade" id="agreeTermsModal" tabindex="-1" aria-labelledby="agreeTermsModalLabel" aria-hidden="true">
             <div class="modal-dialog">

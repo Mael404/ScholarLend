@@ -90,7 +90,7 @@
                   <p class="mt-3" style="color: #eeead6;">Join a student community that understands your educational needs and empowers you to support one another. Start making a difference by lending as little as Php 1,000 and help fellow students achieve their goals while building your own network of like-minded peers.</p>
                   
                   <div class="d-flex mt-4 justify-content-center justify-content-md-start">
-                      <a href="login.html" class="cta-btn btn btn-lg" style="border-radius: 30px; background-color: #dbbf94; font-weight: bolder; color: #23263b;">Learn More</a>
+                      <a href="login.php" class="cta-btn btn btn-lg" style="border-radius: 30px; background-color: #dbbf94; font-weight: bolder; color: #23263b;">Learn More</a>
                   </div>
               </div>
   
@@ -100,9 +100,21 @@
                       <p class="mb-1" style="color: #c2995f; font-family: 'Times New Roman', Times, serif; text-align: left;">Register Now!</p>
                       <h2 class="fw-bold" style="font-family: 'Times New Roman', Times, serif; color: #2a2e4b; text-align: left;">All for the betterment of Filipino Students</h2>
                       <div class="d-flex justify-content-center gap-3 mt-3">
-                        <button type="button" class="btn btn-outline-light btn-rounded custom-width" style="border-width: 2px; border-radius: 20px; margin-top: 20px;">I WANT TO INVEST</button>
-                        <button type="button" class="btn btn-outline-light btn-rounded custom-width" style="border-width: 2px; border-radius: 20px; margin-top: 20px;">I WANT TO BORROW</button>
+                        <button type="button" class="btn btn-outline-light btn-rounded custom-width" style="border-width: 2px; border-radius: 20px; margin-top: 20px;" id="investButton">I WANT TO INVEST</button>
+                        <button type="button" class="btn btn-outline-light btn-rounded custom-width" style="border-width: 2px; border-radius: 20px; margin-top: 20px;" id="borrowButton">I WANT TO BORROW</button>
                     </div>
+                    
+                    <script>
+                        // Add event listeners to the buttons
+                        document.getElementById('investButton').addEventListener('click', function() {
+                            window.location.href = 'login.php';
+                        });
+                    
+                        document.getElementById('borrowButton').addEventListener('click', function() {
+                            window.location.href = 'login.php';
+                        });
+                    </script>
+                    
                     
                     
                     

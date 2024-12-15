@@ -244,7 +244,7 @@ if ($result = $query->fetch(PDO::FETCH_ASSOC)) {
 $user_id = $_SESSION['user_id'];
 
 // Database connection (replace with your own credentials)
-$conn = new mysqli("localhost", "username", "password", "scholarlend_db");
+$conn = new mysqli("localhost", "root", "", "scholarlend_db");
 
 // Check connection
 if ($conn->connect_error) {

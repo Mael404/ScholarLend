@@ -317,19 +317,19 @@ function maskName($name) {
 
     <!-- Help Fund Section -->
   
-    <div class="col-12 col-md-4">
+    <div class="col-12 col-md-4 mt-5">
     <div class="help-fund card p-4" style="background-color: #fff; border-radius: 10px; font-weight:bolder;">
         <h5>Help fund this loan</h5>
         
-        <!-- Open Confirmation Box Button -->
-        <div class="input-group mt-3">
-            <input type="text" class="form-control" value="<?php echo $loan_amount; ?>" readonly>
-            <button type="button" class="btn" style="background-color: #dbbf94; color: #323246; border: none; margin-left: 10px;" onclick="showConfirmationBox()">
-                Lend now
-            </button>
-        </div>
+      <!-- Lend Now Button -->
+<div class="input-group mt-3">
+    <input type="text" class="form-control" value="<?php echo $loan_amount; ?>" readonly>
+    <button type="button" class="btn" style="background-color: #dbbf94; color: #323246; border: none; margin-left: 10px;" onclick="showContractModal()">
+        Lend now
+    </button>
+</div>
         
-        <button class="btn mt-3" style="background-color: #192a4d; color: white; width: 100%;">Invest funds</button>
+      
 
         <!-- Borrower Profile and Loan Details -->
         <div class="d-flex justify-content-between align-items-center mt-4" style="color: #dbbf94;">
@@ -342,20 +342,287 @@ function maskName($name) {
         </div>
     </div>
 </div>
+<style>
+    #contractModal .modal-body p {
+        font-size: 16px; /* Smaller font size */
+        color: black; /* Text color */
+    }
+</style>
+<style>
+    .signatories-table {
+        width: 100%;
+        text-align: center;
+        margin-top: 20px;
+    }
 
+    .signatories-table td {
+        padding: 10px;
+    }
+
+    .signatories-label {
+        font-size: 14px;
+    }
+</style>
 <!-- Custom Confirmation Dialog with Larger Size -->
+<!-- Contract Modal -->
+<div id="contractModal" class="modal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Contract Agreement</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            <p><b>THE PARTIES</b></p>
+                <p>This peer-to-peer lending agreement made as of ___________, (the “Effective Date”) by and between:</p>
+                <p><b>Lender:</b></p>
+                <?php
+
+$servername = "localhost"; // Replace with your server name
+$username = "root"; // Replace with your database username
+$password = ""; // Replace with your database password
+$dbname = "scholarlend_db";
+
+
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Assuming the logged-in user ID is stored in the session as 'user_id'
+if (isset($_SESSION['user_id'])) {
+    $user_id = $_SESSION['user_id'];
+
+    // Query to fetch user details
+    $sql = "SELECT CONCAT(first_name, ' ', middle_name, ' ', last_name) AS lender_name, 
+                   phone_number, 
+                   email 
+            FROM users_tb 
+            WHERE user_id = ?";
+
+    // Prepare statement
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $user_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // Check if a record was found
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $lender_name = $row['lender_name'];
+        $phone_number = $row['phone_number'];
+        $email = $row['email'];
+
+        // Output the details
+        echo "<p>$lender_name<br>
+              Daraga City, Bicol Philippines<br>
+             
+              $phone_number<br>
+              $email</p>";
+    } else {
+        echo "No details found for the logged-in user.";
+    }
+
+    $stmt->close();
+} else {
+    echo "User not logged in.";
+}
+
+$conn->close();
+
+?>
+
+
+<?php
+
+$servername = "localhost"; // Replace with your server name
+$username = "root"; // Replace with your database username
+$password = ""; // Replace with your database password
+$dbname = "scholarlend_db";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Get the transaction_id from the GET request
+if (isset($_GET['transaction_id'])) {
+    $transaction_id = $_GET['transaction_id'];
+
+    // Query to fetch borrower's details using the transaction_id
+    $sql = "SELECT fname, mname, lname, current_address, cellphonenumber, email
+            FROM borrower_info 
+            WHERE transaction_id = ?";
+
+    // Prepare statement
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $transaction_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    // Check if a record was found
+    if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+
+        // Capitalize the first letter of each part of the name
+        $borrower_name = ucwords(strtolower($row['fname'])) . ' ' . 
+                         ucwords(strtolower($row['mname'])) . ' ' . 
+                         ucwords(strtolower($row['lname']));
+
+        $address = $row['current_address'];
+        $phone_number = $row['cellphonenumber'];
+        $email = $row['email'];
+
+        // Output the details
+        echo "<p><b>Borrower:</b></p>
+              <p>$borrower_name<br>
+              $address<br>
+              $phone_number<br>
+              $email</p>";
+    } else {
+        echo "No borrower found for the given transaction ID.";
+    }
+
+    $stmt->close();
+} else {
+    echo "Transaction ID not provided.";
+}
+
+$conn->close();
+
+?>
+
+
+                <p><b>Intermediary:</b></p>
+                <p>ScholarLend, Inc.<br>
+                [Address]<br>
+                [City, State, Zip Code]<br>
+                [Phone Number]<br>
+                [Email Address]</p>
+
+                <p>The parties agree as follows:</p>
+                <p><b>Loan Amount:</b> Lender agrees to loan Borrower the principal sum of P <span id="loanAmountText">________</span> [Amount in Peso], together with interest on the outstanding principal amount of the Loan, and in accordance with the terms set forth below.</p>
+
+
+                <p><b>Repayment of Loan:</b> (Check one.)</p>
+                <p>▢ Single Payment. The Loan together with accrued and unpaid interest is due and payable on ________ [date of payment].</p>
+                <p>▢ Installment Payments. The Loan together with accrued and unpaid interest shall be payable in installments equal to P_________ [payment per installment]. The first payment is due on __________ and due thereafter in ______ [number of payments] equal consecutive:</p>
+                <p>▢ Weekly installments. Each successive payment is due every ________ [day of the week] of the week.</p>
+                <p>▢ Bi-monthly installments. Each successive payment is due every _________ [day of the week] every other week.</p>
+                <p>▢ Monthly installments. Each successive payment is due on the ____ day of the month.</p>
+                <p>▢ Quarterly installments. Each successive payment is due on the ___ day of the quarter.</p>
+
+                <p><b>Interest:</b> The Borrower shall pay interest on the Loan at the rate of 5.5% per week on the Principal amount, or equivalent to P__________. 70% of the interest paid by the Borrower shall be received by the Lender, while the remaining 30% shall go to ScholarLend Inc.</p>
+
+                <p><b>Transaction Fee:</b> Upon perfection of the loan agreement, the Borrower shall pay a one-time transaction fee of P15 to be deducted from the principal amount borrowed. This transaction fee shall go to ScholarLend Inc.</p>
+
+                <p><b>Security:</b> The loan is secured by collateral. Borrower agrees that until the Loan together with interest is paid in full. The Loan is secured by ________.</p>
+
+                <p><b>Intermediary:</b> ScholarLend shall serve as the intermediary between the Lender and Buyer. The receipt, approval, withholding and disbursement process shall be the responsibility of the said Corporation.</p>
+
+                <p><b>Default:</b> Failure to pay on the agreed date/s of payment shall subject the unpaid amount to a penalty rate of eleven percent (11%) per week, until fully paid.</p>
+
+                <p><b>Modification:</b> This agreement may be modified, superseded, or voided only upon the written and signed agreement of the Parties. Further, the physical destruction or loss of this document shall not be construed as a modification or termination of the agreement contained herein.</p>
+
+                <p><b>Good faith:</b> The Parties hereby declare and undertake to perform all obligations arising from this Loan Agreement in good faith and shall comply with all applicable laws and rules.</p>
+
+                <p><b>IN WITNESS WHEREOF, we hereunto affix our signatures this ___ day of _______, 20__.</b></p>
+
+                <p>
+                <table class="signatories-table">
+    <tr>
+        <td>
+            <div class="underline" style="margin-top:75%"></div>
+        </td>
+        
+
+        <td>
+        <img src="borrower.png" alt="Admin" style="width: 100%; max-width: 200px; margin-bottom: 0px;">
+        <div style="font-size: 14px; margin-top: 0px; text-align: center;">BORROWER'S NAME</div>
+            <div class="underline" style="margin-bottom:10%"></div>
+        </td>
+
+
+
+        <td>
+    <img src="admin.png" alt="Admin" style="width: 100%; max-width: 200px; margin-bottom: 0px;">
+    
+    <div style="font-size: 14px; margin-top: 5px; text-align: center;">ROCHIEL GRACE S. YANSON</div>
+    <div class="underline"></div>
+</td>
+
+
+
+    </tr>
+    <tr>
+        <td class="signatories-label">Signature over Printed Name<br>Lender</td>
+        <td class="signatories-label">Signature over Printed Name<br>Borrower</td>
+        <td class="signatories-label">Signature over Printed Name<br>General Manager, ScholarLend</td>
+    </tr>
+</table>
+
+<style>
+    .signatories-table {
+        width: 100%;
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .signatories-table td {
+        padding: 10px;
+    }
+
+    .signatories-label {
+        font-size: 14px;
+    }
+
+    .underline {
+        border-bottom: 2px solid black;
+        width: 80%;  /* Adjust width of underline */
+        margin: 5px auto; /* Center align and space below the image */
+    }
+</style>
+</p>
+
+                <!-- Upload Signature for Borrower -->
+                <div class="form-group mt-3">
+                    <label for="borrowerSignature">Upload Borrower's Signature:</label>
+                    <input type="file" class="form-control" id="borrowerSignature" accept="image/*">
+                </div>
+
+                <!-- Placeholder for Signature -->
+                <div id="borrowerSignaturePreview" class="mt-3" style="display:none;">
+                    <h6>Borrower's Signature:</h6>
+                    <img id="signaturePreview" src="" alt="Borrower's Signature" class="img-fluid" style="max-width: 200px;">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="proceedToConfirmation()">Agree</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Confirmation Box -->
 <div id="confirmationBox" style="display: none; background-color: rgba(0, 0, 0, 0.5); position: fixed; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: center; z-index: 9999;">
     <div style="background-color: white; padding: 40px; border-radius: 10px; width: 500px; text-align: center;">
         <h5 style="font-size: 24px; font-weight: bold; color: #131e3d;">Confirm Payment</h5>
         <p style="font-size: 18px; color: #333; margin: 10px 0;">Are you sure you want to proceed with the payment?</p>
-        <!-- GCash QR Code Image -->
         <img src="https://businessmaker-academy.com/cms/wp-content/uploads/2022/04/Gcash-BMA-QRcode.jpg" alt="GCash QR Code" class="gcash-qr mb-3" style="max-width: 65%; height: auto; border-radius: 10px; max-height: 350px;">
         
-        <!-- Form inside the confirmation box -->
-        <form id="lendForm" method="post" action="process_lend.php" enctype="multipart/form-data">
-            <!-- Hidden input fields for loan_amount and transaction_id -->
+        <form id="lendForm" method="post" action="process_lend.php" enctype="multipart/form-data" onsubmit="return validateSignature()">
             <input type="hidden" name="loan_amount" value="<?php echo $loan_amount; ?>">
             <input type="hidden" name="transaction_id" value="<?php echo $transaction_id; ?>">
+
+           
             
             <div>
                 <button type="submit" id="confirmBtn" name="lendNow" style="background-color: #131e3d; color: white; padding: 10px 20px; border: none; border-radius: 5px; font-size: 16px; margin: 10px;">Confirm</button>
@@ -365,16 +632,49 @@ function maskName($name) {
     </div>
 </div>
 
-<!-- JavaScript to handle the custom confirmation box -->
 <script>
+  document.getElementById('borrowerSignature').addEventListener('change', function(event) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        document.getElementById('signaturePreview').src = e.target.result;
+        document.getElementById('borrowerSignaturePreview').style.display = 'block';
+    };
+    reader.readAsDataURL(this.files[0]);
+});
+    // Show the Contract Modal
+    function showContractModal() {
+        var contractModal = new bootstrap.Modal(document.getElementById('contractModal'));
+        contractModal.show();
+    }
+
+    // Show the Confirmation Box after agreeing to the contract
+    function proceedToConfirmation() {
+        var contractModal = bootstrap.Modal.getInstance(document.getElementById('contractModal'));
+        contractModal.hide();
+        showConfirmationBox();
+    }
+
+    // Show the Confirmation Box
     function showConfirmationBox() {
         document.getElementById("confirmationBox").style.display = "flex";
     }
 
+    // Hide the Confirmation Box
     function hideConfirmationBox() {
         document.getElementById("confirmationBox").style.display = "none";
     }
+
+    // Validate the signature before form submission
+    function validateSignature() {
+        const signatureUpload = document.getElementById('signatureUpload');
+        if (!signatureUpload.files.length) {
+            alert('Please upload your signature before proceeding.');
+            return false;
+        }
+        return true;
+    }
 </script>
+
 
 <!-- Borrower Profile Modal -->
 <div class="modal fade" id="borrowerProfileModal" tabindex="-1" aria-labelledby="borrowerProfileModalLabel" aria-hidden="true">

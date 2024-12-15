@@ -25,6 +25,13 @@ if ($result->num_rows > 0) {
     // Calculate share_lender and format with 2 decimal places
     $response['share_lender'] = number_format($response['interest_earned'] - $response['share_admin'], 2, '.', ''); // Ensures two decimal places
 
+    // Multiply share_admin by days_to_next_deadline
+    if (isset($response['share_admin']) && isset($response['days_to_next_deadline'])) {
+        $response['share_admin_calculation'] = number_format($response['share_admin'] * $response['days_to_next_deadline'], 2, '.', ''); // Format the result with 2 decimal places
+    } else {
+        $response['share_admin_calculation'] = 0; // Set to 0 if values are not set
+    }
+
     // Handle next_deadline as a comma-separated string
     if (!empty($response['next_deadline'])) {
         // Convert the comma-separated string into an array

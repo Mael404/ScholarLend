@@ -616,7 +616,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <p>Date Funded: <span id="modalDateFunded"></span></p>
                     <p>Total Interest: <span id="modalTotalInterest"></span></p>
                     <p>Share of Lender: <span id="modalShareLender"></span></p>
-                    <p>Share of Admin: <span id="modalShareAdmin"></span></p>
+                    <p>Share of Admin every payment: <span id="modalShareAdmin"></span></p>
                     <p>Transaction Fee: <span id="modalTransactionFee"></span></p>
                 </div>
 
@@ -665,7 +665,7 @@ document.getElementById('modalDateFunded').textContent = formattedDate;
             document.getElementById('modalTotalInterest').textContent = data.interest_earned;
             document.getElementById('modalShareLender').textContent = data.share_lender;
             document.getElementById('modalShareAdmin').textContent = data.share_admin;
-            document.getElementById('modalTransactionFee').textContent = '30';
+            document.getElementById('modalTransactionFee').textContent = '15';
             document.getElementById('modalDeadlines').textContent = data.next_deadlines;
             // Retrieve the deadlines string from the element
 const deadlinesText = document.getElementById('modalDeadlines').textContent.trim();

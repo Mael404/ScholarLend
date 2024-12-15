@@ -241,7 +241,7 @@ $result = $conn->query($sql);
         <i class="lnr lnr-home me-2"></i> Home
     </a>
     <?php
-include'condb.php';
+include 'condb.php';
 
 // SQL query to count 'pending' statuses in the loan-deadlines table
 $sql = "SELECT COUNT(*) AS pending_count FROM borrower_info WHERE status = 'invested' OR status = 'pending'";
@@ -268,7 +268,7 @@ $conn->close();
         <i class="lnr lnr-briefcase me-2"></i>Lenders
     </a>
     <?php
-include'condb.php';
+include 'condb.php';
 
 // SQL query to count 'pending' statuses in the loan-deadlines table
 $sql = "SELECT COUNT(*) AS pending_count FROM loan_deadlines WHERE status = 'pending'";
@@ -361,7 +361,7 @@ $conn->close();
     }
 </style>
 <?php
-// Database connection
+
 $servername = "localhost";
 $username = "username";
 $password = "password";

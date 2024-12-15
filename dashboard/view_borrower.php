@@ -198,23 +198,31 @@ if ($result->num_rows > 0) {
 
     // Add the scores and credit score category to the response
     
-    $row['credit_score'] = $credit_score;
-    $row['credit_category'] = $credit_category;
-    $row['yearsofstudy_score'] = $yearsofstudy_score;
-    $row['gwa_score'] = $gwa_score;
-    $row['school_community_score'] = $school_community_score;
-    $row['spending_pattern_score'] = $spending_pattern_score;
-    $row['loan_purpose_score'] = $loan_purpose_score;
-    $row['loan_amount_score'] = $loan_amount_score;
-    $row['monthly_allowance_score'] = $monthly_allowance_score;
-    $row['source_of_allowance_score'] = $source_of_allowance_score;
-    $row['expense_score'] = $expense_score;
-
-    echo json_encode($row); // Return the row as a JSON object
-    
+  // Update the credit_score column in the database
+  $update_query = "UPDATE borrower_info SET credit_score = '$credit_category' WHERE transaction_id = $user_id";
+  if ($conn->query($update_query) === TRUE) {
+      // Preserve individual score breakdown in the response
+      $row['credit_score'] = $credit_score;
+      $row['credit_category'] = $credit_category;
+      $row['yearsofstudy_score'] = $yearsofstudy_score;
+      $row['gwa_score'] = $gwa_score;
+      $row['school_community_score'] = $school_community_score;
+      $row['spending_pattern_score'] = $spending_pattern_score;
+      $row['loan_purpose_score'] = $loan_purpose_score;
+      $row['loan_amount_score'] = $loan_amount_score;
+      $row['monthly_allowance_score'] = $monthly_allowance_score;
+      $row['source_of_allowance_score'] = $source_of_allowance_score;
+      $row['expense_score'] = $expense_score; // Fix the name here
+      
+ 
+  
+  
 } else {
-    echo json_encode(['error' => 'No borrower found with the given ID.']);
+    echo json_encode(['error' => 'Failed to update credit score in the database.']);
+    $conn->close();
+    exit;
 }
+}
+echo json_encode($row); // Return the row as a JSON object
 
-$conn->close();
 ?>

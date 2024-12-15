@@ -49,7 +49,7 @@
           <li><a href="#services">Services</a></li>
           
           <li><a href="#contact">Contact</a></li>
-          <li><a href="login.html">Log-in</a></li>
+          <li><a href="login.php">Log-in</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
@@ -133,21 +133,142 @@
 
       <div class="d-grid gap-2 mt-3">
         <button type="submit" class="btn btn-primary" id="submitBtn" style="background: #caac82; border-color: #caac82; font-size: 0.9rem;">Create Account</button>
-        <a href="login.html" class="btn btn-outline-primary" style="color: #caac82; border-color: #caac82; font-size: 0.9rem;">Log In</a>
+        <a href="login.php" class="btn btn-outline-primary" style="color: #caac82; border-color: #caac82; font-size: 0.9rem;">Log In</a>
       </div>
     </form>
 
 
-         <!-- MODALS -->
+  <!-- MODALS -->
 <div class="modal fade" id="accountModal" tabindex="-1" aria-labelledby="accountModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
+  <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="accountModalLabel" style="font-family: 'Times New Roman', Times, serif; color:#caac82;">Oops, one more thing</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <p>To finish creating your account, please agree to the user terms and conditions:</p>
+          <!-- edit for borrower -->
+          <p>To finish creating your account, please agree to the user terms and conditions:</p>
+<h6>Terms and Conditions for Borrowers</h6>
+<p>
+  These Terms and Conditions govern the use of the Peer-to-Peer (P2P) Microloan Platform (hereinafter referred to as the "ScholarLend") by borrowers ("you" or "Borrower"). By registering as a Borrower on the Platform, you agree to comply with and be bound by the following terms. Please read them carefully before proceeding.
+</p>
+
+<h6>GENERAL TERMS AND CONDITIONS</h6>
+<h6>Eligibility Requirements</h6>
+<ul>
+  <li>You must be a bona fide student of Bicol University and at least 18 years of age to be bound by this contract.</li>
+  <li>You must have a valid university ID and an active student number to verify your status as a student.</li>
+</ul>
+
+<h6>Platform User Obligations</h6>
+<ul>
+  <li>You agree to act in good faith and in accordance with ScholarLend's rules and regulations.</li>
+  <li>You must not engage in any activity that could harm the reputation of ScholarLend or the student community.</li>
+</ul>
+
+<h6>ACCOUNT CREATION AND MANAGEMENT</h6>
+<h6>Account Setup Information</h6>
+<p>
+  In creating an account in ScholarLend, accurate and complete personal information must be provided as required during the registration process. You are responsible for updating changes in your account information.
+</p>
+
+<h6>Account Management</h6>
+<p>
+  You are responsible for the management of your account login information and for all activities that occur under your account.
+</p>
+
+<h6>BORROWING TERMS AND CONDITION</h6>
+<h6>Loan Application</h6>
+<p>
+  In submitting a loan application, you must provide accurate and complete personal information, financial information, loan information, payment details as required in the application form. You have the right to select a loan amount ranging from P500 to P5000 and select your preferred payment schedule.
+</p>
+<p>
+  For installment loans with daily payments, you are required to borrow for a minimum period of 5 days, meaning you cannot select a repayment schedule with fewer than 5 daily payments.
+</p>
+<p>
+  When applying for a loan application, you are required to pay a transaction fee of PHP 15.00. This fee will be deducted from the proceeds you will receive at the time of the loan disbursement.
+</p>
+
+<h6>Access to your Information</h6>
+<p>
+  Lenders will be notified of your loan application. Loan pertinent information will be made available to the lender to allow him/her to make informed loan decisions. This includes loan details, payment terms, credit score breakdown, and academic transcript.
+</p>
+
+<h6>Loan Contract</h6>
+<p>
+  A loan contract will be presented to you, and you will be required to electronically affix your signature to the contract prior to submitting your application for review and approval.
+</p>
+<p>
+  You acknowledge and agree that the lender who will fund your loan application shall be the other party to this contract. You further agree that the identity of this party will be disclosed to you only after the loan has been successfully disbursed.
+</p>
+<p>
+  By affixing your signature, you acknowledge and consent that your personal information, including your name, address, loan details, and payment information will be made available to other parties of the contract.
+</p>
+<p>
+  The loan contract binds you to repay the loan in accordance with the terms specified in the loan agreement, including the payment of interest as outlined therein. You further agree to abide by the details and conditions set forth in the loan application you have submitted.
+</p>
+<p>
+  Any violation of the terms and conditions of the loan contract, including failure to make timely repayments or misrepresentation of information, will constitute a breach of contract, which may result in legal action and penalties.
+</p>
+
+<h6>Loan Repayment</h6>
+<p>
+  You must strictly comply with the repayment schedule of your loan. You must ensure that after paying your outstanding balance, upload the GCash receipt for verification.
+</p>
+<p>
+  ScholarLend will notify you of upcoming repayment deadlines and allow you to track your repayment progress.
+</p>
+<p>
+  Failure to pay on time will constitute a surcharge of an amount double the interest to be paid for that scheduled payment date.
+</p>
+<p>
+  Payment of an installment in advance will still require you to pay the interest that would have accrued up to the scheduled payment date.
+</p>
+<p>
+  If you choose to make an early lump-sum payment, you will be required to pay the principal, interest, and an early payment fee of 5% of the outstanding balance, as this alters the agreed-upon payment terms and ensures the lender receives the expected interest.
+</p>
+
+<h6>DATA PROTECTION AND PRIVACY POLICY</h6>
+<h6>Data Collection and Usage</h6>
+<p>
+  We collect and process your personal data to administer and manage your account in ScholarLend and for the platform’s database and administrative records. This may include but is not limited to your name, contact information, date of birth, and any other information provided on this form.
+</p>
+
+<h6>Data Security</h6>
+<p>
+  We take the security of your personal data seriously. Your data will only be accessible to authorized officers for the purposes mentioned in this notice.
+</p>
+
+<h6>Data Retention</h6>
+<p>
+  Your personal data will be retained for as long as necessary to fulfill the purposes outlined in this notice or as required by applicable laws and regulations.
+</p>
+
+<h6>Data Sharing</h6>
+<p>
+  We will not sell, lease, or otherwise distribute your personal data to third parties for marketing or other unrelated purposes without your explicit consent.
+</p>
+
+<h6>Your Rights</h6>
+<p>
+  You have the right to request access to, correction of, or deletion of your personal data held by us. You may also request to limit the processing of your data or withdraw your consent at any time.
+</p>
+
+<h6>AMENDMENT AND TERMINATION</h6>
+<h6>Amendments</h6>
+<p>
+  ScholarLend reserves the right to amend these Terms and Conditions at any time. You will be notified of any changes, and continued use of the ScholarLend constitutes acceptance of the revised terms.
+</p>
+
+<h6>Suspension and Termination</h6>
+<p>
+  ScholarLend reserves the right to suspend or terminate your account if you violate these Terms and Conditions or engage in any fraudulent or harmful activity.
+</p>
+
+<p>
+  By checking the box below, you acknowledge that you have read, understood, and agree to be bound by these Terms and Conditions. If you do not agree with these terms, please do not use the Platform.
+</p>
         <div class="form-check mb-3">
           <input class="form-check-input" type="checkbox" id="agreeTerms">
           <label class="form-check-label" for="agreeTerms">I agree to the terms and conditions (required)</label>
@@ -164,23 +285,6 @@
     </div>
   </div>
 </div>
-          <!-- Terms Notice Modal -->
-          <div class="modal fade" id="agreeTermsModal" tabindex="-1" aria-labelledby="agreeTermsModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="agreeTermsModalLabel">Notice</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  You must agree to the terms and conditions to proceed.
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
-                </div>
-              </div>
-            </div>
-          </div>
 
           <!-- Age Restriction Modal -->
 <div class="modal fade" id="ageModal" tabindex="-1" aria-labelledby="ageModalLabel" aria-hidden="true">

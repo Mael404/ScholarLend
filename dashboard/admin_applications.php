@@ -320,7 +320,10 @@ $result_pending = $conn->query($sql_pending);
 $pending_applicants = $result_pending->fetch_assoc()['pending_count'];
 
 // Count approved applicants
-$sql_approved = "SELECT COUNT(*) AS approved_count FROM borrower_info WHERE status != 'Pending'";
+$sql_approved = "SELECT COUNT(*) AS approved_count 
+                 FROM borrower_info 
+                 WHERE status NOT IN ('Pending', 'Rejected')";
+
 $result_approved = $conn->query($sql_approved);
 $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
 
@@ -422,39 +425,43 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
                 // Display Confirm button if status is "Pending"
                 if ($status === 'Pending') {
                     echo "
-                    <button type='button' class='btn btn-outline-success mx-1 uniform-button' onclick='checkApplicant(" . htmlspecialchars($row['transaction_id']) . ")'>
-                        <i class='fas fa-check'></i> Confirm
+                    <button type='button' class='btn btn-success mx-1' style='width: 70px; height: 40px;' onclick='checkApplicant(" . htmlspecialchars($row['transaction_id']) . ")'>
+                        <i class='fas fa-check'></i>
+                    </button>
+                    <button type='button' class='btn btn-danger mx-1' style='width: 70px; height: 40px;' onclick='rejectApplicant(" . htmlspecialchars($row['transaction_id']) . ")'>
+                        <i class='fas fa-times'></i>
                     </button>";
                 }
                 
+                
+                            
                 // Display Transfer Funds button if status is "Invested"
                 elseif ($status === 'Invested') {
                     echo "
-                    <button type='button' class='btn btn-outline-primary mx-1 uniform-button' onclick='transferFunds(" . htmlspecialchars($row['transaction_id']) . ")'>
-                        <i class='fas fa-exchange-alt'></i> Transfer Funds
-                    </button>";
+                    <button type='button' class='btn btn-primary mx-1 uniform-button' onclick='transferFunds(" . htmlspecialchars($row['transaction_id']) . ")'>
+    <i class='fas fa-exchange-alt'></i> Transfer Funds
+</button>";
+
                 }
                 
-                // Display disabled button if status is "Completed" or "Posted"
-                elseif ($status === 'Completed') {
-                    echo "
-                    <button type='button' class='btn btn-secondary mx-1 uniform-button' disabled>
-                        <i class='fas fa-check'></i> Loan Settled 
-                    </button>";
-                }  
-                elseif ($status === 'Fund Transferred') {
-                    echo "
-                    <button type='button' class='btn btn-secondary mx-1 uniform-button' disabled>
-                        <i class='fas fa-check'></i> Funded
-                    </button>";
-                } 
-                elseif ($status === 'Posted') {
-                    echo "
-                    <button type='button' class='btn btn-secondary mx-1 uniform-button' disabled>
-                        <i class='fas fa-check'></i> Approved
-                    </button>";
-                }    
-                
+              // Display disabled button if status is "Completed" or "Posted"
+if ($status === 'Completed') {
+    echo "
+    <button type='button' class='btn btn-secondary mx-1 uniform-button' disabled>
+        <i class='fas fa-check'></i> Loan Settled
+    </button>";
+} elseif ($status === 'Fund Transferred') {
+    echo "
+    <button type='button' class='btn btn-secondary mx-1 uniform-button' disabled>
+        <i class='fas fa-check'></i> Funded
+    </button>";
+} elseif ($status === 'Posted') {
+    echo "
+    <button type='button' class='btn btn-secondary mx-1 uniform-button' disabled>
+        <i class='fas fa-check'></i> Approved
+    </button>";
+}
+
 
                 echo "</td>";
                 echo "</tr>";
@@ -530,7 +537,8 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
             <td style="padding: 8px; border: 1px solid #ddd;">Expenses</td>
             <td id="modal-expenses_credit" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
             <td style="padding: 8px; border: 1px solid #ddd; text-align: center;">20</td>
-            <td id="expensesScore" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
+            <td id="monthly_expenzes" style="padding: 8px; border: 1px solid #ddd; text-align: center;"></td>
+            
         </tr>
         <tr>
             <td rowspan="2" style="padding: 8px; border: 1px solid #ddd; vertical-align: middle;">Alternative Data Points</td>
@@ -748,6 +756,21 @@ $approved_applicants = $result_approved->fetch_assoc()['approved_count'];
     
    
 <script>
+    function rejectApplicant(borrowerId) {
+    if (confirm('Are you sure you want to reject this borrower?')) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', 'reject_application.php', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                alert(xhr.responseText); // Display server response
+                location.reload(); // Refresh the page to reflect changes
+            }
+        };
+        xhr.send('id=' + borrowerId + '&status=Rejected');
+    }
+}
+
     function checkApplicant(borrowerId) {
     if (confirm('Are you sure you want to approve this borrower?')) {
         var xhr = new XMLHttpRequest();
@@ -950,7 +973,9 @@ document.getElementById('affiliatedOrganizationScore').textContent = data.school
 document.getElementById('spendingPatternScore').textContent = data.spending_pattern_score;
 document.getElementById('loanPurposeScore').textContent = data.loan_purpose_score;
 document.getElementById('loanAmountScore').textContent = data.loan_amount_score;
-document.getElementById('expensesScore').textContent = data.expense_score;
+document.getElementById('monthly_expenzes').textContent = data.expense_score;
+
+console.log(data.expense_score);
 
 
             }
