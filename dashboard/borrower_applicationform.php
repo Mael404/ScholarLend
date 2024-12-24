@@ -1181,6 +1181,7 @@ $conn->close();
                 <p>The parties agree as follows:</p>
                 <p><b>Loan Amount:</b> Lender agrees to loan Borrower the principal sum of <span id="loanAmountText"></span>, together with interest on the outstanding principal amount of the Loan, and in accordance with the terms set forth below.</p>
      
+       
 
 
 <p><b>Repayment of Loan:</b> (Check one.)</p>
@@ -1189,17 +1190,21 @@ $conn->close();
     <span id="dueDateText">________</span>.
 </p>
 <p>
-<input type="checkbox" id="installment" /> Installment Payments. The Loan together with accrued and unpaid interest shall be payable in installments equal to P <span id="installmentAmount"></span> [payment per installment]. The first payment is due on __________ and due thereafter in ______ [number of payments] equal consecutive: (Check one)
+<p>
+    Installment Payments. The Loan together with accrued and unpaid interest shall be payable in installments equal to ₱<span id="installmentAmount"></span>.
+    The first payment is due on <span id="firstPaymentDate"></span> and due thereafter in <span id="numberOfPayments"></span> equal consecutive payments: (Check one)
+</p>
+
 
 </p>
 <p>
  <input type="checkbox" id="dailyInstallments" /> Daily installments. Each successive payment is due every day until the entire loan is paid.
 </p>
 <p>
-    <input type="checkbox" id="weeklyInstallments" /> Weekly installments. Each successive payment is due every ________ [day of the week] of the week.
+    <input type="checkbox" id="weeklyInstallments" /> Weekly installments. Each successive payment is due every <span id="dayOftheWeek"></span> of the week.
 </p>
 <p>
-    <input type="checkbox" id="monthlyInstallments" /> Monthly installments. Each successive payment is due on the ____ day of the month.
+    <input type="checkbox" id="monthlyInstallments" /> Monthly installments. Each successive payment is due on the <span id="dayOftheMonth"></span> of the month.
 </p>
 <p><b>Interest:</b> The Borrower shall pay interest on the Loan at the rate of 5.5% per week on the Principal amount, or equivalent to ₱<span id="interestValue"></span>. 70% of the interest paid by the Borrower shall be received by the Lender, while the remaining 30% shall go to ScholarLend Inc.</p>
 
@@ -1232,7 +1237,7 @@ $conn->close();
         <td>
     <img src="admin.png" alt="Admin" style="width: 100%; max-width: 200px; margin-bottom: 0px;">
     
-    <div style="font-size: 14px; margin-top: 5px; text-align: center;">Eppeito Manaloto</div>
+    <div style="font-size: 14px; margin-top: 5px; text-align: center;">ROCHIEL GRACE S. YANSON</div>
     <div class="underline"></div>
 </td>
 
@@ -1386,6 +1391,7 @@ function calculateDueDates() {
     const options = { year: 'numeric', month: 'short', day: 'numeric' }; // Date format
     const dueDate = new Date(dueDateString);
 
+
     let tableHTML = `
         <table class="table table-bordered">
             <thead class="bg-dark text-white">
@@ -1399,6 +1405,15 @@ function calculateDueDates() {
 
     if (paymentMode === 'Lump Sum') {
         // For Lump Sum, only show the total amount and due date
+        console.log('Parsed Due Date:', dueDate); // Log the parsed date
+const formattedDate = dueDate.toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+// Set the value of the span
+document.getElementById('dueDateText').textContent = formattedDate;
         tableHTML += `
             <tr>
                 <td>${totalAmount}</td>
@@ -1407,43 +1422,92 @@ function calculateDueDates() {
         `;
     } else {
        // For Installments, calculate next deadlines
-let nextDeadlines = [];
-let today = new Date();
+       let nextDeadlines = [];
+
+let today = new Date(); // Get today's date
 
 if (frequency === 'Daily') {
-    let minStartDate = new Date(dueDate); // Start from the due date
-    minStartDate.setDate(minStartDate.getDate() - 5); // Subtract 5 days
+    let minStartDate = new Date(today); // Start from today
+    let lastDay = new Date(dueDate); // Ensure dueDate is a Date object
+    lastDay.setDate(lastDay.getDate() + 1); // Add 1 extra day to the end date
 
-    // Start the loop from the minimum start date (5 days before the due date)
-    while (minStartDate <= dueDate) {
-        nextDeadlines.push(new Date(minStartDate));
+    // Start the loop from today's date until the updated due date
+    while (minStartDate <= lastDay) {
+        nextDeadlines.push(new Date(minStartDate)); // Add the current date to the deadlines
         minStartDate.setDate(minStartDate.getDate() + 1); // Move to the next day
     }
 
+    // Display the first date in the span with id="firstPaymentDate"
+    if (nextDeadlines.length > 0) {
+        document.getElementById('firstPaymentDate').textContent = nextDeadlines[1].toDateString(); // First deadline is the first date in the array
+    }
 
-} else if (frequency === 'Weekly') {
+    // Store the total count of dates in the span with id="numberOfPayments"
+    document.getElementById('numberOfPayments').textContent = nextDeadlines.length - 1;
+
+}
+
+
+
+ else if (frequency === 'Weekly') {
+    let today = new Date(); // Start from the current date
     while (today <= dueDate) {
         nextDeadlines.push(new Date(today));
-        today.setDate(today.getDate() + 7);
+        today.setDate(today.getDate() + 7); // Move to the next week
     }
+
     // Advance the final date by 1 additional week
     if (nextDeadlines.length > 0) {
         let lastDate = new Date(nextDeadlines[nextDeadlines.length - 1]);
         lastDate.setDate(lastDate.getDate() + 7);
         nextDeadlines.push(lastDate);
     }
-} else if (frequency === 'Monthly') {
+
+    // Get the day of the week for the first payment date
+    if (nextDeadlines.length > 0) {
+        let firstPaymentDate = nextDeadlines[0];
+        let dayOfWeek = firstPaymentDate.toLocaleString('en-US', { weekday: 'long' }); // Get the full weekday name (e.g., "Monday")
+        
+        // Set the day of the week in the span with id="dayOftheWeek"
+        document.getElementById('dayOftheWeek').textContent = dayOfWeek;
+    }
+
+    if (nextDeadlines.length > 0) {
+        document.getElementById('firstPaymentDate').textContent = nextDeadlines[1].toDateString(); // First deadline is the first date in the array
+    }
+
+    document.getElementById('numberOfPayments').textContent = nextDeadlines.length - 1;
+}
+else if (frequency === 'Monthly') {
+    let today = new Date(); // Start from the current date
     while (today <= dueDate) {
         nextDeadlines.push(new Date(today));
-        today.setMonth(today.getMonth() + 1);
+        today.setMonth(today.getMonth() + 1); // Move to the next month
     }
+
     // Advance the final date by 1 additional month
     if (nextDeadlines.length > 0) {
         let lastDate = new Date(nextDeadlines[nextDeadlines.length - 1]);
         lastDate.setMonth(lastDate.getMonth() + 1);
         nextDeadlines.push(lastDate);
     }
+
+    // Get the day of the month for the first payment date
+    if (nextDeadlines.length > 0) {
+        let firstPaymentDate = nextDeadlines[0];
+        let dayOfMonth = firstPaymentDate.getDate(); // Get the day of the month (e.g., 15)
+
+        // Set the day of the month in the span with id="dayOftheMonth"
+        document.getElementById('dayOftheMonth').textContent = dayOfMonth;
+    }
+
+    if (nextDeadlines.length > 0) {
+        document.getElementById('firstPaymentDate').textContent = nextDeadlines[1].toDateString(); // First deadline is the first date in the array
+    }
+
+    document.getElementById('numberOfPayments').textContent = nextDeadlines.length - 1;
 }
+
 
 
 if (nextDeadlines.length > 0) {
@@ -1452,10 +1516,11 @@ if (nextDeadlines.length > 0) {
 
         // Add rows for installments
         const installmentAmount = (totalAmount / nextDeadlines.length).toFixed(2); // Divide total into installments
+
         const totalInstallmentAmount = (installmentAmount * nextDeadlines.length).toFixed(2); // Multiply by the number of deadlines
 
 // Insert the totalInstallmentAmount value into the HTML
-document.getElementById("installmentAmount").textContent = totalInstallmentAmount;
+    document.getElementById("installmentAmount").textContent = totalInstallmentAmount;
         nextDeadlines.forEach(date => {
             tableHTML += `
                 <tr>
@@ -1582,6 +1647,7 @@ document.getElementById('summaryModal').addEventListener('show.bs.modal', calcul
 
 <script>
  document.addEventListener('DOMContentLoaded', function () {
+    
     const paymentMode = document.getElementById('paymentMode');
     const frequencyContainer = document.getElementById('frequencyContainer');
     const paymentFrequency = document.getElementById('paymentFrequency');
@@ -1772,7 +1838,69 @@ document.getElementById('summaryModal').addEventListener('show.bs.modal', calcul
 
 </script>
 
+<script>
+    
+    document.addEventListener("DOMContentLoaded", function () {
+        // Dropdown elements
+        const paymentModeDropdown = document.getElementById("paymentMode");
+        const paymentFrequencyDropdown = document.getElementById("paymentFrequency");
+        const frequencyContainerDiv = document.getElementById("frequencyContainer");
 
+        // Checkbox elements
+        const singlePaymentCheckbox = document.getElementById("singlePayment");
+        const dailyInstallmentsCheckbox = document.getElementById("dailyInstallments");
+        const weeklyInstallmentsCheckbox = document.getElementById("weeklyInstallments");
+        const monthlyInstallmentsCheckbox = document.getElementById("monthlyInstallments");
+
+        // Handle payment mode selection
+        paymentModeDropdown.addEventListener("change", function () {
+            const selectedPaymentMode = paymentModeDropdown.value;
+
+            if (selectedPaymentMode === "Lump Sum") {
+                // Check "Single Payment" and reset others
+                singlePaymentCheckbox.checked = true;
+                dailyInstallmentsCheckbox.checked = false;
+                weeklyInstallmentsCheckbox.checked = false;
+                monthlyInstallmentsCheckbox.checked = false;
+
+                // Hide the frequency container
+                frequencyContainerDiv.style.display = "none";
+            } else if (selectedPaymentMode === "Installment") {
+                // Uncheck "Single Payment" and show frequency options
+                singlePaymentCheckbox.checked = false;
+                frequencyContainerDiv.style.display = "block";
+            } else {
+                // Reset all checkboxes and hide frequency container
+                singlePaymentCheckbox.checked = false;
+                dailyInstallmentsCheckbox.checked = false;
+                weeklyInstallmentsCheckbox.checked = false;
+                monthlyInstallmentsCheckbox.checked = false;
+
+                frequencyContainerDiv.style.display = "none";
+            }
+        });
+
+        // Handle payment frequency selection
+        paymentFrequencyDropdown.addEventListener("change", function () {
+            const selectedPaymentFrequency = paymentFrequencyDropdown.value;
+
+            // Reset all frequency-related checkboxes
+            dailyInstallmentsCheckbox.checked = false;
+            weeklyInstallmentsCheckbox.checked = false;
+            monthlyInstallmentsCheckbox.checked = false;
+
+            if (selectedPaymentFrequency === "Daily") {
+                dailyInstallmentsCheckbox.checked = true;
+            } else if (selectedPaymentFrequency === "Weekly") {
+                weeklyInstallmentsCheckbox.checked = true;
+            } else if (selectedPaymentFrequency === "Monthly") {
+                monthlyInstallmentsCheckbox.checked = true;
+            }
+        });
+    });
+
+
+</script>
 
     
 <script>

@@ -240,7 +240,7 @@ $result = $conn->query($sql);
            
                   
             <div class="user-info d-flex align-items-center my-4 text-center">
-                <img src="red.jpg" alt="User Profile Picture" class="img-fluid rounded-circle" style="width: 50px; height: 50px; margin-right: 10px;">
+                <img src="iconnn.png" alt="User Profile Picture" class="img-fluid rounded-circle" style="width: 50px; height: 50px; margin-right: 10px;">
                 <div class="user-details">
     <div class="username">
         <?php 

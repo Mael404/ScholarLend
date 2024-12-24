@@ -374,7 +374,7 @@ function maskName($name) {
             </div>
             <div class="modal-body">
             <p><b>THE PARTIES</b></p>
-                <p>This peer-to-peer lending agreement made as of ___________, (the “Effective Date”) by and between:</p>
+            <p>This peer-to-peer lending agreement made as of <span id="effectiveDate">__________</span>, (the “Effective Date”) by and between:</p>
                 <p><b>Lender:</b></p>
                 <?php
 
@@ -436,6 +436,18 @@ $conn->close();
 
 ?>
 
+
+
+<p><b>Intermediary:</b></p>
+<p>ScholarLend, Inc.<br>
+[Address]<br>
+[City, State, Zip Code]<br>
+[Phone Number]<br>
+[Email Address]</p>
+
+<p>The parties agree as follows:</p>
+
+
 <?php
 
 $servername = "localhost"; // Replace with your server name
@@ -455,8 +467,8 @@ if ($conn->connect_error) {
 if (isset($_GET['transaction_id'])) {
     $transaction_id = $_GET['transaction_id'];
 
-    // Query to fetch borrower's details and payment info using the transaction_id
-    $sql = "SELECT fname, mname, lname, current_address, cellphonenumber, email, payment_mode, payment_frequency, total_amount, next_deadlines, days_to_next_deadline, interest_earned, loan_amount
+    // Query to fetch borrower's details, payment mode, payment frequency, loan amount, next deadlines, and days_to_next_deadline using the transaction_id
+    $sql = "SELECT fname, mname, lname, current_address, cellphonenumber, email, loan_amount, payment_mode, payment_frequency, next_deadlines, days_to_next_deadline
             FROM borrower_info 
             WHERE transaction_id = ?";
 
@@ -470,13 +482,6 @@ if (isset($_GET['transaction_id'])) {
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
 
-        // Debugging: check if loan_amount exists in the database result
-        if (isset($row['loan_amount'])) {
-          
-        } else {
-            echo "Loan amount is not set in the database."; // In case it's missing in the database
-        }
-
         // Capitalize the first letter of each part of the name
         $borrower_name = ucwords(strtolower($row['fname'])) . ' ' . 
                          ucwords(strtolower($row['mname'])) . ' ' . 
@@ -485,90 +490,49 @@ if (isset($_GET['transaction_id'])) {
         $address = $row['current_address'];
         $phone_number = $row['cellphonenumber'];
         $email = $row['email'];
+        $loan_amount = number_format($row['loan_amount'], 2); // Format the loan amount
+        $payment_mode = $row['payment_mode'];
+        $payment_frequency = $row['payment_frequency'];
 
-        // Get payment mode and frequency
-        $payment_mode = strtolower(trim($row['payment_mode'])); // Convert to lowercase and trim spaces
-        $payment_frequency = strtolower(trim($row['payment_frequency'])); // Same for frequency
-
-        // Get loan details
-        $total_amount = $row['total_amount'];
-        $loan_amount = $row['loan_amount']; // Retrieve loan_amount from the database
+        // Get next deadlines (this column stores multiple dates separated by commas)
         $next_deadlines = $row['next_deadlines'];
+        $deadline_dates = explode(',', $next_deadlines); // Split by commas into an array
+        $first_deadline = isset($deadline_dates[0]) ? $deadline_dates[0] : ''; // First deadline
+
+        // Get days to next deadline
         $days_to_next_deadline = $row['days_to_next_deadline'];
-        $interest_earned = $row['interest_earned']; // Get the interest earned value
 
-        // Split next_deadlines into an array (if multiple dates exist)
-        $next_deadlines_array = explode(",", $next_deadlines);
-        $first_payment_due_date = trim($next_deadlines_array[0]);
-
-        // Initialize repayment details
-        $single_payment_checked = "";
-        $installment_payment_checked = "";
-        $daily_checked = "";
-        $weekly_checked = "";
-        $monthly_checked = "";
-        $payment_per_installment = $total_amount; // Payment per installment is the total_amount
-        $payment_due_date = $first_payment_due_date; // First payment date is the first date from next_deadlines
-        $num_of_payments = $days_to_next_deadline; // Number of payments is the value from days_to_next_deadline
-
-        // Initialize the day of the month for monthly installments
-        $payment_day_of_month = "";
-        $payment_day_of_week = "";
-
-        // Check the payment mode and frequency, and set the correct checkbox
-        if ($payment_mode == 'lump sum') {
-            $single_payment_checked = "checked";
-            // For lump sum, empty the values and replace them with "____"
-            $payment_per_installment = "____";
-          
-            $num_of_payments = "____";
-        } elseif ($payment_mode == 'installment') {
-            $installment_payment_checked = "checked";
-            
-            if ($payment_frequency == 'daily') {
-                $daily_checked = "checked";
-            } elseif ($payment_frequency == 'weekly') {
-                $weekly_checked = "checked";
-                // Get the day of the week for the first payment due date (weekly)
-                $payment_day_of_week = date('l', strtotime($first_payment_due_date)); // 'l' gives the full textual representation of the day
-            } elseif ($payment_frequency == 'monthly') {
-                $monthly_checked = "checked";
-                // Get the day of the month for the first payment due date (monthly)
-                $payment_day_of_month = date('j', strtotime($first_payment_due_date)); // 'j' returns the day of the month without leading zeros
-            }
-        }
-
-        // Output the borrower details and repayment section along with other contract details
+        // Output borrower details
         echo "<p><b>Borrower:</b></p>
               <p>$borrower_name<br>
               $address<br>
               $phone_number<br>
-              $email</p>
+              $email</p>";
+   // Output loan amount in the desired format
+   echo "<p><b>Loan Amount:</b> Lender agrees to loan Borrower the principal sum of P <span id='loanAmountText'>$loan_amount</span>, together with interest on the outstanding principal amount of the Loan, and in accordance with the terms set forth below.</p>";
+        // Output loan amount in the desired format
+        echo "<p><input type='checkbox' class='custom-checkbox' " . ($payment_mode == 'Installment' ? 'checked disabled' : 'disabled') . "> Installment Payments. The Loan together with accrued and unpaid interest shall be payable in installments equal to P$total_amount [payment per installment]. The first payment is due on $first_deadline and due thereafter in $days_to_next_deadline [number of payments] equal consecutive: </p>";
 
-              <p><b>Intermediary:</b></p>
-              <p>ScholarLend, Inc.<br>
-              JRA Building, Rizal St. Daraga <br>
-              Albay, Philippines 4501<br>
-              09510053831 <br>
-              [Email Address]</p>
 
-              <p>The parties agree as follows:</p>
+        // Output the repayment options with checkboxes (All options will be displayed)
+        echo "<p><b>Repayment of Loan:</b></p>";
 
-              <p><b>Loan Amount:</b> Lender agrees to loan Borrower the principal sum of P <span id='loanAmountText'>" . number_format($loan_amount, 2) . "</span>, together with interest on the outstanding principal amount of the Loan, and in accordance with the terms set forth below.</p>
+        // Single Payment checkbox
+        echo "<p><input type='checkbox' class='custom-checkbox' " . ($payment_mode == 'Lump sum' ? 'checked disabled' : 'disabled') . "> Single Payment. The Loan together with accrued and unpaid interest is due and payable on ________ [date of payment].</p>";
 
-              <p><b>Repayment of Loan:</b> (Check one.)</p>
-              <p><input type='checkbox' class='custom-checkbox' $single_payment_checked> Single Payment. The Loan together with accrued and unpaid interest is due and payable on $payment_due_date.</p>
-              <p><input type='checkbox' class='custom-checkbox' $installment_payment_checked> Installment Payments. The Loan together with accrued and unpaid interest shall be payable in installments equal to P $payment_per_installment. The first payment is due on $payment_due_date and due thereafter in $num_of_payments equal consecutive: </p>
-              <p><input type='checkbox' class='custom-checkbox' $daily_checked> Daily installments. Each successive payment is due every day until the entire loan is paid.</p>
-              <p><input type='checkbox' class='custom-checkbox' $weekly_checked> Weekly installments. Each successive payment is due every $payment_day_of_week of the week.</p>
-              <p><input type='checkbox' class='custom-checkbox' $monthly_checked> Monthly installments. Each successive payment is due on the $payment_day_of_month day of the month.</p>
+        // Installment Payments checkbox
+        echo "<p><input type='checkbox' class='custom-checkbox' " . ($payment_mode == 'Installment' ? 'checked disabled' : 'disabled') . "> Installment Payments. The Loan together with accrued and unpaid interest shall be payable in installments equal to P$loan_amount [payment per installment]. The first payment is due on $first_deadline and due thereafter in $days_to_next_deadline [number of payments] equal consecutive: </p>";
 
-              <p><b>Interest:</b> The Borrower shall pay interest on the Loan at the rate of 5.5% per week on the Principal amount, or equivalent to P $interest_earned. 70% of the interest paid by the Borrower shall be received by the Lender, while the remaining 30% shall go to ScholarLend Inc.</p>
 
-              <p><b>Transaction Fee:</b> Upon perfection of the loan agreement, the Borrower shall pay a one-time transaction fee of P15 to be deducted from the principal amount borrowed. This transaction fee shall go to ScholarLend Inc.</p>
+        // For installment payments, fill in the first, second, and third blanks
+        if ($payment_mode == 'Installment') {
+            
 
-              <p><b>Security:</b> The loan is secured by collateral. Borrower agrees that until the Loan together with interest is paid in full. The Loan is secured by ________.</p>";
-
+            // Payment frequency options
+            echo "<p><input type='checkbox' class='custom-checkbox' " . ($payment_frequency == 'Daily' ? 'checked disabled' : 'disabled') . "> Daily installments. Each successive payment is due everyday until the entire loan is paid.</p>";
+            echo "<p><input type='checkbox' class='custom-checkbox' " . ($payment_frequency == 'Weekly' ? 'checked disabled' : 'disabled') . "> Weekly installments. Each successive payment is due every ________ [day of the week] of the week.</p>";
+            echo "<p><input type='checkbox' class='custom-checkbox' " . ($payment_frequency == 'Monthly' ? 'checked disabled' : 'disabled') . "> Monthly installments. Each successive payment is due on the ____ day of the month.</p>";
+        }
     } else {
         echo "No borrower found for the given transaction ID.";
     }
@@ -579,11 +543,65 @@ if (isset($_GET['transaction_id'])) {
 }
 
 $conn->close();
+
 ?>
 
 
 
-          
+<!-- Custom CSS to style the checkboxes -->
+<style>
+    .custom-checkbox {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid #000; /* Black border */
+        border-radius: 4px;
+        position: relative;
+        cursor: pointer;
+        margin-right: 10px;
+        vertical-align: middle;
+        background-color: #fff; /* White background */
+    }
+
+    .custom-checkbox:checked {
+        background-color: #000; /* Black background when checked */
+        border-color: #000; /* Black border when checked */
+    }
+
+    .custom-checkbox:checked::after {
+        content: "✔"; /* Checkmark */
+        color: #000 !important; /* Force black color for checkmark */
+        position: absolute;
+        top: -2px; /* Adjusted to center */
+        left: 3px; /* Adjusted to center */
+        font-size: 16px; /* Larger checkmark */
+        text-decoration: none; /* Remove any underline or other styles */
+    }
+
+    .custom-checkbox:disabled {
+        cursor: not-allowed;
+        opacity: 0.6;
+        border-color: #000; /* Black border for disabled */
+        background-color: #fff; /* White background for disabled */
+    }
+
+    p {
+        margin: 10px 0;
+    }
+</style>
+
+
+
+
+
+                <p><b>Interest:</b> The Borrower shall pay interest on the Loan at the rate of 5.5% per week on the Principal amount, or equivalent to P__________. 70% of the interest paid by the Borrower shall be received by the Lender, while the remaining 30% shall go to ScholarLend Inc.</p>
+
+                <p><b>Transaction Fee:</b> Upon perfection of the loan agreement, the Borrower shall pay a one-time transaction fee of P15 to be deducted from the principal amount borrowed. This transaction fee shall go to ScholarLend Inc.</p>
+
+                <p><b>Security:</b> The loan is secured by collateral. Borrower agrees that until the Loan together with interest is paid in full. The Loan is secured by ________.</p>
+
                 <p><b>Intermediary:</b> ScholarLend shall serve as the intermediary between the Lender and Buyer. The receipt, approval, withholding and disbursement process shall be the responsibility of the said Corporation.</p>
 
                 <p><b>Default:</b> Failure to pay on the agreed date/s of payment shall subject the unpaid amount to a penalty rate of eleven percent (11%) per week, until fully paid.</p>
@@ -963,7 +981,19 @@ $conn->close();
 
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
+  <script>
+        // Function to format the date as "December 20, 2024"
+        function getFormattedDate() {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const currentDate = new Date();
+            return currentDate.toLocaleDateString('en-US', options);
+        }
 
+        // Inject the current date into the paragraph
+        window.onload = function() {
+            document.getElementById("effectiveDate").innerText = getFormattedDate();
+        };
+    </script>
    <script>
 document.addEventListener("DOMContentLoaded", function () {
   const repaymentLink = document.querySelector("#detailedRepaymentSchedule");

@@ -176,7 +176,7 @@ include 'display_user_wallet.php';
 
 <?php
 // Connect to the database
-$pdo = new PDO("mysql:host=localhost;dbname=scholarlend_db", "username", "password");
+$pdo = new PDO("mysql:host=localhost;dbname=scholarlend_db", "root", "");
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 

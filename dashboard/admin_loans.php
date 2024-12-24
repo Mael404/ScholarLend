@@ -250,7 +250,7 @@ $result = $conn->query($sql);
             <div class="user-info d-flex align-items-center my-4 text-center">
         
 
-                <img src="red.jpg" alt="User Profile Picture" class="img-fluid rounded-circle" style="width: 50px; height: 50px; margin-right: 10px;">
+                <img src="iconnn.png" alt="User Profile Picture" class="img-fluid rounded-circle" style="width: 50px; height: 50px; margin-right: 10px;">
                 <div class="user-details">
                     <div class="username">
                         <?php 
@@ -616,7 +616,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     <p>Date Funded: <span id="modalDateFunded"></span></p>
                     <p>Total Interest: <span id="modalTotalInterest"></span></p>
                     <p>Share of Lender: <span id="modalShareLender"></span></p>
-                    <p>Share of Admin every payment: <span id="modalShareAdmin"></span></p>
+                    <p>Share of Admin: <span id="modalShareAdmin"></span></p>
                     <p>Transaction Fee: <span id="modalTransactionFee"></span></p>
                 </div>
 
@@ -650,32 +650,34 @@ function performAction(transactionId) {
             document.getElementById('modalOtherone').textContent = data.loan_amount;
             document.getElementById('modalPaymentMode').textContent = data.payment_mode;
             document.getElementById('modalLenderName').textContent = data.lender_name;
-            
-const date = new Date(data.created_at);
 
+            const date = new Date(data.created_at);
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            const formattedDate = date.toLocaleDateString('en-US', options);
 
-const options = { year: 'numeric', month: 'long', day: 'numeric' };
-
-// Format the date
-const formattedDate = date.toLocaleDateString('en-US', options);
-
-// Set the formatted date to the modal
-document.getElementById('modalDateFunded').textContent = formattedDate;
+            // Set the formatted date to the modal
+            document.getElementById('modalDateFunded').textContent = formattedDate;
 
             document.getElementById('modalTotalInterest').textContent = data.interest_earned;
             document.getElementById('modalShareLender').textContent = data.share_lender;
-            document.getElementById('modalShareAdmin').textContent = data.share_admin;
+
+            // Multiply share_admin by the count of next_deadlines
+            const shareAdmin = parseFloat(data.share_admin);
+            const nextDeadlines = data.next_deadlines.trim();
+
+            // Assuming deadlines are separated by commas, split the string into an array
+            const deadlinesArray = nextDeadlines.split(','); // Adjust delimiter if necessary
+
+            // Calculate the final value for modalShareAdmin
+            const finalShareAdmin = shareAdmin * deadlinesArray.length;
+            document.getElementById('modalShareAdmin').textContent = finalShareAdmin.toFixed(2); // Display with two decimals
+
             document.getElementById('modalTransactionFee').textContent = '15';
             document.getElementById('modalDeadlines').textContent = data.next_deadlines;
-            // Retrieve the deadlines string from the element
-const deadlinesText = document.getElementById('modalDeadlines').textContent.trim();
-
-         
-
-
         })  
         .catch(error => console.error('Error fetching loan details:', error));
 }
+
 </script>
 
 

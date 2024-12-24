@@ -250,7 +250,7 @@ $result = $conn->query($sql);
             <div class="user-info d-flex align-items-center my-4 text-center">
         
 
-                <img src="red.jpg" alt="User Profile Picture" class="img-fluid rounded-circle" style="width: 50px; height: 50px; margin-right: 10px;">
+                <img src="iconnn.png" alt="User Profile Picture" class="img-fluid rounded-circle" style="width: 50px; height: 50px; margin-right: 10px;">
                 <div class="user-details">
                     <div class="username">
                         <?php 
@@ -591,7 +591,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             <td><span id="modalShareLender"></span></td>
                         </tr>
                         <tr>
-                            <th>Share of Admin every payment:</th>
+                            <th>Share of Admin</th>
                             <td><span id="modalShareAdmin"></span></td>
                         </tr>
                         <tr>
@@ -632,6 +632,18 @@ function performAction(transactionId) {
             document.getElementById('modalShareLender').textContent = data.share_lender;
             document.getElementById('modalShareAdmin').textContent = data.share_admin;
             document.getElementById('modalTransactionFee').textContent = '15';
+
+            // Handle the next_deadlines and share_admin multiplication
+            const shareAdmin = parseFloat(data.share_admin);
+            const nextDeadlines = data.next_deadlines.trim();
+            
+            // Assuming deadlines are separated by commas, split the string into an array
+            const deadlinesArray = nextDeadlines.split(','); // Adjust delimiter if necessary
+
+            // Calculate the final value for modalShareAdmin
+            const finalShareAdmin = shareAdmin * deadlinesArray.length;
+            document.getElementById('modalShareAdmin').textContent = finalShareAdmin.toFixed(2); // Display with two decimals
+
             document.getElementById('modalDeadlines').textContent = data.next_deadlines;
         })
         .catch(error => console.error('Error fetching loan details:', error));
